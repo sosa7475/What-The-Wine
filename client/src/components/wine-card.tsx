@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Info, Star, Trash2 } from "lucide-react";
-import type { Wine } from "@shared/schema";
+import { Heart, Info, Star, Trash2, Wine } from "lucide-react";
+import type { Wine as WineType } from "@shared/schema";
 
 interface WineCardProps {
-  wine: Wine;
+  wine: WineType;
   onSave?: () => void;
   onRemove?: () => void;
   onViewDetails?: () => void;
@@ -78,7 +78,7 @@ export default function WineCard({
           <div className="mb-4">
             <p className="text-sm font-medium text-burgundy-700 mb-2">Food Pairings:</p>
             <div className="flex flex-wrap gap-1">
-              {wine.foodPairings.slice(0, 3).map((pairing, index) => (
+              {wine.foodPairings.slice(0, 3).map((pairing: string, index: number) => (
                 <Badge key={index} variant="outline" className="text-xs">
                   {pairing}
                 </Badge>

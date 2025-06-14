@@ -50,7 +50,7 @@ export default function WineRecommendations() {
   const saveWineMutation = useMutation({
     mutationFn: ({ wineId }: { wineId: number }) => addWineToLibrary(1, wineId),
     onSuccess: (_, { wineId }) => {
-      setSavedWines(prev => new Set([...prev, wineId]));
+      setSavedWines(prev => new Set(Array.from(prev).concat(wineId)));
       toast({
         title: "Wine Saved",
         description: "Added to your wine library!",
@@ -181,7 +181,7 @@ export default function WineRecommendations() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">No preference</SelectItem>
+                          <SelectItem value="no-preference">No preference</SelectItem>
                           <SelectItem value="red">Red wine</SelectItem>
                           <SelectItem value="white">White wine</SelectItem>
                           <SelectItem value="rose">Rosé</SelectItem>
