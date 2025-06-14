@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --background: hsl(45, 25%, 98%);
+  --foreground: hsl(355, 50%, 15%);
+  --muted: hsl(45, 15%, 94%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(355, 50%, 15%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(355, 50%, 15%);
+  --border: hsl(45, 20%, 90%);
+  --input: hsl(45, 20%, 90%);
+  --primary: hsl(355, 75%, 32%);
+  --primary-foreground: hsl(45, 25%, 98%);
+  --secondary: hsl(45, 15%, 94%);
+  --secondary-foreground: hsl(355, 50%, 15%);
+  --accent: hsl(45, 15%, 94%);
+  --accent-foreground: hsl(355, 50%, 15%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(355, 75%, 32%);
+  --radius: 0.5rem;
+  
+  /* Custom burgundy and creme colors */
+  --burgundy-50: hsl(355, 100%, 97%);
+  --burgundy-100: hsl(355, 100%, 94%);
+  --burgundy-500: hsl(355, 75%, 32%);
+  --burgundy-600: hsl(355, 100%, 25%);
+  --burgundy-700: hsl(355, 45%, 28%);
+  --burgundy-900: hsl(355, 65%, 18%);
+  
+  --creme-50: hsl(45, 25%, 98%);
+  --creme-100: hsl(48, 75%, 88%);
+  --creme-200: hsl(50, 60%, 85%);
+  --creme-300: hsl(48, 45%, 78%);
+  
+  --gold-400: hsl(43, 74%, 49%);
+  --gold-500: hsl(43, 89%, 38%);
+}
+
+.dark {
+  --background: hsl(355, 25%, 8%);
+  --foreground: hsl(45, 25%, 95%);
+  --muted: hsl(355, 15%, 15%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(355, 25%, 8%);
+  --popover-foreground: hsl(45, 25%, 95%);
+  --card: hsl(355, 25%, 8%);
+  --card-foreground: hsl(45, 25%, 95%);
+  --border: hsl(355, 15%, 20%);
+  --input: hsl(355, 15%, 20%);
+  --primary: hsl(355, 75%, 45%);
+  --primary-foreground: hsl(45, 25%, 98%);
+  --secondary: hsl(355, 15%, 15%);
+  --secondary-foreground: hsl(45, 25%, 95%);
+  --accent: hsl(355, 15%, 15%);
+  --accent-foreground: hsl(45, 25%, 95%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(45, 25%, 95%);
+  --ring: hsl(355, 75%, 45%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer utilities {
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .text-burgundy-50 { color: var(--burgundy-50); }
+  .text-burgundy-100 { color: var(--burgundy-100); }
+  .text-burgundy-500 { color: var(--burgundy-500); }
+  .text-burgundy-600 { color: var(--burgundy-600); } 
+  .text-burgundy-700 { color: var(--burgundy-700); }
+  .text-burgundy-900 { color: var(--burgundy-900); }
+  
+  .bg-burgundy-50 { background-color: var(--burgundy-50); }
+  .bg-burgundy-100 { background-color: var(--burgundy-100); }
+  .bg-burgundy-500 { background-color: var(--burgundy-500); }
+  .bg-burgundy-600 { background-color: var(--burgundy-600); }
+  .bg-burgundy-700 { background-color: var(--burgundy-700); }
+  .bg-burgundy-900 { background-color: var(--burgundy-900); }
+  
+  .border-burgundy-600 { border-color: var(--burgundy-600); }
+  .border-burgundy-500 { border-color: var(--burgundy-500); }
+  
+  .hover\:bg-burgundy-50:hover { background-color: var(--burgundy-50); }
+  .hover\:bg-burgundy-700:hover { background-color: var(--burgundy-700); }
+  .hover\:text-burgundy-600:hover { color: var(--burgundy-600); }
+  .hover\:text-burgundy-700:hover { color: var(--burgundy-700); }
+  
+  .text-creme-50 { color: var(--creme-50); }
+  .text-creme-100 { color: var(--creme-100); }
+  .text-creme-200 { color: var(--creme-200); }
+  .text-creme-300 { color: var(--creme-300); }
+  
+  .bg-creme-50 { background-color: var(--creme-50); }
+  .bg-creme-100 { background-color: var(--creme-100); }
+  .bg-creme-200 { background-color: var(--creme-200); }
+  .bg-creme-300 { background-color: var(--creme-300); }
+  
+  .border-creme-200 { border-color: var(--creme-200); }
+  .border-creme-300 { border-color: var(--creme-300); }
+  
+  .text-gold-400 { color: var(--gold-400); }
+  .text-gold-500 { color: var(--gold-500); }
+  .bg-gold-400 { background-color: var(--gold-400); }
+  .bg-gold-500 { background-color: var(--gold-500); }
+  .hover\:bg-gold-500:hover { background-color: var(--gold-500); }
+}
