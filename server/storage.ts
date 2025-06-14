@@ -5,6 +5,8 @@ import {
   type UserWineLibrary, type InsertUserWineLibrary,
   type WineRecommendation, type InsertWineRecommendation
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, desc, sql, ilike, or } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -30,134 +32,120 @@ export interface IStorage {
   getUserRecommendations(userId: number): Promise<WineRecommendation[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private wines: Map<number, Wine>;
-  private userWineLibrary: Map<number, UserWineLibrary>;
-  private wineRecommendations: Map<number, WineRecommendation>;
-  private currentUserId: number;
-  private currentWineId: number;
-  private currentLibraryId: number;
-  private currentRecommendationId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.wines = new Map();
-    this.userWineLibrary = new Map();
-    this.wineRecommendations = new Map();
-    this.currentUserId = 1;
-    this.currentWineId = 1;
-    this.currentLibraryId = 1;
-    this.currentRecommendationId = 1;
-  }
-
-  // User operations
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
-  // Wine operations
   async getWine(id: number): Promise<Wine | undefined> {
-    return this.wines.get(id);
+    const [wine] = await db.select().from(wines).where(eq(wines.id, id));
+    return wine || undefined;
   }
 
   async getWines(limit = 50, offset = 0): Promise<Wine[]> {
-    const allWines = Array.from(this.wines.values());
-    return allWines.slice(offset, offset + limit);
+    return await db.select().from(wines).limit(limit).offset(offset);
   }
 
   async createWine(insertWine: InsertWine): Promise<Wine> {
-    const id = this.currentWineId++;
-    const wine: Wine = { ...insertWine, id };
-    this.wines.set(id, wine);
+    const [wine] = await db
+      .insert(wines)
+      .values(insertWine)
+      .returning();
     return wine;
   }
 
   async searchWines(query: string): Promise<Wine[]> {
-    const searchTerm = query.toLowerCase();
-    return Array.from(this.wines.values()).filter(wine =>
-      wine.name.toLowerCase().includes(searchTerm) ||
-      wine.winery.toLowerCase().includes(searchTerm) ||
-      wine.region.toLowerCase().includes(searchTerm) ||
-      wine.type.toLowerCase().includes(searchTerm)
+    const searchTerm = `%${query.toLowerCase()}%`;
+    return await db.select().from(wines).where(
+      or(
+        ilike(wines.name, searchTerm),
+        ilike(wines.winery, searchTerm),
+        ilike(wines.region, searchTerm),
+        ilike(wines.type, searchTerm)
+      )
     );
   }
 
   async getWinesByType(type: string): Promise<Wine[]> {
-    return Array.from(this.wines.values()).filter(wine => 
-      wine.type.toLowerCase() === type.toLowerCase()
-    );
+    return await db.select().from(wines).where(eq(wines.type, type));
   }
 
-  // User wine library operations
   async getUserWineLibrary(userId: number): Promise<(UserWineLibrary & { wine: Wine })[]> {
-    const libraryEntries = Array.from(this.userWineLibrary.values())
-      .filter(entry => entry.userId === userId);
-    
-    return libraryEntries.map(entry => {
-      const wine = this.wines.get(entry.wineId);
-      if (!wine) throw new Error(`Wine with id ${entry.wineId} not found`);
-      return { ...entry, wine };
-    });
+    return await db
+      .select()
+      .from(userWineLibrary)
+      .leftJoin(wines, eq(userWineLibrary.wineId, wines.id))
+      .where(eq(userWineLibrary.userId, userId))
+      .then(results => 
+        results.map(result => ({
+          ...result.user_wine_library,
+          wine: result.wines!
+        }))
+      );
   }
 
   async addWineToLibrary(entry: InsertUserWineLibrary): Promise<UserWineLibrary> {
-    const id = this.currentLibraryId++;
-    const libraryEntry: UserWineLibrary = { 
-      ...entry, 
-      id, 
-      dateAdded: new Date() 
-    };
-    this.userWineLibrary.set(id, libraryEntry);
+    const [libraryEntry] = await db
+      .insert(userWineLibrary)
+      .values(entry)
+      .returning();
     return libraryEntry;
   }
 
   async removeWineFromLibrary(userId: number, wineId: number): Promise<boolean> {
-    const entry = Array.from(this.userWineLibrary.entries())
-      .find(([_, entry]) => entry.userId === userId && entry.wineId === wineId);
-    
-    if (entry) {
-      this.userWineLibrary.delete(entry[0]);
-      return true;
-    }
-    return false;
+    const result = await db
+      .delete(userWineLibrary)
+      .where(
+        and(
+          eq(userWineLibrary.userId, userId),
+          eq(userWineLibrary.wineId, wineId)
+        )
+      );
+    return (result.rowCount || 0) > 0;
   }
 
   async isWineInLibrary(userId: number, wineId: number): Promise<boolean> {
-    return Array.from(this.userWineLibrary.values())
-      .some(entry => entry.userId === userId && entry.wineId === wineId);
+    const [entry] = await db
+      .select()
+      .from(userWineLibrary)
+      .where(
+        and(
+          eq(userWineLibrary.userId, userId),
+          eq(userWineLibrary.wineId, wineId)
+        )
+      );
+    return !!entry;
   }
 
-  // Wine recommendation operations
   async saveWineRecommendation(recommendation: InsertWineRecommendation): Promise<WineRecommendation> {
-    const id = this.currentRecommendationId++;
-    const rec: WineRecommendation = { 
-      ...recommendation, 
-      id, 
-      createdAt: new Date() 
-    };
-    this.wineRecommendations.set(id, rec);
+    const [rec] = await db
+      .insert(wineRecommendations)
+      .values(recommendation)
+      .returning();
     return rec;
   }
 
   async getUserRecommendations(userId: number): Promise<WineRecommendation[]> {
-    return Array.from(this.wineRecommendations.values())
-      .filter(rec => rec.userId === userId)
-      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    return await db
+      .select()
+      .from(wineRecommendations)
+      .where(eq(wineRecommendations.userId, userId))
+      .orderBy(desc(wineRecommendations.createdAt));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
