@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera, Image as ImageIcon, Upload, Loader2 } from "lucide-react";
@@ -14,6 +14,7 @@ export default function WineScanner() {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const analysisMutation = useMutation({
     mutationFn: analyzeWineBottle,
@@ -38,6 +39,8 @@ export default function WineScanner() {
     mutationFn: () => addWineToLibrary(1, analyzedWine!.id),
     onSuccess: () => {
       setIsSaved(true);
+      // Invalidate library cache to refresh the wine library
+      queryClient.invalidateQueries({ queryKey: ["/api/library/1"] });
       toast({
         title: "Wine Saved",
         description: "Added to your wine library!",

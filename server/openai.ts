@@ -24,7 +24,7 @@ export async function getWineRecommendations(preferences: WinePreferences): Prom
       "description": "Detailed description of the wine",
       "tasteProfile": "Taste profile and notes",
       "foodPairings": ["pairing1", "pairing2", "pairing3"],
-      "imageUrl": "https://example.com/wine-image.jpg",
+      "imageUrl": "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400",
       "alcoholContent": 13.5,
       "servingTemp": "16-18°C",
       "source": "recommendation"
@@ -39,7 +39,7 @@ User preferences:
 - Wine Type: ${preferences.wineType || 'Any'}
 - Additional Preferences: ${preferences.preferences || 'None'}
 
-Please provide real, high-quality wine recommendations that match these preferences. Include accurate pricing, ratings, and detailed tasting notes.`;
+Please provide real, high-quality wine recommendations that match these preferences. Include accurate pricing, ratings, and detailed tasting notes. For imageUrl, provide actual wine bottle image URLs from reputable sources like wine retailers or producers' websites.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",

@@ -20,13 +20,14 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-burgundy-600 to-burgundy-900 text-white">
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 opacity-60">
           <img 
-            src="https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080" 
+            src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080" 
             alt="Luxury wine cellar background" 
             className="w-full h-full object-cover"
           />
         </div>
+        <div className="absolute inset-0 bg-gradient-to-br from-burgundy-900/70 to-burgundy-600/70"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="font-playfair text-5xl sm:text-6xl font-bold mb-6">

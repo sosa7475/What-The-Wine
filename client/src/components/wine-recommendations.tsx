@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
@@ -17,6 +17,7 @@ export default function WineRecommendations() {
   const [recommendations, setRecommendations] = useState<Wine[]>([]);
   const [savedWines, setSavedWines] = useState<Set<number>>(new Set());
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<WinePreferences>({
     resolver: zodResolver(winePreferencesSchema),
@@ -51,6 +52,8 @@ export default function WineRecommendations() {
     mutationFn: ({ wineId }: { wineId: number }) => addWineToLibrary(1, wineId),
     onSuccess: (_, { wineId }) => {
       setSavedWines(prev => new Set(Array.from(prev).concat(wineId)));
+      // Invalidate library cache to refresh the wine library
+      queryClient.invalidateQueries({ queryKey: ["/api/library/1"] });
       toast({
         title: "Wine Saved",
         description: "Added to your wine library!",
