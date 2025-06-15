@@ -78,6 +78,7 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Implemented user-specific wine linking for recommendations and bottle scanning
 - June 15, 2025. Updated subscription pricing to $6.95/month with Stripe secure checkout integration
 - June 15, 2025. Enhanced background color for better text contrast in call-to-action section
 - June 15, 2025. Complete email subscription system with database storage and user notifications

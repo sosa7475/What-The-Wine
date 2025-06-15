@@ -170,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all wines
+  // Get all wines (public wines only)
   app.get("/api/wines", async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 50;
@@ -180,6 +180,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching wines:", error);
       res.status(500).json({ error: "Failed to fetch wines" });
+    }
+  });
+
+  // Get user-specific wines
+  app.get("/api/user/wines", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+
+      const wines = await storage.getUserWines(userId);
+      res.json({ wines });
+    } catch (error) {
+      console.error("Error fetching user wines:", error);
+      res.status(500).json({ error: "Failed to fetch user wines" });
     }
   });
 
