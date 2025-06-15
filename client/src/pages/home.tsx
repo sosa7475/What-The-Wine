@@ -136,7 +136,7 @@ export default function Home() {
       {/* Testimonials Section */}
       <Testimonials />
       {/* Secondary Call to Action Section */}
-      <section className="py-20 bg-gradient-to-r from-burgundy-600 to-burgundy-800 relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-r from-burgundy-800 to-burgundy-900 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
