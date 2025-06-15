@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Info, Star, Trash2, Wine } from "lucide-react";
 import type { Wine as WineType } from "@shared/schema";
+import { generateWineImageUrl } from "@/lib/wine-images";
 
 interface WineCardProps {
   wine: WineType;
@@ -35,19 +36,16 @@ export default function WineCard({
 
   return (
     <Card className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <div className="h-64 bg-gray-50 flex items-center justify-center">
-        {wine.imageUrl ? (
-          <img
-            src={wine.imageUrl}
-            alt={`${wine.name} wine bottle`}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="flex flex-col items-center text-gray-400">
-            <Wine className="h-16 w-16 mb-2" />
-            <span className="text-sm">No image available</span>
-          </div>
-        )}
+      <div className="h-64 bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden">
+        <img
+          src={wine.imageUrl || generateWineImageUrl(wine)}
+          alt={`${wine.name} wine bottle`}
+          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = generateWineImageUrl(wine);
+          }}
+        />
       </div>
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-3">
