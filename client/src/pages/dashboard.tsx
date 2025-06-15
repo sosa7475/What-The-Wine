@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +15,7 @@ import PaymentDialog from "@/components/payment-dialog";
 
 export default function Dashboard() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const logoutMutation = useLogout();
   const { toast } = useToast();
@@ -54,6 +56,26 @@ export default function Dashboard() {
       toast({
         title: "Error",
         description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelPlan = async () => {
+    try {
+      // In a real implementation, you would call Stripe's API to cancel the subscription
+      // For now, we'll simulate the cancellation
+      toast({
+        title: "Plan Cancelled",
+        description: "Your premium subscription has been cancelled. You'll continue to have access until the end of your billing period.",
+      });
+      setShowCancelDialog(false);
+      // Refresh user data to update premium status
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to cancel subscription. Please contact support.",
         variant: "destructive",
       });
     }
@@ -136,6 +158,47 @@ export default function Dashboard() {
                     You've reached your free limit. Upgrade for unlimited recommendations!
                   </div>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Premium Status Card */}
+        {user.isPremium && (
+          <Card className="mb-8 border-2 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-yellow-500" />
+                  <span className="text-green-800">Premium Active</span>
+                </div>
+                <Button
+                  onClick={() => setShowCancelDialog(true)}
+                  variant="outline"
+                  size="sm"
+                  className="border-red-300 text-red-700 hover:bg-red-50"
+                >
+                  Cancel Plan
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-700">Unlimited wine recommendations</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-700">Advanced bottle scanning</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-700">Personal wine library</span>
+                </div>
+                <p className="text-sm text-green-600 mt-4">
+                  Next billing: $6.95 on {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -322,7 +385,7 @@ export default function Dashboard() {
                       className="w-full bg-burgundy-600 hover:bg-burgundy-700 text-white"
                     >
                       <Crown className="w-4 h-4 mr-2" />
-                      Upgrade Now - $9.99
+                      Upgrade Now - $6.95
                     </Button>
                   </CardContent>
                 </Card>

@@ -192,7 +192,7 @@ export default function Home() {
             <AuthDialog defaultMode="register">
               <Button
                 size="lg"
-                className="bg-white text-burgundy-700 hover:bg-creme-100 px-8 py-3"
+                className="hover:bg-creme-100 px-8 py-3 bg-[#68272d] text-[#FFFFFF]"
               >
                 <Wine className="w-5 h-5 mr-2" />
                 Start Your Wine Journey
