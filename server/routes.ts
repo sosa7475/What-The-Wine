@@ -551,7 +551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/community/recommendations/:recommendationId/comments", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId!;
+      const userId = req.session.user!.id;
       const recommendationId = parseInt(req.params.recommendationId);
       const commentData = insertRecommendationCommentSchema.parse(req.body);
       
