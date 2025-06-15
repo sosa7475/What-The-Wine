@@ -108,10 +108,11 @@ export default function CommunityHub() {
   });
 
   // Fetch user's wine library for review/recommendation forms
-  const { data: userWines = [] } = useQuery({
+  const { data: libraryData, isLoading: loadingUserWines } = useQuery({
     queryKey: ["/api/library"],
     enabled: isAuthenticated,
   });
+  const userWines = libraryData?.library || [];
 
   // Review form
   const reviewForm = useForm({
@@ -292,11 +293,21 @@ export default function CommunityHub() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {userWines.map((entry: any) => (
-                              <SelectItem key={entry.wine.id} value={entry.wine.id.toString()}>
-                                {entry.wine.name} - {entry.wine.winery}
+                            {loadingUserWines ? (
+                              <SelectItem value="loading" disabled>
+                                Loading wines...
                               </SelectItem>
-                            ))}
+                            ) : userWines && userWines.length > 0 ? (
+                              userWines.map((entry: any) => (
+                                <SelectItem key={entry.wine.id} value={entry.wine.id.toString()}>
+                                  {entry.wine.name} - {entry.wine.winery}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="no-wines" disabled>
+                                No wines in your library yet
+                              </SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -421,11 +432,21 @@ export default function CommunityHub() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {userWines.map((entry: any) => (
-                              <SelectItem key={entry.wine.id} value={entry.wine.id.toString()}>
-                                {entry.wine.name} - {entry.wine.winery}
+                            {loadingUserWines ? (
+                              <SelectItem value="loading" disabled>
+                                Loading wines...
                               </SelectItem>
-                            ))}
+                            ) : userWines && userWines.length > 0 ? (
+                              userWines.map((entry: any) => (
+                                <SelectItem key={entry.wine.id} value={entry.wine.id.toString()}>
+                                  {entry.wine.name} - {entry.wine.winery}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="no-wines" disabled>
+                                No wines in your library yet
+                              </SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
                         <FormMessage />
