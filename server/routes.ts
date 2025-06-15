@@ -426,7 +426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Community Features - Wine Reviews
   app.post("/api/community/reviews", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId!;
+      const userId = req.session.user!.id;
       const reviewData = insertWineReviewSchema.parse(req.body);
       
       const review = await storage.createWineReview({
@@ -454,7 +454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/community/reviews/user", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId!;
+      const userId = req.session.user!.id;
       const reviews = await storage.getUserReviews(userId);
       res.json(reviews);
     } catch (error) {
@@ -466,7 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Community Features - Wine Recommendations
   app.post("/api/community/recommendations", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId!;
+      const userId = req.session.user!.id;
       const recommendationData = insertCommunityRecommendationSchema.parse(req.body);
       
       const recommendation = await storage.createCommunityRecommendation({
@@ -496,7 +496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/community/recommendations/user", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId!;
+      const userId = req.session.user!.id;
       const recommendations = await storage.getUserCommunityRecommendations(userId);
       res.json(recommendations);
     } catch (error) {
@@ -507,7 +507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/community/recommendations/:id/like", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId!;
+      const userId = req.session.user!.id;
       const recommendationId = parseInt(req.params.id);
       
       const liked = await storage.toggleRecommendationLike(userId, recommendationId);
@@ -521,7 +521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Community Features - Comments
   app.post("/api/community/reviews/:reviewId/comments", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId!;
+      const userId = req.session.user!.id;
       const reviewId = parseInt(req.params.reviewId);
       const commentData = insertReviewCommentSchema.parse(req.body);
       
