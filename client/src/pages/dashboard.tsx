@@ -5,13 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut, ChevronDown, ChevronUp } from "lucide-react";
+import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut, ChevronDown, ChevronUp, Users } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import WineRecommendations from "@/components/wine-recommendations";
 import WineScanner from "@/components/wine-scanner";
 import WineLibrary from "@/components/wine-library";
+import CommunityHub from "@/components/community-hub";
 import PaymentDialog from "@/components/payment-dialog";
 
 export default function Dashboard() {
@@ -275,7 +276,7 @@ export default function Dashboard() {
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="recommendations" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
             <TabsTrigger value="recommendations" className="flex items-center gap-2">
               <Star className="w-4 h-4" />
               <span className="hidden sm:inline">Recommendations</span>
@@ -287,6 +288,10 @@ export default function Dashboard() {
             <TabsTrigger value="library" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">My Library</span>
+            </TabsTrigger>
+            <TabsTrigger value="community" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">Community</span>
             </TabsTrigger>
             <TabsTrigger value="account" className="flex items-center gap-2">
               <User className="w-4 h-4" />
@@ -334,6 +339,10 @@ export default function Dashboard() {
                 <WineLibrary />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="community" className="space-y-6">
+            <CommunityHub />
           </TabsContent>
 
           <TabsContent value="account" className="space-y-6">

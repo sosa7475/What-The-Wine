@@ -317,7 +317,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(wineReviews)
       .where(and(eq(wineReviews.id, reviewId), eq(wineReviews.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   // Review comment operations
