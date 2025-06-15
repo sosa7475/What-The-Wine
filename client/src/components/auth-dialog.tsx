@@ -109,151 +109,105 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
         <div className="space-y-6">
           {/* Email/Password Forms */}
           {mode === "login" ? (
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
-                <FormField
-                  control={loginForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field}
-                          type="email" 
-                          placeholder="Enter your email"
-                          autoComplete="email"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+            <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email</label>
+                <Input 
+                  {...loginForm.register("email")}
+                  type="email" 
+                  placeholder="Enter your email"
+                  autoComplete="email"
                 />
-                <FormField
-                  control={loginForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field}
-                          type="password" 
-                          placeholder="Enter your password"
-                          autoComplete="current-password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                {loginForm.formState.errors.email && (
+                  <p className="text-sm text-red-600">{loginForm.formState.errors.email.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Password</label>
+                <Input 
+                  {...loginForm.register("password")}
+                  type="password" 
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
                 />
-                <Button 
-                  type="submit" 
-                  className="w-full bg-[#722F37] hover:bg-[#5d252a]"
-                  disabled={loginMutation.isPending}
-                >
-                  {loginMutation.isPending ? "Signing in..." : "Sign In"}
-                </Button>
-              </form>
-            </Form>
+                {loginForm.formState.errors.password && (
+                  <p className="text-sm text-red-600">{loginForm.formState.errors.password.message}</p>
+                )}
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full bg-[#722F37] hover:bg-[#5d252a]"
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
           ) : (
-            <Form {...registerForm}>
-              <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={registerForm.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field}
-                            placeholder="John" 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+            <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">First Name</label>
+                  <Input 
+                    {...registerForm.register("firstName")}
+                    placeholder="John" 
                   />
-                  <FormField
-                    control={registerForm.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field}
-                            placeholder="Doe" 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {registerForm.formState.errors.firstName && (
+                    <p className="text-sm text-red-600">{registerForm.formState.errors.firstName.message}</p>
+                  )}
                 </div>
-                <FormField
-                  control={registerForm.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field}
-                          placeholder="johndoe" 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Last Name</label>
+                  <Input 
+                    {...registerForm.register("lastName")}
+                    placeholder="Doe" 
+                  />
+                  {registerForm.formState.errors.lastName && (
+                    <p className="text-sm text-red-600">{registerForm.formState.errors.lastName.message}</p>
                   )}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Username</label>
+                <Input 
+                  {...registerForm.register("username")}
+                  placeholder="johndoe" 
                 />
-                <FormField
-                  control={registerForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field}
-                          type="email" 
-                          placeholder="Enter your email"
-                          autoComplete="email"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                {registerForm.formState.errors.username && (
+                  <p className="text-sm text-red-600">{registerForm.formState.errors.username.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email</label>
+                <Input 
+                  {...registerForm.register("email")}
+                  type="email" 
+                  placeholder="Enter your email"
+                  autoComplete="email"
                 />
-                <FormField
-                  control={registerForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field}
-                          type="password" 
-                          placeholder="Create a password"
-                          autoComplete="new-password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                {registerForm.formState.errors.email && (
+                  <p className="text-sm text-red-600">{registerForm.formState.errors.email.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Password</label>
+                <Input 
+                  {...registerForm.register("password")}
+                  type="password" 
+                  placeholder="Create a password"
+                  autoComplete="new-password"
                 />
-                <Button 
-                  type="submit" 
-                  className="w-full bg-[#722F37] hover:bg-[#5d252a]"
-                  disabled={registerMutation.isPending}
-                >
-                  {registerMutation.isPending ? "Creating account..." : "Create Account"}
-                </Button>
-              </form>
-            </Form>
+                {registerForm.formState.errors.password && (
+                  <p className="text-sm text-red-600">{registerForm.formState.errors.password.message}</p>
+                )}
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full bg-[#722F37] hover:bg-[#5d252a]"
+                disabled={registerMutation.isPending}
+              >
+                {registerMutation.isPending ? "Creating account..." : "Create Account"}
+              </Button>
+            </form>
           )}
 
           <div className="text-center text-sm">
