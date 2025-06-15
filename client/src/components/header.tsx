@@ -150,69 +150,95 @@ export default function Header({ onScrollTo }: HeaderProps) {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation Overlay */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-burgundy-600">
-            <nav className="flex flex-col space-y-3">
-              {navigation.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    handleNavigation(item);
-                    setIsMenuOpen(false);
-                  }}
-                  className="text-left text-white hover:text-creme-100 font-medium transition-colors duration-200 py-2"
-                >
-                  {item.name}
-                </button>
-              ))}
-
-              {/* Mobile Authentication */}
-              <div className="pt-4 border-t border-burgundy-600">
-                {isAuthenticated && user ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2 text-sm text-white">
-                      <User className="w-4 h-4 text-white" />
-                      <span>
-                        {user.firstName}
-                        {user.isPremium && <Crown className="w-4 h-4 text-yellow-400 inline ml-1" />}
-                      </span>
-                    </div>
-                    <Button
-                      onClick={handleLogout}
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-white text-white hover:bg-white hover:text-burgundy-700"
-                      disabled={logoutMutation.isPending}
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+              onClick={() => setIsMenuOpen(false)}
+            />
+            
+            {/* Floating Menu */}
+            <div className="fixed top-20 left-4 right-4 bg-white rounded-2xl shadow-2xl z-50 md:hidden overflow-hidden">
+              <div className="p-6">
+                {/* Navigation Items */}
+                <nav className="space-y-1 mb-6">
+                  {navigation.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        handleNavigation(item);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg text-burgundy-700 hover:bg-burgundy-50 font-medium transition-colors duration-200 flex items-center"
                     >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      {logoutMutation.isPending ? "Logging out..." : "Logout"}
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <AuthDialog defaultMode="login">
+                      {item.name === "Dashboard" && <User className="w-4 h-4 mr-3" />}
+                      {item.name === "Recommendations" && <Wine className="w-4 h-4 mr-3" />}
+                      {item.name === "Scanner" && <Camera className="w-4 h-4 mr-3" />}
+                      {item.name === "Library" && <Bookmark className="w-4 h-4 mr-3" />}
+                      {item.name}
+                    </button>
+                  ))}
+                </nav>
+
+                {/* Authentication Section */}
+                <div className="pt-4 border-t border-gray-200">
+                  {isAuthenticated && user ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-3 px-4 py-2 bg-burgundy-50 rounded-lg">
+                        <div className="w-8 h-8 bg-burgundy-600 rounded-full flex items-center justify-center">
+                          <User className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-burgundy-700">
+                            {user.firstName}
+                            {user.isPremium && <Crown className="w-4 h-4 text-yellow-500 inline ml-1" />}
+                          </p>
+                          <p className="text-xs text-burgundy-500">{user.email}</p>
+                        </div>
+                      </div>
                       <Button
-                        size="sm"
-                        className="w-full bg-white text-burgundy-700 hover:bg-creme-100"
-                      >
-                        Sign In
-                      </Button>
-                    </AuthDialog>
-                    <AuthDialog defaultMode="register">
-                      <Button
+                        onClick={() => {
+                          handleLogout();
+                          setIsMenuOpen(false);
+                        }}
                         variant="outline"
                         size="sm"
-                        className="w-full border-white text-white hover:bg-white hover:text-burgundy-700"
+                        className="w-full border-burgundy-300 text-burgundy-700 hover:bg-burgundy-50"
+                        disabled={logoutMutation.isPending}
                       >
-                        Get Started
+                        <LogOut className="w-4 h-4 mr-2" />
+                        {logoutMutation.isPending ? "Logging out..." : "Logout"}
                       </Button>
-                    </AuthDialog>
-                  </div>
-                )}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <AuthDialog defaultMode="login">
+                        <Button
+                          size="sm"
+                          className="w-full bg-burgundy-600 hover:bg-burgundy-700 text-white"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Sign In
+                        </Button>
+                      </AuthDialog>
+                      <AuthDialog defaultMode="register">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full border-burgundy-300 text-burgundy-700 hover:bg-burgundy-50"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Get Started
+                        </Button>
+                      </AuthDialog>
+                    </div>
+                  )}
+                </div>
               </div>
-            </nav>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </header>
