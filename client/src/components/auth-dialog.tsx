@@ -42,9 +42,9 @@ export default function AuthDialog({
   const [mode, setMode] = useState<"login" | "register">(defaultMode);
   
   // Update mode when defaultMode changes (for controlled usage)
-  useState(() => {
+  useEffect(() => {
     setMode(defaultMode);
-  });
+  }, [defaultMode]);
   
   // Use controlled state if provided, otherwise use internal state
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
