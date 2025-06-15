@@ -97,6 +97,11 @@ export const insertWineRecommendationSchema = createInsertSchema(wineRecommendat
   createdAt: true,
 });
 
+export const insertEmailSubscriptionSchema = createInsertSchema(emailSubscriptions).omit({
+  id: true,
+  subscribedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -109,6 +114,9 @@ export type UserWineLibrary = typeof userWineLibrary.$inferSelect;
 
 export type InsertWineRecommendation = z.infer<typeof insertWineRecommendationSchema>;
 export type WineRecommendation = typeof wineRecommendations.$inferSelect;
+
+export type InsertEmailSubscription = z.infer<typeof insertEmailSubscriptionSchema>;
+export type EmailSubscription = typeof emailSubscriptions.$inferSelect;
 
 // Preference schema for recommendations
 export const winePreferencesSchema = z.object({

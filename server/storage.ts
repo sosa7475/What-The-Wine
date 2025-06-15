@@ -1,9 +1,10 @@
 import { 
-  users, wines, userWineLibrary, wineRecommendations,
+  users, wines, userWineLibrary, wineRecommendations, emailSubscriptions,
   type User, type InsertUser, 
   type Wine, type InsertWine,
   type UserWineLibrary, type InsertUserWineLibrary,
-  type WineRecommendation, type InsertWineRecommendation
+  type WineRecommendation, type InsertWineRecommendation,
+  type EmailSubscription, type InsertEmailSubscription
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, ilike, or } from "drizzle-orm";
@@ -34,6 +35,10 @@ export interface IStorage {
   // Wine recommendation operations
   saveWineRecommendation(recommendation: InsertWineRecommendation): Promise<WineRecommendation>;
   getUserRecommendations(userId: number): Promise<WineRecommendation[]>;
+
+  // Email subscription operations
+  getSubscriptionByEmail(email: string): Promise<EmailSubscription | undefined>;
+  createSubscription(subscription: InsertEmailSubscription): Promise<EmailSubscription>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -181,6 +186,22 @@ export class DatabaseStorage implements IStorage {
       .from(wineRecommendations)
       .where(eq(wineRecommendations.userId, userId))
       .orderBy(desc(wineRecommendations.createdAt));
+  }
+
+  async getSubscriptionByEmail(email: string): Promise<EmailSubscription | undefined> {
+    const [subscription] = await db
+      .select()
+      .from(emailSubscriptions)
+      .where(eq(emailSubscriptions.email, email));
+    return subscription;
+  }
+
+  async createSubscription(subscription: InsertEmailSubscription): Promise<EmailSubscription> {
+    const [newSubscription] = await db
+      .insert(emailSubscriptions)
+      .values(subscription)
+      .returning();
+    return newSubscription;
   }
 }
 
