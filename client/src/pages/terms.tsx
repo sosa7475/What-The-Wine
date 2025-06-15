@@ -269,7 +269,6 @@ export default function Terms() {
             </p>
             <div className="space-y-2 text-burgundy-100">
               <p><strong>Email:</strong> legal@whatthewine.com</p>
-              <p><strong>Mail:</strong> What the Wine Legal Department, 123 Wine Street, Napa Valley, CA 94558</p>
             </div>
             <p className="text-sm text-burgundy-200 mt-6">
               By using What the Wine, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.

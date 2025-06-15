@@ -68,12 +68,6 @@ export default function Contact() {
       title: "Call Us",
       description: "+1 (555) 123-WINE",
       subtitle: "Monday - Friday, 9 AM - 6 PM EST"
-    },
-    {
-      icon: <MapPin className="w-5 h-5" />,
-      title: "Visit Us",
-      description: "123 Wine Street, Napa Valley, CA 94558",
-      subtitle: "Appointment required"
     }
   ];
 

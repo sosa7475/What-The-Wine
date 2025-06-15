@@ -235,7 +235,6 @@ export default function Privacy() {
             </p>
             <div className="space-y-2 text-burgundy-100">
               <p><strong>Email:</strong> privacy@whatthewine.com</p>
-              <p><strong>Mail:</strong> What the Wine Privacy Officer, 123 Wine Street, Napa Valley, CA 94558</p>
             </div>
           </CardContent>
         </Card>
