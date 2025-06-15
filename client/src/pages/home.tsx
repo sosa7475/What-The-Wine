@@ -275,7 +275,7 @@ export default function Home() {
                 <li>
                   <button 
                     onClick={() => scrollToSection('recommendations')}
-                    className="hover:text-gold-400 transition-colors"
+                    className="hover:text-gold-400 transition-colors text-left"
                   >
                     Wine Recommendations
                   </button>
