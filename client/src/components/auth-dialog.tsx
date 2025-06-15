@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -99,6 +99,11 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
           <DialogTitle className="text-center text-2xl font-bold text-burgundy-700">
             {mode === "login" ? "Welcome Back" : "Join What the Wine"}
           </DialogTitle>
+          <DialogDescription className="text-center text-sm text-gray-600">
+            {mode === "login" 
+              ? "Sign in to access your personalized wine recommendations and library" 
+              : "Create your account to start discovering amazing wines"}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
