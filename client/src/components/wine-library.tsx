@@ -4,32 +4,42 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getUserWineLibrary, removeWineFromLibrary } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
+import { apiRequest } from "@/lib/queryClient";
 import WineCard from "./wine-card";
+import AuthDialog from "./auth-dialog";
 
 export default function WineLibrary() {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const { data: libraryData, isLoading } = useQuery({
-    queryKey: ["/api/library/1"],
-    queryFn: () => getUserWineLibrary(1),
+    queryKey: ["/api/library"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/library");
+      return response.json();
+    },
+    enabled: isAuthenticated,
   });
 
   const removeWineMutation = useMutation({
-    mutationFn: ({ wineId }: { wineId: number }) => removeWineFromLibrary(1, wineId),
+    mutationFn: async ({ wineId }: { wineId: number }) => {
+      const response = await apiRequest("DELETE", `/api/library/${wineId}`);
+      return response.json();
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/library/1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/library"] });
       toast({
         title: "Wine Removed",
         description: "Wine removed from your library",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "Failed to remove wine",
@@ -53,6 +63,53 @@ export default function WineLibrary() {
     
     return matchesSearch && matchesType;
   }) || [];
+
+  if (authLoading) {
+    return (
+      <section id="library" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <section id="library" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
+              My Wine Library
+            </h3>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Build your personal collection and track your favorite wines
+            </p>
+          </div>
+
+          <Card className="bg-gradient-to-r from-[#722F37]/10 to-[#F5F5DC]/20 rounded-2xl p-12 text-center max-w-2xl mx-auto border-2 border-[#722F37]/10">
+            <CardContent>
+              <Lock className="w-16 h-16 text-[#722F37] mx-auto mb-6" />
+              <h4 className="text-2xl font-semibold text-[#722F37] mb-4">Sign In Required</h4>
+              <p className="text-gray-600 mb-6">
+                Please sign in to access your personal wine library and save your favorite wines.
+              </p>
+              <AuthDialog defaultMode="register">
+                <Button className="bg-[#722F37] hover:bg-[#5d252a] text-white px-8 py-3">
+                  Get Started - It's Free
+                </Button>
+              </AuthDialog>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (
