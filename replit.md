@@ -78,6 +78,8 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Complete authentication and payment system implemented with Stripe integration
+- June 15, 2025. Rebranded application to "What the Wine" with custom WTW logo
 - June 14, 2025. Initial setup
 ```
 
@@ -85,4 +87,5 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
+App branding: "What the Wine" with custom WTW logo (WtW_1749955950754.png)
 ```
