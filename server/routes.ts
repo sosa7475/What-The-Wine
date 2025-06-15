@@ -87,8 +87,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Wine recommendations endpoint with usage limits
-  app.post("/api/recommendations", async (req, res) => {
+  app.post("/api/recommendations", optionalAuth, async (req, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.session.user) {
+        return res.status(401).json({ 
+          error: "Authentication required",
+          message: "Please sign up or log in to get wine recommendations" 
+        });
+      }
+
+      const user = req.session.user;
+
+      // Check usage limits for non-premium users
+      if (!user.isPremium && (user.recommendationCount || 0) >= 3) {
+        return res.status(402).json({ 
+          error: "Usage limit reached",
+          message: "You've used your 3 free recommendations. Upgrade to premium for unlimited access.",
+          requiresPayment: true
+        });
+      }
+
       const preferences = winePreferencesSchema.parse(req.body);
       const recommendedWines = await getWineRecommendations(preferences);
       
@@ -99,9 +118,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         savedWines.push(savedWine);
       }
 
+      // Update user's recommendation count
+      await storage.updateUserRecommendationCount(user.id);
+
       // Save recommendation record
       await storage.saveWineRecommendation({
-        userId: req.body.userId || null,
+        userId: user.id,
         occasion: preferences.occasion || null,
         budget: preferences.budget || null,
         foodPairing: preferences.foodPairing || null,
@@ -183,15 +205,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user wine library
-  app.get("/api/library/:userId", async (req, res) => {
+  // Stripe payment routes
+  app.post("/api/create-payment-intent", requireAuth, async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
-      if (isNaN(userId)) {
-        return res.status(400).json({ error: "Invalid user ID" });
-      }
+      const user = req.session.user!;
       
-      const library = await storage.getUserWineLibrary(userId);
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: 999, // $9.99 for premium access
+        currency: "usd",
+        metadata: {
+          userId: user.id.toString(),
+        },
+      });
+      
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ error: "Failed to create payment intent" });
+    }
+  });
+
+  app.post("/api/confirm-payment", requireAuth, async (req, res) => {
+    try {
+      const { paymentIntentId } = req.body;
+      const user = req.session.user!;
+      
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status === "succeeded") {
+        // Update user to premium
+        await storage.updateUserPremiumStatus(user.id, true);
+        
+        // Update session
+        req.session.user = { ...user, isPremium: true };
+        
+        res.json({ success: true, message: "Payment successful! You now have unlimited access." });
+      } else {
+        res.status(400).json({ error: "Payment not completed" });
+      }
+    } catch (error) {
+      console.error("Error confirming payment:", error);
+      res.status(500).json({ error: "Failed to confirm payment" });
+    }
+  });
+
+  // Get user wine library (requires auth)
+  app.get("/api/library", requireAuth, async (req, res) => {
+    try {
+      const user = req.session.user!;
+      const library = await storage.getUserWineLibrary(user.id);
       res.json({ library });
     } catch (error) {
       console.error("Error fetching wine library:", error);
@@ -199,18 +261,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add wine to library
-  app.post("/api/library", async (req, res) => {
+  // Add wine to library (requires auth)
+  app.post("/api/library", requireAuth, async (req, res) => {
     try {
-      const entry = insertUserWineLibrarySchema.parse(req.body);
+      const user = req.session.user!;
+      const { wineId, personalNotes } = req.body;
       
       // Check if wine is already in library
-      const exists = await storage.isWineInLibrary(entry.userId, entry.wineId);
+      const exists = await storage.isWineInLibrary(user.id, wineId);
       if (exists) {
         return res.status(400).json({ error: "Wine already in library" });
       }
       
-      const libraryEntry = await storage.addWineToLibrary(entry);
+      const libraryEntry = await storage.addWineToLibrary({
+        userId: user.id,
+        wineId,
+        personalNotes: personalNotes || null,
+      });
       res.json({ entry: libraryEntry });
     } catch (error) {
       console.error("Error adding wine to library:", error);
@@ -218,17 +285,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Remove wine from library
-  app.delete("/api/library/:userId/:wineId", async (req, res) => {
+  // Remove wine from library (requires auth)
+  app.delete("/api/library/:wineId", requireAuth, async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
+      const user = req.session.user!;
       const wineId = parseInt(req.params.wineId);
       
-      if (isNaN(userId) || isNaN(wineId)) {
-        return res.status(400).json({ error: "Invalid user ID or wine ID" });
+      if (isNaN(wineId)) {
+        return res.status(400).json({ error: "Invalid wine ID" });
       }
       
-      const removed = await storage.removeWineFromLibrary(userId, wineId);
+      const removed = await storage.removeWineFromLibrary(user.id, wineId);
       if (!removed) {
         return res.status(404).json({ error: "Wine not found in library" });
       }

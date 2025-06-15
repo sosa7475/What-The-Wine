@@ -1,0 +1,250 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useLogin, useRegister } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const registerSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+interface AuthDialogProps {
+  children: React.ReactNode;
+  defaultMode?: "login" | "register";
+}
+
+export default function AuthDialog({ children, defaultMode = "login" }: AuthDialogProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<"login" | "register">(defaultMode);
+  const { toast } = useToast();
+
+  const loginMutation = useLogin();
+  const registerMutation = useRegister();
+
+  const loginForm = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const registerForm = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      email: "",
+      username: "",
+      firstName: "",
+      lastName: "",
+      password: "",
+    },
+  });
+
+  const handleLogin = async (data: z.infer<typeof loginSchema>) => {
+    try {
+      await loginMutation.mutateAsync(data);
+      setIsOpen(false);
+      toast({
+        title: "Welcome back!",
+        description: "You've successfully logged in.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRegister = async (data: z.infer<typeof registerSchema>) => {
+    try {
+      await registerMutation.mutateAsync(data);
+      setIsOpen(false);
+      toast({
+        title: "Welcome to Sommelier AI!",
+        description: "Your account has been created successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Registration failed",
+        description: error.message || "Please try again with different details.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-center text-2xl font-bold text-[#722F37]">
+            {mode === "login" ? "Welcome Back" : "Join Sommelier AI"}
+          </DialogTitle>
+        </DialogHeader>
+
+        {mode === "login" ? (
+          <Form {...loginForm}>
+            <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+              <FormField
+                control={loginForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="your@email.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={loginForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button 
+                type="submit" 
+                className="w-full bg-[#722F37] hover:bg-[#5d252a]"
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
+          </Form>
+        ) : (
+          <Form {...registerForm}>
+            <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={registerForm.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={registerForm.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={registerForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="wineenthusiast" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={registerForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="your@email.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={registerForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button 
+                type="submit" 
+                className="w-full bg-[#722F37] hover:bg-[#5d252a]"
+                disabled={registerMutation.isPending}
+              >
+                {registerMutation.isPending ? "Creating account..." : "Create Account"}
+              </Button>
+            </form>
+          </Form>
+        )}
+
+        <div className="text-center text-sm">
+          {mode === "login" ? (
+            <p>
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => setMode("register")}
+                className="text-[#722F37] hover:underline font-medium"
+              >
+                Sign up
+              </button>
+            </p>
+          ) : (
+            <p>
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={() => setMode("login")}
+                className="text-[#722F37] hover:underline font-medium"
+              >
+                Sign in
+              </button>
+            </p>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
