@@ -177,7 +177,7 @@ export default function Home() {
           </svg>
         </div>
         
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 bg-[68272d]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 bg-[391316]">
           <div className="mb-8">
             <h2 className="font-playfair text-4xl font-bold mb-6 text-[#391316]">
               Ready to Discover Your Perfect Wine?
