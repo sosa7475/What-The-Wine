@@ -123,7 +123,12 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input 
+                        type="password" 
+                        placeholder="Enter your password"
+                        autoComplete="current-password"
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -202,7 +207,12 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input 
+                        type="password" 
+                        placeholder="Create a secure password"
+                        autoComplete="new-password"
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
