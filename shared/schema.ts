@@ -153,12 +153,14 @@ export const insertEmailSubscriptionSchema = createInsertSchema(emailSubscriptio
 
 export const insertWineReviewSchema = createInsertSchema(wineReviews).omit({
   id: true,
+  userId: true,
   createdAt: true,
   updatedAt: true,
 });
 
 export const insertCommunityRecommendationSchema = createInsertSchema(communityRecommendations).omit({
   id: true,
+  userId: true,
   likesCount: true,
   createdAt: true,
   updatedAt: true,

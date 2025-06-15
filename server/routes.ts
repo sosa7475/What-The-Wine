@@ -429,10 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.user!.id;
       const reviewData = insertWineReviewSchema.parse(req.body);
       
-      const review = await storage.createWineReview({
-        ...reviewData,
-        userId,
-      });
+      const review = await storage.createWineReview(reviewData, userId);
       
       res.json(review);
     } catch (error) {
@@ -469,10 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.user!.id;
       const recommendationData = insertCommunityRecommendationSchema.parse(req.body);
       
-      const recommendation = await storage.createCommunityRecommendation({
-        ...recommendationData,
-        userId,
-      });
+      const recommendation = await storage.createCommunityRecommendation(recommendationData, userId);
       
       res.json(recommendation);
     } catch (error) {

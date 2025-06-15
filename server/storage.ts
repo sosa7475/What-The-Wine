@@ -49,7 +49,7 @@ export interface IStorage {
   createSubscription(subscription: InsertEmailSubscription): Promise<EmailSubscription>;
 
   // Wine review operations
-  createWineReview(review: InsertWineReview): Promise<WineReview>;
+  createWineReview(review: InsertWineReview, userId: number): Promise<WineReview>;
   getWineReviews(wineId: number): Promise<(WineReview & { user: { username: string; firstName: string } })[]>;
   getUserReviews(userId: number): Promise<(WineReview & { wine: Wine })[]>;
   updateWineReview(reviewId: number, userId: number, review: Partial<InsertWineReview>): Promise<WineReview | null>;
@@ -61,7 +61,7 @@ export interface IStorage {
   deleteReviewComment(commentId: number, userId: number): Promise<boolean>;
 
   // Community recommendation operations
-  createCommunityRecommendation(recommendation: InsertCommunityRecommendation): Promise<CommunityRecommendation>;
+  createCommunityRecommendation(recommendation: InsertCommunityRecommendation, userId: number): Promise<CommunityRecommendation>;
   getCommunityRecommendations(limit?: number, offset?: number): Promise<(CommunityRecommendation & { user: { username: string; firstName: string }; wine: Wine })[]>;
   getUserCommunityRecommendations(userId: number): Promise<(CommunityRecommendation & { wine: Wine })[]>;
   updateCommunityRecommendation(recommendationId: number, userId: number, recommendation: Partial<InsertCommunityRecommendation>): Promise<CommunityRecommendation | null>;
@@ -253,10 +253,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Wine review operations
-  async createWineReview(review: InsertWineReview): Promise<WineReview> {
+  async createWineReview(review: InsertWineReview, userId: number): Promise<WineReview> {
     const [newReview] = await db
       .insert(wineReviews)
-      .values(review)
+      .values({ ...review, userId })
       .returning();
     return newReview;
   }
@@ -357,10 +357,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Community recommendation operations
-  async createCommunityRecommendation(recommendation: InsertCommunityRecommendation): Promise<CommunityRecommendation> {
+  async createCommunityRecommendation(recommendation: InsertCommunityRecommendation, userId: number): Promise<CommunityRecommendation> {
     const [newRecommendation] = await db
       .insert(communityRecommendations)
-      .values(recommendation)
+      .values({ ...recommendation, userId })
       .returning();
     return newRecommendation;
   }
