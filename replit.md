@@ -78,6 +78,12 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Created comprehensive support page system with Help Center, Contact Us, Privacy Policy, and Terms of Service
+- June 15, 2025. Added professional FAQ sections covering all app features and premium subscription details
+- June 15, 2025. Implemented contact form with subject categorization and success confirmation workflow
+- June 15, 2025. Added complete legal documentation with privacy protection details and terms compliance
+- June 15, 2025. Updated footer navigation to link to all new support pages for better user accessibility
+- June 15, 2025. Fixed "Get Started" button visibility issue by adding transparent background for white text contrast
 - June 15, 2025. Changed subscription pricing from $6.95 to $3.99 across all displays and Stripe functionality
 - June 15, 2025. Updated wine image system to use custom uploaded wine type images (red, white, rosé, sparkling)
 - June 15, 2025. Enhanced wine bottle scanner to automatically save scanned wines to user's library for authenticated users
