@@ -152,15 +152,15 @@ export default function WineRecommendations() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-gray-700">Free Recommendations Used:</span>
-                    <span className="font-semibold text-[#722F37]">{user.recommendationCount || 0} / 3</span>
+                    <span className="font-semibold text-[#722F37]">{user.recommendationCount || 0} / 5</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
                       className="bg-gradient-to-r from-[#722F37] to-[#8B4513] h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(((user.recommendationCount || 0) / 3) * 100, 100)}%` }}
+                      style={{ width: `${Math.min(((user.recommendationCount || 0) / 5) * 100, 100)}%` }}
                     ></div>
                   </div>
-                  {(user.recommendationCount || 0) >= 3 && (
+                  {(user.recommendationCount || 0) >= 5 && (
                     <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
                       <div className="flex items-center gap-2 text-orange-700 mb-2">
                         <Lock className="w-4 h-4" />
