@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+
 import { useLogin, useRegister } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -102,28 +102,6 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Replit Auth Button */}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full border-gray-300 hover:bg-gray-50"
-            onClick={() => window.location.href = '/api/login'}
-          >
-            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            Continue with Replit
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-muted-foreground">Or</span>
-            </div>
-          </div>
-
           {/* Email/Password Forms */}
           {mode === "login" ? (
             <Form {...loginForm}>
