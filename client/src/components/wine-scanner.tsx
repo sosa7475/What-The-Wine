@@ -21,13 +21,32 @@ export default function WineScanner() {
 
   const analysisMutation = useMutation({
     mutationFn: analyzeWineBottle,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setAnalyzedWine(data.wine);
       setIsSaved(false);
-      toast({
-        title: "Wine Analyzed",
-        description: `Successfully identified ${data.wine.name}!`,
-      });
+      
+      // Automatically save to library if user is authenticated
+      if (isAuthenticated && user) {
+        try {
+          await addWineToLibrary(user.id, data.wine.id);
+          setIsSaved(true);
+          queryClient.invalidateQueries({ queryKey: ["/api/wine-library", user.id] });
+          toast({
+            title: "Wine Analyzed & Saved",
+            description: `Successfully identified ${data.wine.name} and added to your library!`,
+          });
+        } catch (error) {
+          toast({
+            title: "Wine Analyzed",
+            description: `Successfully identified ${data.wine.name}! (Error saving to library)`,
+          });
+        }
+      } else {
+        toast({
+          title: "Wine Analyzed",
+          description: `Successfully identified ${data.wine.name}!`,
+        });
+      }
     },
     onError: (error) => {
       toast({

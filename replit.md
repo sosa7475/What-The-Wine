@@ -78,6 +78,8 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Enhanced wine bottle scanner to automatically save scanned wines to user's library for authenticated users
+- June 15, 2025. Fixed password field input issue in authentication dialog using direct React Hook Form registration
 - June 15, 2025. Increased free recommendation limit from 3 to 5 recommendations before requiring premium upgrade
 - June 15, 2025. Fixed "Get Recommendations" button to properly switch dashboard tabs instead of scrolling
 - June 15, 2025. Fixed wine image system to display proper wine bottles and glasses matching wine type/color instead of random images
