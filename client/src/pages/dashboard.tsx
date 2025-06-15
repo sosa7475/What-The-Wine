@@ -9,6 +9,8 @@ import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import WineRecommendations from "@/components/wine-recommendations";
 import WineScanner from "@/components/wine-scanner";
 import WineLibrary from "@/components/wine-library";
@@ -23,6 +25,16 @@ export default function Dashboard() {
   const logoutMutation = useLogout();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+
+  // Fetch library data for wine count
+  const { data: libraryData } = useQuery({
+    queryKey: ["/api/library"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/library");
+      return response.json();
+    },
+    enabled: isAuthenticated,
+  });
 
   // Handle Stripe checkout success/failure
   useEffect(() => {
@@ -251,7 +263,7 @@ export default function Dashboard() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500">Wines in Library</p>
-                  <p className="text-2xl font-bold text-gray-900">0</p>
+                  <p className="text-2xl font-bold text-gray-900">{libraryData?.library?.length || 0}</p>
                 </div>
               </div>
             </CardContent>
