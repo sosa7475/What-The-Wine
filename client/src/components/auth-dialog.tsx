@@ -96,7 +96,7 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-[#722F37]">
-            {mode === "login" ? "Welcome Back" : "Join Sommelier AI"}
+            {mode === "login" ? "Welcome Back" : "Join What the Wine"}
           </DialogTitle>
         </DialogHeader>
 

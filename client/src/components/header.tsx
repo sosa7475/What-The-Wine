@@ -11,8 +11,12 @@ export default function Header({ onScrollTo }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
-            <Wine className="text-burgundy-600 h-8 w-8" />
-            <h1 className="font-playfair text-2xl font-bold text-burgundy-700">Sommelier AI</h1>
+            <img 
+              src="@assets/WtW_1749955950754.png" 
+              alt="What the Wine" 
+              className="h-10 w-10 object-contain"
+            />
+            <h1 className="font-playfair text-2xl font-bold text-burgundy-700">What the Wine</h1>
           </div>
           <nav className="hidden md:flex space-x-8">
             <button

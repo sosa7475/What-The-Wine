@@ -1,8 +1,8 @@
-# Sommelier AI - Wine Recommendation Application
+# What the Wine - AI Wine Recommendation Application
 
 ## Overview
 
-Sommelier AI is a full-stack web application that provides personalized wine recommendations powered by OpenAI's GPT-4. The application features an elegant, wine-themed user interface built with React and shadcn/ui components, with a Node.js/Express backend for API services and PostgreSQL database integration using Drizzle ORM.
+What the Wine is a full-stack web application that provides personalized wine recommendations powered by OpenAI's GPT-4. The application features an elegant, wine-themed user interface with custom branding (WTW logo) built with React and shadcn/ui components, with a Node.js/Express backend for API services and PostgreSQL database integration using Drizzle ORM.
 
 ## System Architecture
 

@@ -55,7 +55,7 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="font-playfair text-5xl sm:text-6xl font-bold mb-6">
-              Discover Your Perfect Wine
+              What the Wine Should I Drink?
             </h2>
             <p className="text-xl text-gray-100 mb-8 leading-relaxed">
               Let our AI sommelier guide you to exceptional wines tailored to your taste, occasion, and culinary preferences
@@ -140,8 +140,12 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <Wine className="text-gold-400 h-8 w-8" />
-                <h4 className="font-playfair text-2xl font-bold">Sommelier AI</h4>
+                <img 
+                  src="@assets/WtW_1749955950754.png" 
+                  alt="What the Wine" 
+                  className="h-8 w-8 object-contain"
+                />
+                <h4 className="font-playfair text-2xl font-bold">What the Wine</h4>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
                 Your intelligent wine companion for discovering, exploring, and collecting exceptional wines from around the world.
