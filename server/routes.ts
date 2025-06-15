@@ -231,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         ],
         mode: 'subscription',
-        success_url: `${req.headers.origin}/dashboard?upgrade=success`,
+        success_url: `${req.headers.origin}/dashboard?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${req.headers.origin}/dashboard?upgrade=cancelled`,
         metadata: {
           userId: req.session.userId?.toString() || '',

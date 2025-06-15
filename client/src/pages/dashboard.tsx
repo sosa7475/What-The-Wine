@@ -9,7 +9,7 @@ import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import WineRecommendations from "@/components/wine-recommendations";
 import WineScanner from "@/components/wine-scanner";
@@ -26,6 +26,7 @@ export default function Dashboard() {
   const logoutMutation = useLogout();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
   // Fetch library data for wine count
   const { data: libraryData } = useQuery({
@@ -37,12 +38,49 @@ export default function Dashboard() {
     enabled: isAuthenticated,
   });
 
-  // Handle Stripe checkout success/failure
+  // Handle Stripe checkout success/failure and verify subscription
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const upgrade = urlParams.get('upgrade');
+    const sessionId = urlParams.get('session_id');
     
-    if (upgrade === 'success') {
+    if (upgrade === 'success' && sessionId) {
+      // Verify subscription with backend
+      const verifySubscription = async () => {
+        try {
+          const response = await apiRequest("POST", "/api/check-subscription", {
+            sessionId: sessionId
+          });
+          const result = await response.json();
+          
+          if (result.success && result.isPremium) {
+            toast({
+              title: "Welcome to Premium!",
+              description: "Your subscription is now active. Enjoy unlimited wine recommendations!",
+            });
+            // Invalidate auth cache to refresh user data
+            queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+            // Refresh page to ensure all components update
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            toast({
+              title: "Subscription Verification",
+              description: "Please refresh the page to see your updated subscription status.",
+            });
+          }
+        } catch (error) {
+          console.error("Error verifying subscription:", error);
+          toast({
+            title: "Subscription Update",
+            description: "Your payment was successful. Please refresh the page to see your premium status.",
+          });
+        }
+      };
+      
+      verifySubscription();
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard');
+    } else if (upgrade === 'success') {
       toast({
         title: "Welcome to Premium!",
         description: "Your subscription is now active. Enjoy unlimited wine recommendations!",
