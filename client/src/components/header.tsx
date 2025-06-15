@@ -126,7 +126,7 @@ export default function Header({ onScrollTo }: HeaderProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-white text-white hover:bg-white hover:text-burgundy-700"
+                    className="border-white text-white hover:bg-white hover:text-burgundy-700 bg-transparent"
                   >
                     Get Started
                   </Button>
