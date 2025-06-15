@@ -8,6 +8,7 @@ import WineScanner from "@/components/wine-scanner";
 import WineLibrary from "@/components/wine-library";
 import Testimonials from "@/components/testimonials";
 import AuthDialog from "@/components/auth-dialog";
+import EmailSubscriptionForm from "@/components/email-subscription";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -222,25 +223,7 @@ export default function Home() {
               </p>
             </div>
             
-            <form className="max-w-md mx-auto">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
-                  required
-                />
-                <Button
-                  type="submit"
-                  className="bg-burgundy-600 hover:bg-burgundy-700 text-white px-6 py-3 whitespace-nowrap"
-                >
-                  Subscribe
-                </Button>
-              </div>
-              <p className="text-sm text-gray-500 mt-3 text-center">
-                No spam, unsubscribe anytime. Your privacy is important to us.
-              </p>
-            </form>
+            <EmailSubscriptionForm />
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 pt-8 border-t border-gray-200">
               <div className="text-center">

@@ -178,6 +178,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email subscription endpoint
+  app.post("/api/subscribe", async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      if (!email || !email.includes("@")) {
+        return res.status(400).json({ error: "Valid email address is required" });
+      }
+
+      // Check if email already exists
+      const existingSubscription = await storage.getSubscriptionByEmail(email);
+      if (existingSubscription) {
+        return res.json({ 
+          message: "Email already subscribed",
+          alreadySubscribed: true 
+        });
+      }
+
+      // Add new subscription
+      await storage.createSubscription({ email });
+
+      res.json({ 
+        message: "Successfully subscribed to our newsletter",
+        success: true 
+      });
+    } catch (error) {
+      console.error("Error subscribing email:", error);
+      res.status(500).json({ 
+        error: "Failed to subscribe", 
+        message: (error as Error).message 
+      });
+    }
+  });
+
   // Search wines
   app.get("/api/wines/search", async (req, res) => {
     try {

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, real, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -52,6 +52,13 @@ export const wineRecommendations = pgTable("wine_recommendations", {
   preferences: text("preferences"),
   recommendations: text("recommendations"), // JSON string of wine IDs
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const emailSubscriptions = pgTable("email_subscriptions", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  subscribedAt: timestamp("subscribed_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
 });
 
 // Insert schemas
