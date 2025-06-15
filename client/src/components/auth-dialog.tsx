@@ -119,13 +119,10 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input 
+                          {...field}
                           type="email" 
                           placeholder="Enter your email"
                           autoComplete="email"
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
                         />
                       </FormControl>
                       <FormMessage />
@@ -140,13 +137,10 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input 
+                          {...field}
                           type="password" 
                           placeholder="Enter your password"
                           autoComplete="current-password"
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
                         />
                       </FormControl>
                       <FormMessage />
@@ -174,11 +168,8 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                         <FormLabel>First Name</FormLabel>
                         <FormControl>
                           <Input 
+                            {...field}
                             placeholder="John" 
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            name={field.name}
                           />
                         </FormControl>
                         <FormMessage />
@@ -193,11 +184,8 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                         <FormLabel>Last Name</FormLabel>
                         <FormControl>
                           <Input 
+                            {...field}
                             placeholder="Doe" 
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            name={field.name}
                           />
                         </FormControl>
                         <FormMessage />
@@ -213,11 +201,8 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                       <FormLabel>Username</FormLabel>
                       <FormControl>
                         <Input 
+                          {...field}
                           placeholder="johndoe" 
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
                         />
                       </FormControl>
                       <FormMessage />
@@ -232,13 +217,10 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input 
+                          {...field}
                           type="email" 
                           placeholder="Enter your email"
                           autoComplete="email"
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
                         />
                       </FormControl>
                       <FormMessage />
@@ -253,13 +235,10 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input 
+                          {...field}
                           type="password" 
                           placeholder="Create a password"
                           autoComplete="new-password"
-                          value={field.value || ""}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
                         />
                       </FormControl>
                       <FormMessage />
