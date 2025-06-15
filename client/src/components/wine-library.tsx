@@ -8,6 +8,7 @@ import { Search, Filter, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
+import type { UserWineLibrary, Wine } from "@shared/schema";
 import WineCard from "./wine-card";
 import AuthDialog from "./auth-dialog";
 
@@ -52,7 +53,7 @@ export default function WineLibrary() {
     removeWineMutation.mutate({ wineId });
   };
 
-  const filteredWines = libraryData?.library.filter((entry) => {
+  const filteredWines = libraryData?.library.filter((entry: UserWineLibrary & { wine: Wine }) => {
     const wine = entry.wine;
     const matchesSearch = 
       wine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -186,7 +187,7 @@ export default function WineLibrary() {
         ) : (
           <>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-              {filteredWines.map((entry) => (
+              {filteredWines.map((entry: UserWineLibrary & { wine: Wine }) => (
                 <WineCard
                   key={entry.id}
                   wine={entry.wine}
