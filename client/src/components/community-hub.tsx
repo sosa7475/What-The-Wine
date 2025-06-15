@@ -112,7 +112,7 @@ export default function CommunityHub() {
     queryKey: ["/api/library"],
     enabled: isAuthenticated,
   });
-  const userWines = libraryData?.library || [];
+  const userWines = (libraryData as any)?.library || [];
 
   // Review form
   const reviewForm = useForm({
