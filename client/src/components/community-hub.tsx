@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Star, Heart, MessageCircle, Plus, Wine, Calendar, MapPin, DollarSign } from "lucide-react";
@@ -255,24 +255,27 @@ export default function CommunityHub() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-burgundy-700">Wine Community</h2>
-          <p className="text-gray-600">
+          <h2 className="text-2xl sm:text-3xl font-bold text-burgundy-700">Wine Community</h2>
+          <p className="text-gray-600 text-sm sm:text-base">
             Share your wine experiences and discover new favorites from fellow enthusiasts.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
             <DialogTrigger asChild>
-              <Button className="bg-burgundy-600 hover:bg-burgundy-700">
+              <Button className="bg-burgundy-600 hover:bg-burgundy-700 w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 Write Review
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md mx-4 sm:mx-auto">
               <DialogHeader>
                 <DialogTitle>Write a Wine Review</DialogTitle>
+                <DialogDescription>
+                  Share your wine tasting experience with the community
+                </DialogDescription>
               </DialogHeader>
               <Form {...reviewForm}>
                 <form onSubmit={reviewForm.handleSubmit((data) => createReviewMutation.mutate(data))} className="space-y-4">
@@ -336,7 +339,13 @@ export default function CommunityHub() {
                       <FormItem>
                         <FormLabel>Review Title</FormLabel>
                         <FormControl>
-                          <Input placeholder="Sum up your experience..." {...field} />
+                          <Input 
+                            placeholder="Sum up your experience..." 
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -352,7 +361,10 @@ export default function CommunityHub() {
                           <Textarea
                             placeholder="Share your tasting notes, thoughts, and experiences with this wine..."
                             rows={4}
-                            {...field}
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
                           />
                         </FormControl>
                         <FormMessage />
@@ -382,14 +394,17 @@ export default function CommunityHub() {
 
           <Dialog open={showRecommendationDialog} onOpenChange={setShowRecommendationDialog}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="border-burgundy-300 text-burgundy-700">
+              <Button variant="outline" className="border-burgundy-300 text-burgundy-700 w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 Share Recommendation
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md mx-4 sm:mx-auto">
               <DialogHeader>
                 <DialogTitle>Share a Wine Recommendation</DialogTitle>
+                <DialogDescription>
+                  Recommend a wine to the community with details about why it's special
+                </DialogDescription>
               </DialogHeader>
               <Form {...recommendationForm}>
                 <form onSubmit={recommendationForm.handleSubmit((data) => createRecommendationMutation.mutate(data))} className="space-y-4">
