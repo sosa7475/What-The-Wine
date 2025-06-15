@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,11 +27,28 @@ interface AuthDialogProps {
   children: React.ReactNode;
   defaultMode?: "login" | "register";
   onOpen?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function AuthDialog({ children, defaultMode = "login", onOpen }: AuthDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function AuthDialog({ 
+  children, 
+  defaultMode = "login", 
+  onOpen, 
+  open: controlledOpen, 
+  onOpenChange: controlledOnOpenChange 
+}: AuthDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [mode, setMode] = useState<"login" | "register">(defaultMode);
+  
+  // Update mode when defaultMode changes (for controlled usage)
+  useState(() => {
+    setMode(defaultMode);
+  });
+  
+  // Use controlled state if provided, otherwise use internal state
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setIsOpen = controlledOnOpenChange !== undefined ? controlledOnOpenChange : setInternalOpen;
   const { toast } = useToast();
 
   const loginMutation = useLogin();

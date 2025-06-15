@@ -13,6 +13,8 @@ interface HeaderProps {
 
 export default function Header({ onScrollTo }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
   const { user, isAuthenticated, isLoading } = useAuth();
   const logoutMutation = useLogout();
   const { toast } = useToast();
@@ -232,23 +234,29 @@ export default function Header({ onScrollTo }: HeaderProps) {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <AuthDialog defaultMode="login" onOpen={() => setIsMenuOpen(false)}>
-                        <Button
-                          size="sm"
-                          className="w-full bg-burgundy-600 hover:bg-burgundy-700 text-white"
-                        >
-                          Sign In
-                        </Button>
-                      </AuthDialog>
-                      <AuthDialog defaultMode="register" onOpen={() => setIsMenuOpen(false)}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full border-burgundy-300 text-burgundy-700 hover:bg-burgundy-50"
-                        >
-                          Get Started
-                        </Button>
-                      </AuthDialog>
+                      <Button
+                        size="sm"
+                        className="w-full bg-burgundy-600 hover:bg-burgundy-700 text-white"
+                        onClick={() => {
+                          setAuthMode("login");
+                          setShowAuthDialog(true);
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        Sign In
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full border-burgundy-300 text-burgundy-700 hover:bg-burgundy-50"
+                        onClick={() => {
+                          setAuthMode("register");
+                          setShowAuthDialog(true);
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        Get Started
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -257,6 +265,15 @@ export default function Header({ onScrollTo }: HeaderProps) {
           </>
         )}
       </div>
+      
+      {/* Standalone AuthDialog for mobile menu */}
+      <AuthDialog 
+        defaultMode={authMode}
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+      >
+        <div />
+      </AuthDialog>
     </header>
   );
 }
