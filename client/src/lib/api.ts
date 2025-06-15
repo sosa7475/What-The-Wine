@@ -36,8 +36,8 @@ export async function analyzeWineBottle(imageFile: File): Promise<WineAnalysisRe
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error || "Failed to analyze wine bottle");
+    const errorData = await response.json().catch(() => ({ error: "Failed to analyze wine bottle" }));
+    throw new Error(errorData.error || errorData.message || "Failed to analyze wine bottle");
   }
 
   return response.json();

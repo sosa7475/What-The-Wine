@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { Wine, WinePreferences } from "@shared/schema";
+import type { Wine, WinePreferences, InsertWine } from "@shared/schema";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
@@ -65,7 +65,7 @@ Please provide real, high-quality wine recommendations that match these preferen
   }
 }
 
-export async function analyzeWineBottle(base64Image: string): Promise<Wine> {
+export async function analyzeWineBottle(base64Image: string): Promise<InsertWine> {
   try {
     const prompt = `Analyze this wine bottle image and provide detailed information about the wine. Respond with JSON in this exact format:
 
@@ -113,7 +113,27 @@ Identify the wine from the label and provide accurate information including tast
     });
 
     const result = JSON.parse(response.choices[0].message.content || "{}");
-    return result;
+    
+    // Validate and provide fallback values for required fields
+    const validatedWine = {
+      name: result.name || "Unknown Wine",
+      winery: result.winery || "Unknown Winery",
+      region: result.region || "Unknown Region",
+      country: result.country || "Unknown Country",
+      vintage: result.vintage && !isNaN(parseInt(result.vintage)) ? parseInt(result.vintage) : new Date().getFullYear(),
+      type: ["red", "white", "rose", "sparkling", "dessert"].includes(result.type) ? result.type : "red",
+      price: result.price && !isNaN(parseFloat(result.price)) ? parseFloat(result.price) : 0,
+      rating: result.rating && !isNaN(parseFloat(result.rating)) ? Math.min(5, Math.max(0, parseFloat(result.rating))) : 0,
+      description: result.description || "Wine details analyzed from bottle image",
+      tasteProfile: result.tasteProfile || "Profile not available",
+      foodPairings: Array.isArray(result.foodPairings) ? result.foodPairings : ["Various dishes"],
+      imageUrl: result.imageUrl || "",
+      alcoholContent: result.alcoholContent && !isNaN(parseFloat(result.alcoholContent)) ? parseFloat(result.alcoholContent) : 12.5,
+      servingTemp: result.servingTemp || "Serve at cellar temperature",
+      source: "scanned"
+    } as Omit<Wine, 'id'>;
+    
+    return validatedWine;
   } catch (error) {
     console.error("Error analyzing wine bottle:", error);
     throw new Error("Failed to analyze wine bottle: " + (error as Error).message);
