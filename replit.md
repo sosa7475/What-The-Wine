@@ -78,6 +78,9 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Finalized support page navigation with consistent headers, back buttons, and footers across all pages
+- June 15, 2025. Removed phone contact option from Contact Us page, maintaining email-only support (support@whatthewine.com)
+- June 15, 2025. Added complete navigation infrastructure to Help Center, Contact Us, Privacy Policy, and Terms of Service
 - June 15, 2025. Created comprehensive support page system with Help Center, Contact Us, Privacy Policy, and Terms of Service
 - June 15, 2025. Added professional FAQ sections covering all app features and premium subscription details
 - June 15, 2025. Implemented contact form with subject categorization and success confirmation workflow
