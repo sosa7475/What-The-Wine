@@ -16,7 +16,11 @@ export default function Header({ onScrollTo }: HeaderProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const logoutMutation = useLogout();
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  
+  // Check if we're on a support page
+  const isSupportPage = location.includes('/help') || location.includes('/contact') || 
+                       location.includes('/privacy') || location.includes('/terms');
 
   const navigation = isAuthenticated ? [
     { name: "Dashboard", id: "dashboard", isRoute: true },
@@ -29,6 +33,9 @@ export default function Header({ onScrollTo }: HeaderProps) {
   const handleNavigation = (item: { name: string; id: string; isRoute?: boolean }) => {
     if (item.isRoute) {
       setLocation(`/${item.id}`);
+    } else if (isSupportPage) {
+      // From support pages, always redirect to home page
+      setLocation("/");
     } else if (isAuthenticated) {
       // For authenticated users, redirect to dashboard with the specific tab
       setLocation("/dashboard");
@@ -70,11 +77,22 @@ export default function Header({ onScrollTo }: HeaderProps) {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <img 
-              src={logoPath} 
-              alt="What the Wine" 
-              className="h-12 w-auto object-contain"
-            />
+            <button
+              onClick={() => {
+                if (isSupportPage) {
+                  setLocation("/");
+                } else {
+                  onScrollTo("hero");
+                }
+              }}
+              className="focus:outline-none"
+            >
+              <img 
+                src={logoPath} 
+                alt="What the Wine" 
+                className="h-12 w-auto object-contain hover:opacity-80 transition-opacity"
+              />
+            </button>
           </div>
 
           {/* Desktop Navigation */}
