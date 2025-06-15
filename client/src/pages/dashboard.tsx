@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,6 +18,29 @@ export default function Dashboard() {
   const logoutMutation = useLogout();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+
+  // Handle Stripe checkout success/failure
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const upgrade = urlParams.get('upgrade');
+    
+    if (upgrade === 'success') {
+      toast({
+        title: "Welcome to Premium!",
+        description: "Your subscription is now active. Enjoy unlimited wine recommendations!",
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard');
+    } else if (upgrade === 'cancelled') {
+      toast({
+        title: "Upgrade Cancelled",
+        description: "You can upgrade to premium anytime from your dashboard.",
+        variant: "destructive",
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, [toast]);
 
   const handleLogout = async () => {
     try {

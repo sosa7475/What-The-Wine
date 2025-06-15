@@ -178,6 +178,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Stripe checkout session for premium subscription
+  app.post("/api/create-checkout-session", requireAuth, async (req, res) => {
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'What the Wine Premium',
+                description: 'Unlimited wine recommendations and premium features',
+              },
+              unit_amount: 695, // $6.95 in cents
+              recurring: {
+                interval: 'month',
+              },
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'subscription',
+        success_url: `${req.headers.origin}/dashboard?upgrade=success`,
+        cancel_url: `${req.headers.origin}/dashboard?upgrade=cancelled`,
+        metadata: {
+          userId: req.session.userId?.toString() || '',
+        },
+      });
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
   // Email subscription endpoint
   app.post("/api/subscribe", async (req, res) => {
     try {
