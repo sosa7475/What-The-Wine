@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Phone, MapPin, MessageCircle, Clock, CheckCircle, ArrowLeft } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Clock, CheckCircle, ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -66,12 +66,6 @@ export default function Contact() {
       title: "Email Us",
       description: "support@whatthewine.com",
       subtitle: "We typically respond within 24 hours"
-    },
-    {
-      icon: <Phone className="w-5 h-5" />,
-      title: "Call Us",
-      description: "+1 (555) 123-WINE",
-      subtitle: "Monday - Friday, 9 AM - 6 PM EST"
     }
   ];
 
