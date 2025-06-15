@@ -1,5 +1,6 @@
 import { Wine } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoPath from "@assets/WtW_1749955950754.png";
 
 interface HeaderProps {
   onScrollTo: (section: string) => void;
@@ -12,7 +13,7 @@ export default function Header({ onScrollTo }: HeaderProps) {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
             <img 
-              src="@assets/WtW_1749955950754.png" 
+              src={logoPath} 
               alt="What the Wine" 
               className="h-10 w-10 object-contain"
             />

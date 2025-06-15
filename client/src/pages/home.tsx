@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Wine, Brain, Camera, Bookmark, Crown, LogOut, User } from "lucide-react";
+import logoPath from "@assets/WtW_1749955950754.png";
 import Header from "@/components/header";
 import WineRecommendations from "@/components/wine-recommendations";
 import WineScanner from "@/components/wine-scanner";
@@ -141,7 +142,7 @@ export default function Home() {
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
                 <img 
-                  src="@assets/WtW_1749955950754.png" 
+                  src={logoPath} 
                   alt="What the Wine" 
                   className="h-8 w-8 object-contain"
                 />
