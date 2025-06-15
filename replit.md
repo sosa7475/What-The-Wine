@@ -78,6 +78,9 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Updated subscription pricing to $6.95/month with Stripe secure checkout integration
+- June 15, 2025. Enhanced background color for better text contrast in call-to-action section
+- June 15, 2025. Complete email subscription system with database storage and user notifications
 - June 15, 2025. Comprehensive user dashboard implemented with seamless tab navigation
 - June 15, 2025. Added email signup section and secondary call-to-action on home page
 - June 15, 2025. Complete authentication and payment system implemented with Stripe integration
