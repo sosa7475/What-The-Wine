@@ -136,33 +136,6 @@ export default function Home() {
       {/* Testimonials Section */}
       <Testimonials />
       
-      {/* Limited Time Offer Banner */}
-      <section className="py-16 bg-red-600 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700"></div>
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-white text-red-600 text-sm font-bold px-4 py-2 rounded-full inline-block mb-4">
-            🔥 LIMITED TIME OFFER
-          </div>
-          <h3 className="font-playfair text-3xl font-bold mb-4">
-            Premium Wine Experience at 30% Off!
-          </h3>
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="text-2xl line-through opacity-75">$9.99/month</div>
-            <div className="text-4xl font-bold">$6.95/month</div>
-          </div>
-          <p className="text-lg mb-6 opacity-90">
-            Get unlimited wine recommendations, advanced bottle scanning, and your personal wine library
-          </p>
-          <AuthDialog defaultMode="register">
-            <Button
-              size="lg"
-              className="bg-white text-red-600 hover:bg-gray-100 font-semibold px-8 py-3"
-            >
-              Claim This Deal Now
-            </Button>
-          </AuthDialog>
-        </div>
-      </section>
       {/* Secondary Call to Action Section */}
       <section className="py-20 bg-gradient-to-r from-burgundy-800 to-burgundy-900 relative overflow-hidden">
         {/* Background Pattern */}
