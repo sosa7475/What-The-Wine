@@ -78,6 +78,7 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Changed subscription pricing from $6.95 to $3.99 across all displays and Stripe functionality
 - June 15, 2025. Updated wine image system to use custom uploaded wine type images (red, white, rosé, sparkling)
 - June 15, 2025. Enhanced wine bottle scanner to automatically save scanned wines to user's library for authenticated users
 - June 15, 2025. Fixed password field input issue in authentication dialog using direct React Hook Form registration

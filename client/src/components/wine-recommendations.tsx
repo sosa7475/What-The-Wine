@@ -175,7 +175,7 @@ export default function WineRecommendations() {
                         size="sm"
                       >
                         <Crown className="w-4 h-4 mr-2" />
-                        Upgrade to Premium - $6.95
+                        Upgrade to Premium - $3.99
                       </Button>
                     </div>
                   )}

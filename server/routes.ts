@@ -221,7 +221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 name: 'What the Wine Premium',
                 description: 'Unlimited wine recommendations and premium features',
               },
-              unit_amount: 695, // $6.95 in cents
+              unit_amount: 399, // $3.99 in cents
               recurring: {
                 interval: 'month',
               },

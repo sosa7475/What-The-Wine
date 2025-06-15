@@ -426,7 +426,7 @@ export default function Dashboard() {
                       className="w-full bg-burgundy-600 hover:bg-burgundy-700 text-white"
                     >
                       <Crown className="w-4 h-4 mr-2" />
-                      Upgrade Now - $6.95
+                      Upgrade Now - $3.99
                     </Button>
                   </CardContent>
                 </Card>
