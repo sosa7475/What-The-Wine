@@ -21,6 +21,7 @@ export default function Dashboard() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [isUsageStatsOpen, setIsUsageStatsOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState("recommendations");
   const { user, isAuthenticated } = useAuth();
   const logoutMutation = useLogout();
   const { toast } = useToast();
@@ -287,7 +288,7 @@ export default function Dashboard() {
         </div>
 
         {/* Main Dashboard Tabs */}
-        <Tabs defaultValue="recommendations" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
             <TabsTrigger value="recommendations" className="flex items-center gap-2">
               <Star className="w-4 h-4" />
@@ -348,7 +349,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <WineLibrary />
+                <WineLibrary onNavigateToRecommendations={() => setActiveTab("recommendations")} />
               </CardContent>
             </Card>
           </TabsContent>

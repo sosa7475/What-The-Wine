@@ -12,7 +12,11 @@ import type { UserWineLibrary, Wine } from "@shared/schema";
 import WineCard from "./wine-card";
 import AuthDialog from "./auth-dialog";
 
-export default function WineLibrary() {
+interface WineLibraryProps {
+  onNavigateToRecommendations?: () => void;
+}
+
+export default function WineLibrary({ onNavigateToRecommendations }: WineLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const { toast } = useToast();
@@ -176,7 +180,7 @@ export default function WineLibrary() {
               </p>
               {libraryData?.library.length === 0 && (
                 <Button
-                  onClick={() => document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={onNavigateToRecommendations}
                   className="mt-4 bg-burgundy-600 hover:bg-burgundy-700 text-white"
                 >
                   Get Recommendations
