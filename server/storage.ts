@@ -353,7 +353,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(reviewComments)
       .where(and(eq(reviewComments.id, commentId), eq(reviewComments.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   // Community recommendation operations
@@ -430,7 +430,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(communityRecommendations)
       .where(and(eq(communityRecommendations.id, recommendationId), eq(communityRecommendations.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   // Recommendation comment operations
@@ -466,7 +466,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(recommendationComments)
       .where(and(eq(recommendationComments.id, commentId), eq(recommendationComments.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   // Recommendation like operations

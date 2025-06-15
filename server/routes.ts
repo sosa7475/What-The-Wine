@@ -423,6 +423,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Community Features - Wine Reviews
+  app.post("/api/community/reviews", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const reviewData = insertWineReviewSchema.parse(req.body);
+      
+      const review = await storage.createWineReview({
+        ...reviewData,
+        userId,
+      });
+      
+      res.json(review);
+    } catch (error) {
+      console.error("Error creating wine review:", error);
+      res.status(500).json({ error: "Failed to create wine review" });
+    }
+  });
+
+  app.get("/api/community/reviews/wine/:wineId", async (req, res) => {
+    try {
+      const wineId = parseInt(req.params.wineId);
+      const reviews = await storage.getWineReviews(wineId);
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching wine reviews:", error);
+      res.status(500).json({ error: "Failed to fetch wine reviews" });
+    }
+  });
+
+  app.get("/api/community/reviews/user", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const reviews = await storage.getUserReviews(userId);
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching user reviews:", error);
+      res.status(500).json({ error: "Failed to fetch user reviews" });
+    }
+  });
+
+  // Community Features - Wine Recommendations
+  app.post("/api/community/recommendations", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const recommendationData = insertCommunityRecommendationSchema.parse(req.body);
+      
+      const recommendation = await storage.createCommunityRecommendation({
+        ...recommendationData,
+        userId,
+      });
+      
+      res.json(recommendation);
+    } catch (error) {
+      console.error("Error creating community recommendation:", error);
+      res.status(500).json({ error: "Failed to create community recommendation" });
+    }
+  });
+
+  app.get("/api/community/recommendations", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+      
+      const recommendations = await storage.getCommunityRecommendations(limit, offset);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error fetching community recommendations:", error);
+      res.status(500).json({ error: "Failed to fetch community recommendations" });
+    }
+  });
+
+  app.get("/api/community/recommendations/user", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const recommendations = await storage.getUserCommunityRecommendations(userId);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error fetching user recommendations:", error);
+      res.status(500).json({ error: "Failed to fetch user recommendations" });
+    }
+  });
+
+  app.post("/api/community/recommendations/:id/like", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const recommendationId = parseInt(req.params.id);
+      
+      const liked = await storage.toggleRecommendationLike(userId, recommendationId);
+      res.json({ liked });
+    } catch (error) {
+      console.error("Error toggling recommendation like:", error);
+      res.status(500).json({ error: "Failed to toggle recommendation like" });
+    }
+  });
+
+  // Community Features - Comments
+  app.post("/api/community/reviews/:reviewId/comments", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const reviewId = parseInt(req.params.reviewId);
+      const commentData = insertReviewCommentSchema.parse(req.body);
+      
+      const comment = await storage.createReviewComment({
+        ...commentData,
+        userId,
+        reviewId,
+      });
+      
+      res.json(comment);
+    } catch (error) {
+      console.error("Error creating review comment:", error);
+      res.status(500).json({ error: "Failed to create review comment" });
+    }
+  });
+
+  app.get("/api/community/reviews/:reviewId/comments", async (req, res) => {
+    try {
+      const reviewId = parseInt(req.params.reviewId);
+      const comments = await storage.getReviewComments(reviewId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching review comments:", error);
+      res.status(500).json({ error: "Failed to fetch review comments" });
+    }
+  });
+
+  app.post("/api/community/recommendations/:recommendationId/comments", requireAuth, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const recommendationId = parseInt(req.params.recommendationId);
+      const commentData = insertRecommendationCommentSchema.parse(req.body);
+      
+      const comment = await storage.createRecommendationComment({
+        ...commentData,
+        userId,
+        recommendationId,
+      });
+      
+      res.json(comment);
+    } catch (error) {
+      console.error("Error creating recommendation comment:", error);
+      res.status(500).json({ error: "Failed to create recommendation comment" });
+    }
+  });
+
+  app.get("/api/community/recommendations/:recommendationId/comments", async (req, res) => {
+    try {
+      const recommendationId = parseInt(req.params.recommendationId);
+      const comments = await storage.getRecommendationComments(recommendationId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching recommendation comments:", error);
+      res.status(500).json({ error: "Failed to fetch recommendation comments" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

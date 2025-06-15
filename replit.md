@@ -78,6 +78,9 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Implemented comprehensive wine community features including reviews, recommendations, and commenting system
+- June 15, 2025. Added Community tab to dashboard with wine review and recommendation creation forms
+- June 15, 2025. Created complete backend API for community features with proper authentication and data validation
 - June 15, 2025. Removed promotional banner from home page, kept discount pricing only in payment dialogs and upgrade prompts
 - June 15, 2025. Made Usage Stats section collapsible in dashboard with chevron toggle and smooth animations
 - June 15, 2025. Added promotional pricing: $9.99 crossed out, $6.95 sale price with "Limited Time Offer" messaging
