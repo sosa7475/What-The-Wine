@@ -439,7 +439,13 @@ export default function CommunityHub() {
                       <FormItem>
                         <FormLabel>Recommendation Title</FormLabel>
                         <FormControl>
-                          <Input placeholder="Why recommend this wine?" {...field} />
+                          <Input 
+                            placeholder="Why recommend this wine?" 
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -455,14 +461,17 @@ export default function CommunityHub() {
                           <Textarea
                             placeholder="Describe why others should try this wine..."
                             rows={3}
-                            {...field}
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField
                       control={recommendationForm.control}
                       name="occasion"
@@ -470,7 +479,13 @@ export default function CommunityHub() {
                         <FormItem>
                           <FormLabel>Occasion</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., Date night" {...field} />
+                            <Input 
+                              placeholder="e.g., Date night" 
+                              value={field.value || ""}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              name={field.name}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -483,7 +498,13 @@ export default function CommunityHub() {
                         <FormItem>
                           <FormLabel>Food Pairing</FormLabel>
                           <FormControl>
-                            <Input placeholder="e.g., Steak" {...field} />
+                            <Input 
+                              placeholder="e.g., Steak" 
+                              value={field.value || ""}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              name={field.name}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
