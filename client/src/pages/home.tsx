@@ -130,8 +130,48 @@ export default function Home() {
       <Testimonials />
 
       {/* Secondary Call to Action Section */}
-      <section className="py-20 bg-gradient-to-r from-burgundy-600 to-burgundy-800">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-20 bg-gradient-to-r from-burgundy-600 to-burgundy-800 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+              <pattern id="wine-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="10" cy="10" r="1.5" fill="white" opacity="0.3"/>
+                <circle cx="5" cy="5" r="1" fill="white" opacity="0.2"/>
+                <circle cx="15" cy="15" r="1" fill="white" opacity="0.2"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#wine-pattern)" />
+          </svg>
+        </div>
+        
+        {/* Wine Bottle Silhouettes */}
+        <div className="absolute left-10 top-10 opacity-5 transform rotate-12">
+          <svg width="60" height="120" viewBox="0 0 60 120" fill="white">
+            <path d="M20 0h20v30l5 5v85h-30V35l5-5V0z"/>
+          </svg>
+        </div>
+        <div className="absolute right-16 bottom-16 opacity-5 transform -rotate-12">
+          <svg width="60" height="120" viewBox="0 0 60 120" fill="white">
+            <path d="M20 0h20v30l5 5v85h-30V35l5-5V0z"/>
+          </svg>
+        </div>
+        
+        {/* Grape Vine Pattern */}
+        <div className="absolute right-10 top-20 opacity-8">
+          <svg width="80" height="100" viewBox="0 0 80 100" fill="white">
+            <circle cx="20" cy="20" r="3"/>
+            <circle cx="25" cy="25" r="3"/>
+            <circle cx="30" cy="20" r="3"/>
+            <circle cx="35" cy="25" r="3"/>
+            <circle cx="22" cy="30" r="3"/>
+            <circle cx="28" cy="32" r="3"/>
+            <circle cx="33" cy="30" r="3"/>
+            <path d="M25 10 Q30 15 35 10" stroke="white" strokeWidth="2" fill="none"/>
+          </svg>
+        </div>
+        
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <div className="mb-8">
             <h2 className="font-playfair text-4xl font-bold text-white mb-6">
               Ready to Discover Your Perfect Wine?
