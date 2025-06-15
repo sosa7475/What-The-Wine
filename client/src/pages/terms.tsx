@@ -268,7 +268,7 @@ export default function Terms() {
               If you have questions about these terms of service or need clarification on any provision, please contact us.
             </p>
             <div className="space-y-2 text-burgundy-100">
-              <p><strong>Email:</strong> legal@whatthewine.com</p>
+              <p><strong>Email:</strong> support@whatthewine.com</p>
             </div>
             <p className="text-sm text-burgundy-200 mt-6">
               By using What the Wine, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.

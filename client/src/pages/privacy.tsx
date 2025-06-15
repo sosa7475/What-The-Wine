@@ -234,7 +234,7 @@ export default function Privacy() {
               If you have questions about this privacy policy or how we handle your data, please don't hesitate to contact us.
             </p>
             <div className="space-y-2 text-burgundy-100">
-              <p><strong>Email:</strong> privacy@whatthewine.com</p>
+              <p><strong>Email:</strong> support@whatthewine.com</p>
             </div>
           </CardContent>
         </Card>
