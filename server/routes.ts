@@ -109,10 +109,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.session.user;
 
       // Check usage limits for non-premium users
-      if (!user.isPremium && (user.recommendationCount || 0) >= 3) {
+      if (!user.isPremium && (user.recommendationCount || 0) >= 5) {
         return res.status(402).json({ 
           error: "Usage limit reached",
-          message: "You've used your 3 free recommendations. Upgrade to premium for unlimited access.",
+          message: "You've used your 5 free recommendations. Upgrade to premium for unlimited access.",
           requiresPayment: true
         });
       }

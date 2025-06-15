@@ -78,6 +78,8 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Increased free recommendation limit from 3 to 5 recommendations before requiring premium upgrade
+- June 15, 2025. Fixed "Get Recommendations" button to properly switch dashboard tabs instead of scrolling
 - June 15, 2025. Fixed wine image system to display proper wine bottles and glasses matching wine type/color instead of random images
 - June 15, 2025. Updated wine image generation with curated, wine-specific photos for red, white, rosé, and sparkling wines
 - June 15, 2025. Enhanced wine cards with professional wine bottle imagery and consistent image mapping

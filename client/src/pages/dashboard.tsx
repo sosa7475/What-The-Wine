@@ -175,16 +175,16 @@ export default function Dashboard() {
                     <div className="flex items-center justify-between">
                       <span className="text-orange-700">Free Recommendations Used:</span>
                       <span className="font-semibold text-orange-800">
-                        {user.recommendationCount || 0} / 3
+                        {user.recommendationCount || 0} / 5
                       </span>
                     </div>
                     <div className="w-full bg-orange-200 rounded-full h-3">
                       <div 
                         className="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-300"
-                        style={{ width: `${usagePercentage}%` }}
+                        style={{ width: `${Math.min(100, ((user.recommendationCount || 0) / 5) * 100)}%` }}
                       ></div>
                     </div>
-                    {(user.recommendationCount || 0) >= 3 && (
+                    {(user.recommendationCount || 0) >= 5 && (
                       <div className="text-sm text-orange-700 font-medium">
                         You've reached your free limit. Upgrade for unlimited recommendations!
                       </div>
@@ -249,7 +249,7 @@ export default function Dashboard() {
                   <p className="text-sm font-medium text-gray-500">Recommendations Used</p>
                   <p className="text-2xl font-bold text-gray-900">
                     {user.recommendationCount || 0}
-                    {user.isPremium ? "" : " / 3"}
+                    {user.isPremium ? "" : " / 5"}
                   </p>
                 </div>
               </div>

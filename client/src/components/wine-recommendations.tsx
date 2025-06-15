@@ -54,7 +54,7 @@ export default function WineRecommendations() {
         setShowPaymentDialog(true);
         toast({
           title: "Usage Limit Reached",
-          description: "You've used your 3 free recommendations. Upgrade to premium for unlimited access.",
+          description: "You've used your 5 free recommendations. Upgrade to premium for unlimited access.",
           variant: "destructive",
         });
       } else if (error.message?.includes("Authentication required")) {
