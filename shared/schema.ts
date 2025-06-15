@@ -62,6 +62,54 @@ export const emailSubscriptions = pgTable("email_subscriptions", {
   isActive: boolean("is_active").default(true),
 });
 
+export const wineReviews = pgTable("wine_reviews", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  wineId: integer("wine_id").notNull(),
+  rating: integer("rating").notNull(), // 1-5 stars
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const communityRecommendations = pgTable("community_recommendations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  wineId: integer("wine_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  occasion: text("occasion"),
+  foodPairing: text("food_pairing"),
+  priceValue: integer("price_value"), // 1-5 scale
+  likesCount: integer("likes_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const reviewComments = pgTable("review_comments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  reviewId: integer("review_id").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const recommendationComments = pgTable("recommendation_comments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  recommendationId: integer("recommendation_id").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const recommendationLikes = pgTable("recommendation_likes", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  recommendationId: integer("recommendation_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -103,6 +151,34 @@ export const insertEmailSubscriptionSchema = createInsertSchema(emailSubscriptio
   subscribedAt: true,
 });
 
+export const insertWineReviewSchema = createInsertSchema(wineReviews).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCommunityRecommendationSchema = createInsertSchema(communityRecommendations).omit({
+  id: true,
+  likesCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertReviewCommentSchema = createInsertSchema(reviewComments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertRecommendationCommentSchema = createInsertSchema(recommendationComments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertRecommendationLikeSchema = createInsertSchema(recommendationLikes).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -118,6 +194,21 @@ export type WineRecommendation = typeof wineRecommendations.$inferSelect;
 
 export type InsertEmailSubscription = z.infer<typeof insertEmailSubscriptionSchema>;
 export type EmailSubscription = typeof emailSubscriptions.$inferSelect;
+
+export type InsertWineReview = z.infer<typeof insertWineReviewSchema>;
+export type WineReview = typeof wineReviews.$inferSelect;
+
+export type InsertCommunityRecommendation = z.infer<typeof insertCommunityRecommendationSchema>;
+export type CommunityRecommendation = typeof communityRecommendations.$inferSelect;
+
+export type InsertReviewComment = z.infer<typeof insertReviewCommentSchema>;
+export type ReviewComment = typeof reviewComments.$inferSelect;
+
+export type InsertRecommendationComment = z.infer<typeof insertRecommendationCommentSchema>;
+export type RecommendationComment = typeof recommendationComments.$inferSelect;
+
+export type InsertRecommendationLike = z.infer<typeof insertRecommendationLikeSchema>;
+export type RecommendationLike = typeof recommendationLikes.$inferSelect;
 
 // Preference schema for recommendations
 export const winePreferencesSchema = z.object({

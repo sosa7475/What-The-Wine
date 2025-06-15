@@ -4,7 +4,16 @@ import multer from "multer";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { getWineRecommendations, analyzeWineBottle } from "./openai";
-import { winePreferencesSchema, insertUserWineLibrarySchema, registerUserSchema, loginUserSchema } from "@shared/schema";
+import { 
+  winePreferencesSchema, 
+  insertUserWineLibrarySchema, 
+  registerUserSchema, 
+  loginUserSchema,
+  insertWineReviewSchema,
+  insertCommunityRecommendationSchema,
+  insertReviewCommentSchema,
+  insertRecommendationCommentSchema
+} from "@shared/schema";
 import { getSession, hashPassword, verifyPassword, requireAuth, optionalAuth } from "./auth";
 
 if (!process.env.STRIPE_SECRET_KEY) {
