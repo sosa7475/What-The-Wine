@@ -65,7 +65,7 @@ Please provide real, high-quality wine recommendations that match these preferen
   }
 }
 
-export async function analyzeWineBottle(base64Image: string): Promise<InsertWine> {
+export async function analyzeWineBottle(base64Image: string): Promise<any> {
   try {
     const prompt = `Analyze this wine bottle image and provide detailed information about the wine. Respond with JSON in this exact format:
 
@@ -131,7 +131,7 @@ Identify the wine from the label and provide accurate information including tast
       alcoholContent: result.alcoholContent && !isNaN(parseFloat(result.alcoholContent)) ? parseFloat(result.alcoholContent) : 12.5,
       servingTemp: result.servingTemp || "Serve at cellar temperature",
       source: "scanned"
-    } as Omit<Wine, 'id'>;
+    };
     
     return validatedWine;
   } catch (error) {
