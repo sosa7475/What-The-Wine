@@ -182,7 +182,7 @@ export default function Home() {
             <h2 className="font-playfair text-4xl font-bold mb-6 text-[#391316]">
               Ready to Discover Your Perfect Wine?
             </h2>
-            <p className="text-creme-100 text-lg max-w-2xl mx-auto mb-8">
+            <p className="text-lg max-w-2xl mx-auto mb-8 text-[#391316]">
               Join thousands of wine enthusiasts who trust What the Wine for personalized recommendations, 
               expert insights, and unforgettable wine experiences.
             </p>
