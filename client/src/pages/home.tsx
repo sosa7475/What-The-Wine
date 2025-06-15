@@ -42,7 +42,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-creme-50">
       <Header onScrollTo={scrollToSection} />
-      
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-burgundy-600 to-burgundy-900 text-white">
         <div className="absolute inset-0 opacity-60">
@@ -70,16 +69,12 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Wine Recommendations Section */}
       <WineRecommendations />
-
       {/* Wine Scanner Section */}
       <WineScanner />
-
       {/* Wine Library Section */}
       <WineLibrary />
-
       {/* Features Section */}
       <section className="py-20 bg-creme-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,10 +126,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Testimonials Section */}
       <Testimonials />
-
       {/* Footer */}
       <footer className="bg-burgundy-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -195,7 +188,7 @@ export default function Home() {
           </div>
 
           <div className="border-t border-burgundy-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Sommelier AI. All rights reserved. Elevating your wine experience with artificial intelligence.</p>
+            <p>© 2024 What the Wine. All rights reserved. Elevating your wine experience with artificial intelligence.</p>
           </div>
         </div>
       </footer>
