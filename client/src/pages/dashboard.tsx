@@ -127,23 +127,36 @@ export default function Dashboard() {
 
   const handleCancelPlan = async () => {
     try {
-      // In a real implementation, you would call Stripe's API to cancel the subscription
-      // For now, we'll simulate the cancellation
-      toast({
-        title: "Plan Cancelled",
-        description: "Your premium subscription has been cancelled. You'll continue to have access until the end of your billing period.",
-      });
-      setShowCancelDialog(false);
-      // Refresh user data to update premium status
-      window.location.reload();
+      const response = await apiRequest("POST", "/api/cancel-subscription");
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Subscription Cancelled",
+          description: result.message,
+        });
+        
+        // Refresh subscription data
+        queryClient.invalidateQueries({ queryKey: ["/api/subscription-details"] });
+        setShowCancelDialog(false);
+      } else {
+        toast({
+          title: "Cancellation Failed",
+          description: result.error || "Unable to cancel subscription",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
+      console.error("Error cancelling subscription:", error);
       toast({
         title: "Error",
-        description: "Failed to cancel subscription. Please contact support.",
+        description: "Failed to cancel subscription. Please try again.",
         variant: "destructive",
       });
     }
   };
+
+
 
   if (!isAuthenticated || !user) {
     return null; // This will be handled by routing
