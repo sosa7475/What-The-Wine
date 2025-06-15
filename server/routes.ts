@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import Stripe from "stripe";
@@ -241,6 +242,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error creating checkout session:', error);
       res.status(500).json({ error: 'Failed to create checkout session' });
+    }
+  });
+
+  // Check subscription status endpoint for manual verification
+  app.post("/api/check-subscription", requireAuth, async (req, res) => {
+    try {
+      const user = req.session.user!;
+      const { sessionId } = req.body;
+      
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID required" });
+      }
+      
+      // Retrieve the session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      
+      if (session.payment_status === 'paid' && session.mode === 'subscription') {
+        // Update user to premium
+        await storage.updateUserPremiumStatus(user.id, true);
+        
+        // Store Stripe customer ID
+        if (session.customer) {
+          await storage.updateUserStripeCustomerId(user.id, session.customer as string);
+        }
+        
+        // Update session
+        req.session.user = { ...user, isPremium: true };
+        
+        res.json({ success: true, isPremium: true });
+      } else {
+        res.json({ success: false, isPremium: false });
+      }
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      res.status(500).json({ error: 'Failed to check subscription status' });
     }
   });
 
