@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Wine, Menu, X, User, LogOut, Crown } from "lucide-react";
+import { Wine, Menu, X, User, LogOut, Crown, Camera, Bookmark } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
