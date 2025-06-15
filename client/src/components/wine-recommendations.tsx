@@ -2,22 +2,27 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, Crown, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getWineRecommendations, addWineToLibrary } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
+import { apiRequest } from "@/lib/queryClient";
 import { winePreferencesSchema, type WinePreferences, type Wine } from "@shared/schema";
 import WineCard from "./wine-card";
+import AuthDialog from "./auth-dialog";
+import PaymentDialog from "./payment-dialog";
 
 export default function WineRecommendations() {
   const [recommendations, setRecommendations] = useState<Wine[]>([]);
   const [savedWines, setSavedWines] = useState<Set<number>>(new Set());
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   const form = useForm<WinePreferences>({
     resolver: zodResolver(winePreferencesSchema),
@@ -31,35 +36,57 @@ export default function WineRecommendations() {
   });
 
   const recommendationMutation = useMutation({
-    mutationFn: getWineRecommendations,
+    mutationFn: async (data: WinePreferences) => {
+      const response = await apiRequest("POST", "/api/recommendations", data);
+      return response.json();
+    },
     onSuccess: (data) => {
       setRecommendations(data.wines);
       toast({
         title: "Recommendations Generated",
         description: `Found ${data.wines.length} perfect wines for you!`,
       });
+      // Invalidate auth to get updated recommendation count
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to get recommendations",
-        variant: "destructive",
-      });
+    onError: (error: any) => {
+      if (error.message?.includes("Usage limit reached")) {
+        setShowPaymentDialog(true);
+        toast({
+          title: "Usage Limit Reached",
+          description: "You've used your 3 free recommendations. Upgrade to premium for unlimited access.",
+          variant: "destructive",
+        });
+      } else if (error.message?.includes("Authentication required")) {
+        toast({
+          title: "Sign In Required",
+          description: "Please sign in to get wine recommendations.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to get recommendations",
+          variant: "destructive",
+        });
+      }
     },
   });
 
   const saveWineMutation = useMutation({
-    mutationFn: ({ wineId }: { wineId: number }) => addWineToLibrary(1, wineId),
+    mutationFn: async ({ wineId }: { wineId: number }) => {
+      const response = await apiRequest("POST", "/api/library", { wineId });
+      return response.json();
+    },
     onSuccess: (_, { wineId }) => {
       setSavedWines(prev => new Set(Array.from(prev).concat(wineId)));
-      // Invalidate library cache to refresh the wine library
-      queryClient.invalidateQueries({ queryKey: ["/api/library/1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/library"] });
       toast({
         title: "Wine Saved",
         description: "Added to your wine library!",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "Failed to save wine",
@@ -89,6 +116,74 @@ export default function WineRecommendations() {
             Tell us about your preferences and we'll suggest three perfect wines for you
           </p>
         </div>
+
+        {/* Authentication prompt for non-authenticated users */}
+        {!isAuthenticated && !isLoading && (
+          <Card className="bg-gradient-to-r from-[#722F37]/10 to-[#F5F5DC]/20 rounded-2xl p-6 mb-8 max-w-4xl mx-auto border-2 border-[#722F37]/10">
+            <CardContent className="text-center">
+              <Lock className="w-12 h-12 text-[#722F37] mx-auto mb-4" />
+              <h4 className="text-xl font-semibold text-[#722F37] mb-2">Sign In Required</h4>
+              <p className="text-gray-600 mb-4">
+                Please sign in to get personalized wine recommendations and save wines to your library.
+              </p>
+              <AuthDialog defaultMode="register">
+                <Button className="bg-[#722F37] hover:bg-[#5d252a] text-white">
+                  Get Started - It's Free
+                </Button>
+              </AuthDialog>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Usage Status for Authenticated Users */}
+        {isAuthenticated && user && (
+          <Card className="bg-gradient-to-r from-[#722F37]/10 to-[#F5F5DC]/20 rounded-2xl p-6 mb-8 max-w-4xl mx-auto border-2 border-[#722F37]/10">
+            <CardContent>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-[#722F37]">Welcome back, {user.firstName}!</h4>
+                {user.isPremium && <Crown className="w-6 h-6 text-yellow-500" />}
+              </div>
+              {user.isPremium ? (
+                <div className="flex items-center gap-2 text-green-600">
+                  <Crown className="w-5 h-5" />
+                  <span>Premium Member - Unlimited Recommendations</span>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-700">Free Recommendations Used:</span>
+                    <span className="font-semibold text-[#722F37]">{user.recommendationCount || 0} / 3</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-[#722F37] to-[#8B4513] h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(((user.recommendationCount || 0) / 3) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  {(user.recommendationCount || 0) >= 3 && (
+                    <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                      <div className="flex items-center gap-2 text-orange-700 mb-2">
+                        <Lock className="w-4 h-4" />
+                        <span className="font-medium">Usage limit reached</span>
+                      </div>
+                      <p className="text-sm text-orange-600 mb-3">
+                        Upgrade to premium for unlimited wine recommendations and advanced features.
+                      </p>
+                      <Button 
+                        onClick={() => setShowPaymentDialog(true)}
+                        className="bg-[#722F37] hover:bg-[#5d252a] text-white"
+                        size="sm"
+                      >
+                        <Crown className="w-4 h-4 mr-2" />
+                        Upgrade to Premium - $9.99
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Preference Form */}
         <Card className="bg-creme-50 rounded-2xl p-8 mb-12 max-w-4xl mx-auto shadow-sm">
@@ -250,6 +345,12 @@ export default function WineRecommendations() {
             ))}
           </div>
         )}
+
+        {/* Payment Dialog */}
+        <PaymentDialog
+          isOpen={showPaymentDialog}
+          onClose={() => setShowPaymentDialog(false)}
+        />
       </div>
     </section>
   );
