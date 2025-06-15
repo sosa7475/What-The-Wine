@@ -399,6 +399,57 @@ export default function Dashboard() {
           isOpen={showPaymentDialog}
           onClose={() => setShowPaymentDialog(false)}
         />
+
+        {/* Cancel Plan Dialog */}
+        <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-red-700">Cancel Premium Plan</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to cancel your premium subscription? You'll lose access to:
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 py-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span className="text-sm">Unlimited wine recommendations</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span className="text-sm">Advanced bottle scanning</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span className="text-sm">Personal wine library</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span className="text-sm">Expert wine insights</span>
+              </div>
+            </div>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-yellow-800">
+                You'll continue to have access until the end of your current billing period.
+                You can reactivate anytime.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowCancelDialog(false)}
+                className="flex-1"
+              >
+                Keep Premium
+              </Button>
+              <Button
+                onClick={handleCancelPlan}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              >
+                Cancel Plan
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
