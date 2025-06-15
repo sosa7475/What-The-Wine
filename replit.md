@@ -78,6 +78,9 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Fixed critical review posting authentication errors by correcting userId handling in all community routes
+- June 15, 2025. Resolved write review button crash with proper TypeScript array type safety validation
+- June 15, 2025. Updated Zod schemas to properly omit userId fields from request validation while adding them on backend
 - June 15, 2025. Implemented comprehensive wine community features including reviews, recommendations, and commenting system
 - June 15, 2025. Added Community tab to dashboard with wine review and recommendation creation forms
 - June 15, 2025. Created complete backend API for community features with proper authentication and data validation
