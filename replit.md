@@ -78,6 +78,8 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Comprehensive user dashboard implemented with seamless tab navigation
+- June 15, 2025. Added email signup section and secondary call-to-action on home page
 - June 15, 2025. Complete authentication and payment system implemented with Stripe integration
 - June 15, 2025. Rebranded application to "What the Wine" with custom WTW logo
 - June 14, 2025. Initial setup

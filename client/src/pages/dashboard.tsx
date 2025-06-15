@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut } from "lucide-react";
+import { useAuth, useLogout } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import WineRecommendations from "@/components/wine-recommendations";
 import WineScanner from "@/components/wine-scanner";
 import WineLibrary from "@/components/wine-library";
@@ -13,6 +15,26 @@ import PaymentDialog from "@/components/payment-dialog";
 export default function Dashboard() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const { user, isAuthenticated } = useAuth();
+  const logoutMutation = useLogout();
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+      setLocation("/");
+      toast({
+        title: "Logged out",
+        description: "You've been successfully logged out.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!isAuthenticated || !user) {
     return null; // This will be handled by routing
@@ -35,12 +57,24 @@ export default function Dashboard() {
                 Discover exceptional wines tailored to your taste
               </p>
             </div>
-            {user.isPremium && (
-              <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 px-4 py-2">
-                <Crown className="w-4 h-4 mr-2" />
-                Premium Member
-              </Badge>
-            )}
+            <div className="flex items-center gap-4">
+              {user.isPremium && (
+                <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 px-4 py-2">
+                  <Crown className="w-4 h-4 mr-2" />
+                  Premium Member
+                </Badge>
+              )}
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                size="sm"
+                className="border-burgundy-300 text-burgundy-700 hover:bg-burgundy-50"
+                disabled={logoutMutation.isPending}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                {logoutMutation.isPending ? "Logging out..." : "Logout"}
+              </Button>
+            </div>
           </div>
         </div>
 

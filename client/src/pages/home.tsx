@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Wine, Brain, Camera, Bookmark, Crown, LogOut, User } from "lucide-react";
+import { Wine, Brain, Camera, Bookmark, Crown, LogOut, User, Star, TrendingUp } from "lucide-react";
 import logoPath from "@assets/cropped_1749956607943.png";
 import Header from "@/components/header";
 import WineRecommendations from "@/components/wine-recommendations";
@@ -128,6 +128,103 @@ export default function Home() {
       </section>
       {/* Testimonials Section */}
       <Testimonials />
+
+      {/* Secondary Call to Action Section */}
+      <section className="py-20 bg-gradient-to-r from-burgundy-600 to-burgundy-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mb-8">
+            <h2 className="font-playfair text-4xl font-bold text-white mb-6">
+              Ready to Discover Your Perfect Wine?
+            </h2>
+            <p className="text-creme-100 text-lg max-w-2xl mx-auto mb-8">
+              Join thousands of wine enthusiasts who trust What the Wine for personalized recommendations, 
+              expert insights, and unforgettable wine experiences.
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <AuthDialog defaultMode="register">
+              <Button
+                size="lg"
+                className="bg-white text-burgundy-700 hover:bg-creme-100 px-8 py-3"
+              >
+                <Wine className="w-5 h-5 mr-2" />
+                Start Your Wine Journey
+              </Button>
+            </AuthDialog>
+            <AuthDialog defaultMode="login">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-white text-white hover:bg-white hover:text-burgundy-700 px-8 py-3"
+              >
+                Sign In to Continue
+              </Button>
+            </AuthDialog>
+          </div>
+        </div>
+      </section>
+
+      {/* Email Signup Section */}
+      <section className="py-16 bg-creme-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
+            <div className="text-center mb-8">
+              <h3 className="font-playfair text-3xl font-bold text-burgundy-700 mb-4">
+                Stay in the Know
+              </h3>
+              <p className="text-gray-600 text-lg">
+                Get weekly wine recommendations, expert tips, and exclusive offers delivered to your inbox.
+              </p>
+            </div>
+            
+            <form className="max-w-md mx-auto">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent"
+                  required
+                />
+                <Button
+                  type="submit"
+                  className="bg-burgundy-600 hover:bg-burgundy-700 text-white px-6 py-3 whitespace-nowrap"
+                >
+                  Subscribe
+                </Button>
+              </div>
+              <p className="text-sm text-gray-500 mt-3 text-center">
+                No spam, unsubscribe anytime. Your privacy is important to us.
+              </p>
+            </form>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 pt-8 border-t border-gray-200">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Wine className="w-6 h-6 text-burgundy-600" />
+                </div>
+                <h4 className="font-semibold text-burgundy-700 mb-2">Weekly Picks</h4>
+                <p className="text-sm text-gray-600">Curated wine selections based on trending tastes</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Star className="w-6 h-6 text-burgundy-600" />
+                </div>
+                <h4 className="font-semibold text-burgundy-700 mb-2">Expert Tips</h4>
+                <p className="text-sm text-gray-600">Professional advice from certified sommeliers</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <TrendingUp className="w-6 h-6 text-burgundy-600" />
+                </div>
+                <h4 className="font-semibold text-burgundy-700 mb-2">Exclusive Offers</h4>
+                <p className="text-sm text-gray-600">Special discounts and early access to features</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-burgundy-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
