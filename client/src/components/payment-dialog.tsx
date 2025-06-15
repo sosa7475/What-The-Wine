@@ -46,16 +46,11 @@ export default function PaymentDialog({ isOpen, onClose }: PaymentDialogProps) {
         
         <Card className="border-2 border-burgundy-200">
           <CardHeader className="text-center pb-4">
-            <div className="bg-red-100 text-red-800 text-sm font-semibold px-3 py-1 rounded-full inline-block mb-3">
-              Limited Time Offer
-            </div>
             <CardTitle className="text-2xl text-burgundy-700">Premium Plan</CardTitle>
             <div className="flex items-center justify-center gap-3 mb-2">
-              <div className="text-xl text-gray-400 line-through">$9.99</div>
               <div className="text-3xl font-bold text-burgundy-700">$3.99</div>
             </div>
             <div className="text-lg font-normal text-gray-600">/month</div>
-            <div className="text-sm text-green-600 font-medium mt-1">Save 60% off regular price!</div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">

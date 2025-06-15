@@ -280,6 +280,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cancel subscription endpoint
+  app.post("/api/cancel-subscription", requireAuth, async (req, res) => {
+    try {
+      const user = req.session.user!;
+      
+      if (!user.isPremium || !user.stripeCustomerId) {
+        return res.status(400).json({ error: "No active subscription found" });
+      }
+      
+      // Get all subscriptions for the customer
+      const subscriptions = await stripe.subscriptions.list({
+        customer: user.stripeCustomerId,
+        status: 'active',
+      });
+      
+      if (subscriptions.data.length === 0) {
+        return res.status(400).json({ error: "No active subscription found" });
+      }
+      
+      // Cancel the subscription at period end (so they keep access until end of billing cycle)
+      const subscription = subscriptions.data[0];
+      await stripe.subscriptions.update(subscription.id, {
+        cancel_at_period_end: true,
+      });
+      
+      res.json({ 
+        success: true, 
+        message: "Subscription will be cancelled at the end of your current billing period",
+        cancelAt: new Date((subscription as any).current_period_end * 1000).toISOString()
+      });
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      res.status(500).json({ error: 'Failed to cancel subscription' });
+    }
+  });
+
+  // Get subscription details endpoint
+  app.get("/api/subscription-details", requireAuth, async (req, res) => {
+    try {
+      const user = req.session.user!;
+      
+      if (!user.isPremium || !user.stripeCustomerId) {
+        return res.json({ hasSubscription: false });
+      }
+      
+      const subscriptions = await stripe.subscriptions.list({
+        customer: user.stripeCustomerId,
+        status: 'active',
+      });
+      
+      if (subscriptions.data.length === 0) {
+        return res.json({ hasSubscription: false });
+      }
+      
+      const subscription = subscriptions.data[0];
+      res.json({
+        hasSubscription: true,
+        status: subscription.status,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
+        amount: subscription.items.data[0].price.unit_amount,
+        currency: subscription.items.data[0].price.currency,
+      });
+    } catch (error) {
+      console.error('Error fetching subscription details:', error);
+      res.status(500).json({ error: 'Failed to fetch subscription details' });
+    }
+  });
+
   // Email subscription endpoint
   app.post("/api/subscribe", async (req, res) => {
     try {
