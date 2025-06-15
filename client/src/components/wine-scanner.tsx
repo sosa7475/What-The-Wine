@@ -4,9 +4,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera, Image as ImageIcon, Upload, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { analyzeWineBottle, addWineToLibrary } from "@/lib/api";
 import type { Wine } from "@shared/schema";
 import WineCard from "./wine-card";
+import AuthDialog from "./auth-dialog";
 
 export default function WineScanner() {
   const [analyzedWine, setAnalyzedWine] = useState<Wine | null>(null);
@@ -14,6 +16,7 @@ export default function WineScanner() {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
   const analysisMutation = useMutation({
@@ -36,22 +39,34 @@ export default function WineScanner() {
   });
 
   const saveWineMutation = useMutation({
-    mutationFn: () => addWineToLibrary(1, analyzedWine!.id),
+    mutationFn: () => {
+      if (!isAuthenticated || !user) {
+        throw new Error("Please sign in to save wines to your library");
+      }
+      return addWineToLibrary(user.id, analyzedWine!.id);
+    },
     onSuccess: () => {
       setIsSaved(true);
-      // Invalidate library cache to refresh the wine library
-      queryClient.invalidateQueries({ queryKey: ["/api/library/1"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/wine-library", user?.id] });
       toast({
         title: "Wine Saved",
         description: "Added to your wine library!",
       });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to save wine",
-        variant: "destructive",
-      });
+      if (error.message.includes("sign in")) {
+        toast({
+          title: "Sign In Required",
+          description: "Please sign in to save wines to your library",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to save wine",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -190,9 +205,37 @@ export default function WineScanner() {
               <div className="max-w-sm mx-auto">
                 <WineCard
                   wine={analyzedWine}
-                  onSave={() => saveWineMutation.mutate()}
+                  onSave={isAuthenticated ? () => saveWineMutation.mutate() : undefined}
                   isSaved={isSaved}
                 />
+                
+                {/* Authentication prompt for non-authenticated users */}
+                {!isAuthenticated && (
+                  <div className="mt-4 p-4 bg-burgundy-50 rounded-lg border border-burgundy-200">
+                    <p className="text-burgundy-700 text-sm text-center mb-3">
+                      Sign in to save wines to your personal library
+                    </p>
+                    <div className="flex gap-2">
+                      <AuthDialog defaultMode="login">
+                        <Button 
+                          size="sm" 
+                          className="flex-1 bg-burgundy-600 hover:bg-burgundy-700 text-white"
+                        >
+                          Sign In
+                        </Button>
+                      </AuthDialog>
+                      <AuthDialog defaultMode="register">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 border-burgundy-300 text-burgundy-700 hover:bg-burgundy-50"
+                        >
+                          Sign Up
+                        </Button>
+                      </AuthDialog>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
