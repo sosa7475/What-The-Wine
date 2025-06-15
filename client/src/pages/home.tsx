@@ -70,11 +70,17 @@ export default function Home() {
         </div>
       </section>
       {/* Wine Recommendations Section */}
-      <WineRecommendations />
+      <div id="recommendations">
+        <WineRecommendations />
+      </div>
       {/* Wine Scanner Section */}
-      <WineScanner />
+      <div id="scanner">
+        <WineScanner />
+      </div>
       {/* Wine Library Section */}
-      <WineLibrary />
+      <div id="library">
+        <WineLibrary />
+      </div>
       {/* Features Section */}
       <section className="py-20 bg-creme-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

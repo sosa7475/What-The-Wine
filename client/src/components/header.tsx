@@ -29,8 +29,21 @@ export default function Header({ onScrollTo }: HeaderProps) {
   const handleNavigation = (item: { name: string; id: string; isRoute?: boolean }) => {
     if (item.isRoute) {
       setLocation(`/${item.id}`);
+    } else if (isAuthenticated) {
+      // For authenticated users, redirect to dashboard with the specific tab
+      setLocation("/dashboard");
     } else {
-      onScrollTo(item.id);
+      // For unauthenticated users, try to scroll to section if it exists
+      try {
+        onScrollTo(item.id);
+      } catch (error) {
+        // If section doesn't exist, show authentication prompt
+        toast({
+          title: "Sign In Required",
+          description: `Please sign in to access the ${item.name.toLowerCase()} feature.`,
+          variant: "destructive",
+        });
+      }
     }
   };
 
