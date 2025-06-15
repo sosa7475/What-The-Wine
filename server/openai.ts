@@ -6,6 +6,54 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
 });
 
+// Generate wine bottle image URL based on wine characteristics
+function generateWineImageUrl(wine: any): string {
+  // Use Unsplash with wine-specific search terms for high-quality wine bottle images
+  const wineType = wine.type?.toLowerCase() || 'wine';
+  const searchTerms = `${wineType}-wine-bottle`;
+  
+  // Generate a consistent image based on wine characteristics
+  const imageId = Math.abs(
+    (wine.name?.charCodeAt(0) || 0) + 
+    (wine.winery?.charCodeAt(0) || 0) + 
+    (wine.region?.charCodeAt(0) || 0)
+  ) % 20 + 1;
+  
+  const wineImages = {
+    red: [
+      'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1596142332133-327e2a4ceb13?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400&h=600&fit=crop'
+    ],
+    white: [
+      'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1564424224827-cd24b8915874?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=600&fit=crop'
+    ],
+    rose: [
+      'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1564424224827-cd24b8915874?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1568213816046-0ee1c42bd559?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=600&fit=crop'
+    ],
+    sparkling: [
+      'https://images.unsplash.com/photo-1547595628-c61a29f496f0?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1542051838130-2e2c8a20c045?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1569275513865-77a7d5eb1b5c?w=400&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1572804013427-4d7ca7268217?w=400&h=600&fit=crop'
+    ]
+  };
+  
+  const typeImages = wineImages[wineType as keyof typeof wineImages] || wineImages.red;
+  return typeImages[imageId % typeImages.length];
+}
+
 export async function getWineRecommendations(preferences: WinePreferences): Promise<Wine[]> {
   try {
     const prompt = `You are a professional sommelier. Based on the following preferences, recommend 3 wines with detailed information. Respond with JSON in this exact format:
@@ -24,7 +72,6 @@ export async function getWineRecommendations(preferences: WinePreferences): Prom
       "description": "Detailed description of the wine",
       "tasteProfile": "Taste profile and notes",
       "foodPairings": ["pairing1", "pairing2", "pairing3"],
-      "imageUrl": "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=400",
       "alcoholContent": 13.5,
       "servingTemp": "16-18°C",
       "source": "recommendation"
@@ -39,7 +86,7 @@ User preferences:
 - Wine Type: ${preferences.wineType || 'Any'}
 - Additional Preferences: ${preferences.preferences || 'None'}
 
-Please provide real, high-quality wine recommendations that match these preferences. Include accurate pricing, ratings, and detailed tasting notes. For imageUrl, provide actual wine bottle image URLs from reputable sources like wine retailers or producers' websites.`;
+Please provide real, high-quality wine recommendations that match these preferences. Include accurate pricing, ratings, and detailed tasting notes.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -58,7 +105,15 @@ Please provide real, high-quality wine recommendations that match these preferen
     });
 
     const result = JSON.parse(response.choices[0].message.content || "{}");
-    return result.wines || [];
+    const wines = result.wines || [];
+    
+    // Add wine bottle images to each recommendation
+    const winesWithImages = wines.map((wine: any) => ({
+      ...wine,
+      imageUrl: generateWineImageUrl(wine)
+    }));
+    
+    return winesWithImages;
   } catch (error) {
     console.error("Error getting wine recommendations:", error);
     throw new Error("Failed to get wine recommendations: " + (error as Error).message);
@@ -81,7 +136,6 @@ export async function analyzeWineBottle(base64Image: string): Promise<any> {
   "description": "Detailed description of the wine",
   "tasteProfile": "Taste profile and notes",
   "foodPairings": ["pairing1", "pairing2", "pairing3"],
-  "imageUrl": "",
   "alcoholContent": 13.5,
   "servingTemp": "16-18°C",
   "source": "scanned"
@@ -127,7 +181,7 @@ Identify the wine from the label and provide accurate information including tast
       description: result.description || "Wine details analyzed from bottle image",
       tasteProfile: result.tasteProfile || "Profile not available",
       foodPairings: Array.isArray(result.foodPairings) ? result.foodPairings : ["Various dishes"],
-      imageUrl: result.imageUrl || "",
+      imageUrl: generateWineImageUrl(result),
       alcoholContent: result.alcoholContent && !isNaN(parseFloat(result.alcoholContent)) ? parseFloat(result.alcoholContent) : 12.5,
       servingTemp: result.servingTemp || "Serve at cellar temperature",
       source: "scanned"
