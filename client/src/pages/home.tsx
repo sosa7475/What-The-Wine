@@ -1,16 +1,40 @@
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Wine, Brain, Camera, Bookmark } from "lucide-react";
+import { Wine, Brain, Camera, Bookmark, Crown, LogOut, User } from "lucide-react";
 import Header from "@/components/header";
 import WineRecommendations from "@/components/wine-recommendations";
 import WineScanner from "@/components/wine-scanner";
 import WineLibrary from "@/components/wine-library";
+import Testimonials from "@/components/testimonials";
+import AuthDialog from "@/components/auth-dialog";
+import { useAuth, useLogout } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const logoutMutation = useLogout();
+  const { toast } = useToast();
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+      toast({
+        title: "Logged out",
+        description: "You've been successfully logged out.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
