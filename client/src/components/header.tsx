@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Wine, Menu, X, User, LogOut, Crown } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import AuthDialog from "./auth-dialog";
 import logoPath from "@assets/cropped_1749956607943.png";
 
@@ -15,16 +16,28 @@ export default function Header({ onScrollTo }: HeaderProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const logoutMutation = useLogout();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
-  const navigation = [
+  const navigation = isAuthenticated ? [
+    { name: "Dashboard", id: "dashboard", isRoute: true },
+  ] : [
     { name: "Recommendations", id: "recommendations" },
     { name: "Scanner", id: "scanner" },
     { name: "Library", id: "library" },
   ];
 
+  const handleNavigation = (item: { name: string; id: string; isRoute?: boolean }) => {
+    if (item.isRoute) {
+      setLocation(`/${item.id}`);
+    } else {
+      onScrollTo(item.id);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
+      setLocation("/");
       toast({
         title: "Logged out",
         description: "You've been successfully logged out.",
@@ -56,7 +69,7 @@ export default function Header({ onScrollTo }: HeaderProps) {
             {navigation.map((item) => (
               <button
                 key={item.id}
-                onClick={() => onScrollTo(item.id)}
+                onClick={() => handleNavigation(item)}
                 className="text-white hover:text-creme-100 font-medium transition-colors duration-200"
               >
                 {item.name}
@@ -132,7 +145,7 @@ export default function Header({ onScrollTo }: HeaderProps) {
                 <button
                   key={item.id}
                   onClick={() => {
-                    onScrollTo(item.id);
+                    handleNavigation(item);
                     setIsMenuOpen(false);
                   }}
                   className="text-left text-white hover:text-creme-100 font-medium transition-colors duration-200 py-2"
