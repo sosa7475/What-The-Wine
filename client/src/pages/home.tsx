@@ -128,7 +128,6 @@ export default function Home() {
       </section>
       {/* Testimonials Section */}
       <Testimonials />
-
       {/* Secondary Call to Action Section */}
       <section className="py-20 bg-gradient-to-r from-burgundy-600 to-burgundy-800 relative overflow-hidden">
         {/* Background Pattern */}
@@ -171,7 +170,7 @@ export default function Home() {
           </svg>
         </div>
         
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 bg-[68272d]">
           <div className="mb-8">
             <h2 className="font-playfair text-4xl font-bold text-white mb-6">
               Ready to Discover Your Perfect Wine?
@@ -204,7 +203,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Email Signup Section */}
       <section className="py-16 bg-creme-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -264,7 +262,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="bg-burgundy-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
