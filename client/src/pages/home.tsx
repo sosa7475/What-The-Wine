@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Wine, Brain, Camera, Bookmark, Crown, LogOut, User } from "lucide-react";
-import logoPath from "@assets/WtW_1749955950754.png";
+import logoPath from "@assets/cropped_1749956607943.png";
 import Header from "@/components/header";
 import WineRecommendations from "@/components/wine-recommendations";
 import WineScanner from "@/components/wine-scanner";
@@ -80,15 +80,12 @@ export default function Home() {
       {/* Wine Library Section */}
       <WineLibrary />
 
-      {/* Testimonials Section */}
-      <Testimonials />
-
       {/* Features Section */}
       <section className="py-20 bg-creme-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-              Why Choose Sommelier AI?
+              Why Choose What the Wine?
             </h3>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
               Discover the perfect wine experience with our intelligent recommendations and comprehensive wine knowledge
@@ -134,6 +131,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      <Testimonials />
 
       {/* Footer */}
       <footer className="bg-burgundy-900 text-white py-16">

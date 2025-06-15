@@ -90,17 +90,17 @@ export default function Header({ onScrollTo }: HeaderProps) {
               <div className="flex items-center space-x-3">
                 <AuthDialog defaultMode="login">
                   <Button
-                    variant="outline"
                     size="sm"
-                    className="border-white text-white hover:bg-white hover:text-burgundy-700"
+                    className="bg-white text-burgundy-700 hover:bg-creme-100"
                   >
                     Sign In
                   </Button>
                 </AuthDialog>
                 <AuthDialog defaultMode="register">
                   <Button
+                    variant="outline"
                     size="sm"
-                    className="bg-white text-burgundy-700 hover:bg-creme-100"
+                    className="border-white text-white hover:bg-white hover:text-burgundy-700"
                   >
                     Get Started
                   </Button>
@@ -167,17 +167,17 @@ export default function Header({ onScrollTo }: HeaderProps) {
                   <div className="space-y-2">
                     <AuthDialog defaultMode="login">
                       <Button
-                        variant="outline"
                         size="sm"
-                        className="w-full border-white text-white hover:bg-white hover:text-burgundy-700"
+                        className="w-full bg-white text-burgundy-700 hover:bg-creme-100"
                       >
                         Sign In
                       </Button>
                     </AuthDialog>
                     <AuthDialog defaultMode="register">
                       <Button
+                        variant="outline"
                         size="sm"
-                        className="w-full bg-white text-burgundy-700 hover:bg-creme-100"
+                        className="w-full border-white text-white hover:bg-white hover:text-burgundy-700"
                       >
                         Get Started
                       </Button>
