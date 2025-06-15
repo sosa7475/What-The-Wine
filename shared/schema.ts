@@ -17,6 +17,7 @@ export const users = pgTable("users", {
 
 export const wines = pgTable("wines", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id"), // Optional - wines can be global or user-specific
   name: text("name").notNull(),
   winery: text("winery").notNull(),
   region: text("region").notNull(),

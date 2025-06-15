@@ -23,8 +23,10 @@ export interface IStorage {
   getWine(id: number): Promise<Wine | undefined>;
   getWines(limit?: number, offset?: number): Promise<Wine[]>;
   createWine(wine: InsertWine): Promise<Wine>;
+  createUserWine(wine: InsertWine, userId: number): Promise<Wine>;
   searchWines(query: string): Promise<Wine[]>;
   getWinesByType(type: string): Promise<Wine[]>;
+  getUserWines(userId: number): Promise<Wine[]>;
 
   // User wine library operations
   getUserWineLibrary(userId: number): Promise<(UserWineLibrary & { wine: Wine })[]>;
@@ -109,6 +111,14 @@ export class DatabaseStorage implements IStorage {
     return wine;
   }
 
+  async createUserWine(insertWine: InsertWine, userId: number): Promise<Wine> {
+    const [wine] = await db
+      .insert(wines)
+      .values({ ...insertWine, userId })
+      .returning();
+    return wine;
+  }
+
   async searchWines(query: string): Promise<Wine[]> {
     const searchTerm = `%${query.toLowerCase()}%`;
     return await db.select().from(wines).where(
@@ -123,6 +133,10 @@ export class DatabaseStorage implements IStorage {
 
   async getWinesByType(type: string): Promise<Wine[]> {
     return await db.select().from(wines).where(eq(wines.type, type));
+  }
+
+  async getUserWines(userId: number): Promise<Wine[]> {
+    return await db.select().from(wines).where(eq(wines.userId, userId));
   }
 
   async getUserWineLibrary(userId: number): Promise<(UserWineLibrary & { wine: Wine })[]> {

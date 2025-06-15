@@ -111,10 +111,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const preferences = winePreferencesSchema.parse(req.body);
       const recommendedWines = await getWineRecommendations(preferences);
       
-      // Save wines to storage and return with IDs
+      // Save wines to storage linked to user
       const savedWines = [];
       for (const wine of recommendedWines) {
-        const savedWine = await storage.createWine(wine);
+        const savedWine = await storage.createUserWine(wine, user.id);
         savedWines.push(savedWine);
       }
 
@@ -143,17 +143,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Wine bottle analysis endpoint
-  app.post("/api/analyze-bottle", upload.single("image"), async (req, res) => {
+  app.post("/api/analyze-bottle", requireAuth, upload.single("image"), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No image file provided" });
       }
 
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+
       const base64Image = req.file.buffer.toString('base64');
       const analyzedWine = await analyzeWineBottle(base64Image);
       
-      // Save analyzed wine to storage
-      const savedWine = await storage.createWine(analyzedWine);
+      // Save analyzed wine linked to user
+      const savedWine = await storage.createUserWine(analyzedWine, userId);
       
       res.json({ wine: savedWine });
     } catch (error) {
