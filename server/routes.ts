@@ -1,9 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
+import Stripe from "stripe";
 import { storage } from "./storage";
 import { getWineRecommendations, analyzeWineBottle } from "./openai";
-import { winePreferencesSchema, insertWineSchema, insertUserWineLibrarySchema } from "@shared/schema";
+import { winePreferencesSchema, insertUserWineLibrarySchema, registerUserSchema, loginUserSchema } from "@shared/schema";
+import { getSession, hashPassword, verifyPassword, requireAuth, optionalAuth } from "./auth";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -13,7 +20,73 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Wine recommendations endpoint
+  // Session middleware
+  app.use(getSession());
+
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const userData = registerUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      // Hash password and create user
+      const hashedPassword = await hashPassword(userData.password);
+      const user = await storage.createUser({
+        ...userData,
+        password: hashedPassword,
+      });
+
+      // Set session
+      req.session.userId = user.id;
+      req.session.user = user;
+
+      res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = loginUserSchema.parse(req.body);
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user || !(await verifyPassword(password, user.password))) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      req.session.userId = user.id;
+      req.session.user = user;
+
+      res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy(() => {
+      res.json({ message: "Logged out" });
+    });
+  });
+
+  app.get("/api/auth/me", optionalAuth, (req, res) => {
+    if (req.session.user) {
+      const user = req.session.user;
+      res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
+    } else {
+      res.json({ user: null });
+    }
+  });
+
+  // Wine recommendations endpoint with usage limits
   app.post("/api/recommendations", async (req, res) => {
     try {
       const preferences = winePreferencesSchema.parse(req.body);

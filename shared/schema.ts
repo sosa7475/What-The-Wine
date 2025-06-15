@@ -4,8 +4,15 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  isPremium: boolean("is_premium").default(false),
+  recommendationCount: integer("recommendation_count").default(0),
+  stripeCustomerId: text("stripe_customer_id"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const wines = pgTable("wines", {
@@ -49,8 +56,24 @@ export const wineRecommendations = pgTable("wine_recommendations", {
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
+  email: true,
   username: true,
   password: true,
+  firstName: true,
+  lastName: true,
+});
+
+export const loginUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+export const registerUserSchema = z.object({
+  email: z.string().email(),
+  username: z.string().min(3),
+  password: z.string().min(6),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
 });
 
 export const insertWineSchema = createInsertSchema(wines).omit({

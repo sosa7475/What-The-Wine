@@ -12,7 +12,11 @@ export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserRecommendationCount(userId: number): Promise<User>;
+  updateUserPremiumStatus(userId: number, isPremium: boolean): Promise<User>;
+  updateUserStripeCustomerId(userId: number, customerId: string): Promise<User>;
 
   // Wine operations
   getWine(id: number): Promise<Wine | undefined>;
@@ -43,10 +47,42 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async updateUserRecommendationCount(userId: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ recommendationCount: sql`${users.recommendationCount} + 1` })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserPremiumStatus(userId: number, isPremium: boolean): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isPremium })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserStripeCustomerId(userId: number, customerId: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(users.id, userId))
       .returning();
     return user;
   }
