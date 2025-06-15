@@ -179,7 +179,7 @@ export default function Home() {
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 bg-[68272d]">
           <div className="mb-8">
-            <h2 className="font-playfair text-4xl font-bold text-white mb-6">
+            <h2 className="font-playfair text-4xl font-bold mb-6 text-[#391316]">
               Ready to Discover Your Perfect Wine?
             </h2>
             <p className="text-creme-100 text-lg max-w-2xl mx-auto mb-8">
