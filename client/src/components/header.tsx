@@ -232,21 +232,19 @@ export default function Header({ onScrollTo }: HeaderProps) {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <AuthDialog defaultMode="login">
+                      <AuthDialog defaultMode="login" onOpen={() => setIsMenuOpen(false)}>
                         <Button
                           size="sm"
                           className="w-full bg-burgundy-600 hover:bg-burgundy-700 text-white"
-                          onClick={() => setIsMenuOpen(false)}
                         >
                           Sign In
                         </Button>
                       </AuthDialog>
-                      <AuthDialog defaultMode="register">
+                      <AuthDialog defaultMode="register" onOpen={() => setIsMenuOpen(false)}>
                         <Button
                           variant="outline"
                           size="sm"
                           className="w-full border-burgundy-300 text-burgundy-700 hover:bg-burgundy-50"
-                          onClick={() => setIsMenuOpen(false)}
                         >
                           Get Started
                         </Button>

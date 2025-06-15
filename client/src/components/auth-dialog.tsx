@@ -26,9 +26,10 @@ const registerSchema = z.object({
 interface AuthDialogProps {
   children: React.ReactNode;
   defaultMode?: "login" | "register";
+  onOpen?: () => void;
 }
 
-export default function AuthDialog({ children, defaultMode = "login" }: AuthDialogProps) {
+export default function AuthDialog({ children, defaultMode = "login", onOpen }: AuthDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<"login" | "register">(defaultMode);
   const { toast } = useToast();
@@ -89,8 +90,15 @@ export default function AuthDialog({ children, defaultMode = "login" }: AuthDial
     }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open && onOpen) {
+      onOpen();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
