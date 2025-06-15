@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
@@ -16,6 +17,7 @@ import PaymentDialog from "@/components/payment-dialog";
 export default function Dashboard() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [isUsageStatsOpen, setIsUsageStatsOpen] = useState(true);
   const { user, isAuthenticated } = useAuth();
   const logoutMutation = useLogout();
   const { toast } = useToast();
@@ -123,44 +125,61 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Usage Status Card */}
+        {/* Usage Status Card - Collapsible */}
         {!user.isPremium && (
-          <Card className="mb-8 border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="text-orange-800">Your Usage Status</span>
-                <Button
-                  onClick={() => setShowPaymentDialog(true)}
-                  size="sm"
-                  className="bg-burgundy-600 hover:bg-burgundy-700 text-white"
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Upgrade to Premium
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-orange-700">Free Recommendations Used:</span>
-                  <span className="font-semibold text-orange-800">
-                    {user.recommendationCount || 0} / 3
-                  </span>
-                </div>
-                <div className="w-full bg-orange-200 rounded-full h-3">
-                  <div 
-                    className="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-300"
-                    style={{ width: `${usagePercentage}%` }}
-                  ></div>
-                </div>
-                {(user.recommendationCount || 0) >= 3 && (
-                  <div className="text-sm text-orange-700 font-medium">
-                    You've reached your free limit. Upgrade for unlimited recommendations!
+          <Collapsible open={isUsageStatsOpen} onOpenChange={setIsUsageStatsOpen}>
+            <Card className="mb-8 border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-2 text-orange-800 hover:bg-orange-100 p-0 h-auto font-bold text-lg"
+                    >
+                      {isUsageStatsOpen ? (
+                        <ChevronUp className="w-5 h-5" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5" />
+                      )}
+                      Your Usage Status
+                    </Button>
+                  </CollapsibleTrigger>
+                  <Button
+                    onClick={() => setShowPaymentDialog(true)}
+                    size="sm"
+                    className="bg-burgundy-600 hover:bg-burgundy-700 text-white"
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Upgrade to Premium
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CollapsibleContent>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-orange-700">Free Recommendations Used:</span>
+                      <span className="font-semibold text-orange-800">
+                        {user.recommendationCount || 0} / 3
+                      </span>
+                    </div>
+                    <div className="w-full bg-orange-200 rounded-full h-3">
+                      <div 
+                        className="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-300"
+                        style={{ width: `${usagePercentage}%` }}
+                      ></div>
+                    </div>
+                    {(user.recommendationCount || 0) >= 3 && (
+                      <div className="text-sm text-orange-700 font-medium">
+                        You've reached your free limit. Upgrade for unlimited recommendations!
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
         )}
 
         {/* Premium Status Card */}

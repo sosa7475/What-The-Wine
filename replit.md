@@ -78,6 +78,7 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 15, 2025. Made Usage Stats section collapsible in dashboard with chevron toggle and smooth animations
 - June 15, 2025. Added promotional pricing: $9.99 crossed out, $6.95 sale price with "Limited Time Offer" messaging
 - June 15, 2025. Removed Replit Auth option, keeping only email/password authentication
 - June 15, 2025. Implemented user-specific wine linking for recommendations and bottle scanning
