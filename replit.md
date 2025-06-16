@@ -78,6 +78,9 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 16, 2025. Moved subscription management interface from main dashboard to Account tab for less prominent access
+- June 16, 2025. Fixed subscription cancellation date conversion errors causing API failures
+- June 16, 2025. Updated subscription details to use proper Stripe billing cycle data instead of undefined fields
 - June 15, 2025. Enhanced header navigation to redirect users to home page when clicking logo or navigation items from support pages
 - June 15, 2025. Finalized support page navigation with consistent headers, back buttons, and footers across all pages
 - June 15, 2025. Removed phone contact option from Contact Us page, maintaining email-only support (support@whatthewine.com)
