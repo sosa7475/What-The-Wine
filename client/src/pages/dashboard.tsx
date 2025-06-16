@@ -426,6 +426,43 @@ export default function Dashboard() {
 
           <TabsContent value="account" className="space-y-6">
             <div className="grid gap-6">
+              {/* Subscription Status Banner */}
+              {user.isPremium && subscriptionData && (
+                <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Crown className="w-5 h-5 text-amber-600" />
+                        <div>
+                          <h3 className="font-semibold text-amber-800">Premium Subscription</h3>
+                          <p className="text-sm text-gray-600">Plan Details</p>
+                        </div>
+                      </div>
+                      {subscriptionData.cancelAtPeriodEnd && (
+                        <span className="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full">
+                          Cancelled
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Premium Monthly - $3.99/month</p>
+                      </div>
+                      {subscriptionData.currentPeriodEnd && (
+                        <div>
+                          <p className="text-sm text-gray-600">
+                            {subscriptionData.cancelAtPeriodEnd ? 'Cancels on' : 'Next billing'}: {' '}
+                            <span className="font-medium text-gray-900">
+                              {new Date(subscriptionData.currentPeriodEnd).toLocaleDateString()}
+                            </span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
