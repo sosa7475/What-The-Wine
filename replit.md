@@ -78,6 +78,9 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 16, 2025. Added custom dessert wine image to wine recommendation display system
+- June 16, 2025. Fixed wine image system to use curated project images instead of unreliable external URLs preventing random images like speakers
+- June 16, 2025. Fixed mobile responsiveness for price indicators in community recommendations and dashboard upgrade button layouts
 - June 16, 2025. Removed premium subscription banner from main dashboard, only showing upgrade banner for free tier users
 - June 16, 2025. Added subscription reactivation functionality with backend API and frontend buttons
 - June 16, 2025. Removed redundant subscription details section and streamlined Account tab layout

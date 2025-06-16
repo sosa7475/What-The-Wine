@@ -18,7 +18,7 @@ function generateWineImageUrl(wine: any): string {
     rosé: '/attached_assets/rose_1749966019645.png',
     sparkling: '/attached_assets/sparkling_1749966019645.jpg',
     champagne: '/attached_assets/sparkling_1749966019645.jpg',
-    dessert: '/attached_assets/white_1749966019645.jpeg'
+    dessert: '/attached_assets/images_1750043730760.jpeg'
   };
   
   // Return the appropriate wine image, defaulting to red wine
