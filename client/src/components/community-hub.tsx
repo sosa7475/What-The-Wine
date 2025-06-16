@@ -596,14 +596,14 @@ export default function CommunityHub() {
             {recommendations.map((recommendation: CommunityRecommendation) => (
               <Card key={recommendation.id} className="border-l-4 border-l-burgundy-200">
                 <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="w-10 h-10">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="flex items-start gap-3 flex-1">
+                      <Avatar className="w-10 h-10 flex-shrink-0">
                         <AvatarFallback className="bg-burgundy-100 text-burgundy-700">
                           {recommendation.user.firstName?.[0] || recommendation.user.username[0]}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-semibold text-burgundy-700">
                             {recommendation.user.firstName || recommendation.user.username}
@@ -613,14 +613,14 @@ export default function CommunityHub() {
                           </span>
                         </div>
                         <CardTitle className="text-lg mb-2">{recommendation.title}</CardTitle>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-600 mb-3">
                           <div className="flex items-center gap-1">
-                            <Wine className="w-4 h-4" />
-                            <span>{recommendation.wine.name}</span>
+                            <Wine className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{recommendation.wine.name}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            <span>{recommendation.wine.winery}, {recommendation.wine.region}</span>
+                            <MapPin className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{recommendation.wine.winery}, {recommendation.wine.region}</span>
                           </div>
                           {recommendation.wine.vintage && (
                             <Badge variant="secondary">{recommendation.wine.vintage}</Badge>
@@ -629,7 +629,7 @@ export default function CommunityHub() {
                       </div>
                     </div>
                     {recommendation.priceValue && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 sm:flex-shrink-0 sm:ml-4">
                         {renderPriceValue(recommendation.priceValue)}
                       </div>
                     )}
