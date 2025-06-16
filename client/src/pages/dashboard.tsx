@@ -237,12 +237,12 @@ export default function Dashboard() {
           <Collapsible open={isUsageStatsOpen} onOpenChange={setIsUsageStatsOpen}>
             <Card className="mb-8 border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <CollapsibleTrigger asChild>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="flex items-center gap-2 text-orange-800 hover:bg-orange-100 p-0 h-auto font-bold text-lg"
+                      className="flex items-center gap-2 text-orange-800 hover:bg-orange-100 p-0 h-auto font-bold text-lg justify-start"
                     >
                       {isUsageStatsOpen ? (
                         <ChevronUp className="w-5 h-5" />
@@ -255,12 +255,12 @@ export default function Dashboard() {
                   <Button
                     onClick={() => setShowPaymentDialog(true)}
                     size="sm"
-                    className="bg-burgundy-600 hover:bg-burgundy-700 text-white"
+                    className="bg-burgundy-600 hover:bg-burgundy-700 text-white flex-shrink-0"
                   >
                     <Crown className="w-4 h-4 mr-2" />
                     Upgrade to Premium
                   </Button>
-                </CardTitle>
+                </div>
               </CardHeader>
               <CollapsibleContent>
                 <CardContent>

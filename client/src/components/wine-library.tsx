@@ -134,23 +134,23 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
   return (
     <section id="library" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-12 space-y-4 md:space-y-0">
-          <h3 className="font-playfair text-4xl font-bold text-burgundy-700">My Wine Library</h3>
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-12 space-y-6 lg:space-y-0">
+          <h3 className="font-playfair text-3xl sm:text-4xl font-bold text-burgundy-700">My Wine Library</h3>
           
-          <div className="flex items-center space-x-4">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+            <div className="relative flex-1 sm:flex-initial">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 type="text"
                 placeholder="Search wines..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-creme-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent w-64"
+                className="pl-10 pr-4 py-2 border border-creme-300 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-transparent w-full sm:w-64"
               />
             </div>
             
             <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-40 border-creme-300 focus:ring-burgundy-500">
+              <SelectTrigger className="w-full sm:w-40 border-creme-300 focus:ring-burgundy-500">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
