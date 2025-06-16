@@ -230,49 +230,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Premium Subscription Management */}
-        {user.isPremium && subscriptionData?.hasSubscription && (
-          <Card className="mb-8 border-2 border-yellow-200 bg-gradient-to-r from-yellow-50 to-amber-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-yellow-800">
-                <Crown className="w-5 h-5" />
-                Premium Subscription
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600 mb-2">Plan Details</p>
-                  <p className="font-semibold">Premium Monthly - $3.99/month</p>
-                  <p className="text-sm text-gray-600">
-                    Next billing: {new Date(subscriptionData.currentPeriodEnd).toLocaleDateString()}
-                  </p>
-                  {subscriptionData.cancelAtPeriodEnd && (
-                    <p className="text-sm text-orange-600 font-medium mt-1">
-                      Cancels on {new Date(subscriptionData.currentPeriodEnd).toLocaleDateString()}
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-end justify-end">
-                  {!subscriptionData.cancelAtPeriodEnd ? (
-                    <Button
-                      onClick={() => setShowCancelDialog(true)}
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 border-red-300 hover:bg-red-50"
-                    >
-                      Cancel Subscription
-                    </Button>
-                  ) : (
-                    <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
-                      Cancelled
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+
 
         {/* Usage Status Card - Collapsible */}
         {!user.isPremium && (

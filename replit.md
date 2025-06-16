@@ -78,6 +78,7 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 16, 2025. Removed premium subscription banner from main dashboard, only showing upgrade banner for free tier users
 - June 16, 2025. Added subscription reactivation functionality with backend API and frontend buttons
 - June 16, 2025. Removed redundant subscription details section and streamlined Account tab layout
 - June 16, 2025. Added clean subscription status banner to Account tab showing key billing information
