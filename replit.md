@@ -78,6 +78,7 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 16, 2025. Added Google Analytics gtag.js (G-QQV6YL3FJ7) alongside Google Tag Manager for comprehensive tracking
 - June 16, 2025. Installed Google Tag Manager (GTM-PDCNGPD9) for tracking page views and user interactions
 - June 16, 2025. Added custom dessert wine image to wine recommendation display system
 - June 16, 2025. Fixed wine image system to use curated project images instead of unreliable external URLs preventing random images like speakers
