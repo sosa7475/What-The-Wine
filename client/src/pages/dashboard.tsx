@@ -156,6 +156,36 @@ export default function Dashboard() {
     }
   };
 
+  const handleReactivatePlan = async () => {
+    try {
+      const response = await apiRequest("POST", "/api/reactivate-subscription");
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Subscription Reactivated",
+          description: result.message,
+        });
+        
+        // Refresh subscription data
+        queryClient.invalidateQueries({ queryKey: ["/api/subscription-details"] });
+      } else {
+        toast({
+          title: "Reactivation Failed",
+          description: result.error || "Unable to reactivate subscription",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error reactivating subscription:", error);
+      toast({
+        title: "Error",
+        description: "Failed to reactivate subscription. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
 
 
   if (!isAuthenticated || !user) {
@@ -438,11 +468,22 @@ export default function Dashboard() {
                           <p className="text-sm text-gray-600">Plan Details</p>
                         </div>
                       </div>
-                      {subscriptionData.cancelAtPeriodEnd && (
-                        <span className="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full">
-                          Cancelled
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {subscriptionData.cancelAtPeriodEnd && (
+                          <>
+                            <Button
+                              onClick={handleReactivatePlan}
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              Reactivate
+                            </Button>
+                            <span className="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full">
+                              Cancelled
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
@@ -506,7 +547,7 @@ export default function Dashboard() {
                         <Crown className="w-5 h-5 text-yellow-500" />
                         <span className="text-green-800">Premium Benefits</span>
                       </div>
-                      {!subscriptionData?.cancelAtPeriodEnd && (
+                      {!subscriptionData?.cancelAtPeriodEnd ? (
                         <Button
                           onClick={() => setShowCancelDialog(true)}
                           variant="outline"
@@ -514,6 +555,15 @@ export default function Dashboard() {
                           className="border-red-300 text-red-700 hover:bg-red-50"
                         >
                           Cancel Plan
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={handleReactivatePlan}
+                          variant="outline"
+                          size="sm"
+                          className="border-green-300 text-green-700 hover:bg-green-50"
+                        >
+                          Reactivate Plan
                         </Button>
                       )}
                     </CardTitle>

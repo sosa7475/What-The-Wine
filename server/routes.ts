@@ -331,6 +331,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reactivate subscription endpoint
+  app.post("/api/reactivate-subscription", requireAuth, async (req, res) => {
+    try {
+      const user = req.session.user!;
+      
+      if (!user.isPremium || !user.stripeCustomerId) {
+        return res.status(400).json({ error: "No subscription found to reactivate" });
+      }
+      
+      // Get all subscriptions for the customer
+      const subscriptions = await stripe.subscriptions.list({
+        customer: user.stripeCustomerId,
+        status: 'active',
+      });
+      
+      if (subscriptions.data.length === 0) {
+        return res.status(400).json({ error: "No active subscription found" });
+      }
+      
+      const subscription = subscriptions.data[0];
+      
+      // Check if subscription is set to cancel at period end
+      if (!subscription.cancel_at_period_end) {
+        return res.status(400).json({ error: "Subscription is not scheduled for cancellation" });
+      }
+      
+      // Reactivate the subscription by removing the cancel_at_period_end flag
+      await stripe.subscriptions.update(subscription.id, {
+        cancel_at_period_end: false,
+      });
+      
+      res.json({ 
+        success: true, 
+        message: "Your subscription has been reactivated and will continue billing normally"
+      });
+    } catch (error) {
+      console.error('Error reactivating subscription:', error);
+      res.status(500).json({ error: 'Failed to reactivate subscription' });
+    }
+  });
+
   // Get subscription details endpoint
   app.get("/api/subscription-details", requireAuth, async (req, res) => {
     try {
