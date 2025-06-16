@@ -301,14 +301,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Cancel the subscription at period end (so they keep access until end of billing cycle)
       const subscription = subscriptions.data[0];
+      
+      // Debug: Log the subscription object to understand its structure
+      console.log('Subscription object keys:', Object.keys(subscription));
+      console.log('Subscription current_period_end:', (subscription as any).current_period_end);
+      
       await stripe.subscriptions.update(subscription.id, {
         cancel_at_period_end: true,
       });
       
       res.json({ 
         success: true, 
-        message: "Subscription will be cancelled at the end of your current billing period",
-        cancelAt: new Date((subscription as any).current_period_end * 1000).toISOString()
+        message: "Subscription will be cancelled at the end of your current billing period"
       });
     } catch (error) {
       console.error('Error cancelling subscription:', error);
@@ -335,11 +339,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const subscription = subscriptions.data[0];
+      
+      // Debug: Log the subscription object to understand its structure
+      console.log('Subscription details object keys:', Object.keys(subscription));
+      console.log('Subscription details current_period_end:', (subscription as any).current_period_end);
+      
       res.json({
         hasSubscription: true,
         status: subscription.status,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString(),
+        currentPeriodEnd: null, // Temporarily remove problematic date conversion
         amount: subscription.items.data[0].price.unit_amount,
         currency: subscription.items.data[0].price.currency,
       });
