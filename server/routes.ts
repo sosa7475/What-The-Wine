@@ -96,53 +96,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Wine recommendations endpoint with usage limits
+  // Wine recommendations endpoint with usage limits (supports guest users)
   app.post("/api/recommendations", optionalAuth, async (req, res) => {
     try {
-      // Check if user is authenticated
-      if (!req.session.user) {
-        return res.status(401).json({ 
-          error: "Authentication required",
-          message: "Please sign up or log in to get wine recommendations" 
-        });
-      }
-
-      const user = req.session.user;
-
-      // Check usage limits for non-premium users
-      if (!user.isPremium && (user.recommendationCount || 0) >= 5) {
-        return res.status(402).json({ 
-          error: "Usage limit reached",
-          message: "You've used your 5 free recommendations. Upgrade to premium for unlimited access.",
-          requiresPayment: true
-        });
-      }
-
       const preferences = winePreferencesSchema.parse(req.body);
+      const { guestUsageCount } = req.body;
+      
+      // Handle authenticated users
+      if (req.session.user) {
+        const user = req.session.user;
+
+        // Check usage limits for non-premium users
+        if (!user.isPremium && (user.recommendationCount || 0) >= 5) {
+          return res.status(402).json({ 
+            error: "Usage limit reached",
+            message: "You've used your 5 free recommendations. Upgrade to premium for unlimited access.",
+            requiresPayment: true
+          });
+        }
+
+        const recommendedWines = await getWineRecommendations(preferences);
+        
+        // Save wines to storage linked to user
+        const savedWines = [];
+        for (const wine of recommendedWines) {
+          const savedWine = await storage.createUserWine(wine, user.id);
+          savedWines.push(savedWine);
+        }
+
+        // Update user's recommendation count
+        await storage.updateUserRecommendationCount(user.id);
+
+        // Save recommendation record
+        await storage.saveWineRecommendation({
+          userId: user.id,
+          occasion: preferences.occasion || null,
+          budget: preferences.budget || null,
+          foodPairing: preferences.foodPairing || null,
+          wineType: preferences.wineType || null,
+          preferences: preferences.preferences || null,
+          recommendations: JSON.stringify(savedWines.map(w => w.id)),
+        });
+
+        return res.json({ wines: savedWines, isGuest: false });
+      }
+
+      // Handle guest users (up to 2 free recommendations)
+      const currentGuestCount = guestUsageCount || 0;
+      if (currentGuestCount >= 2) {
+        return res.status(402).json({ 
+          error: "Guest limit reached",
+          message: "You've used your 2 free guest recommendations. Sign up for 5 more free recommendations!",
+          requiresAuth: true
+        });
+      }
+
+      // Generate recommendations for guest users (don't save to database)
       const recommendedWines = await getWineRecommendations(preferences);
       
-      // Save wines to storage linked to user
-      const savedWines = [];
-      for (const wine of recommendedWines) {
-        const savedWine = await storage.createUserWine(wine, user.id);
-        savedWines.push(savedWine);
-      }
+      // Add image URLs and return wines without saving
+      const winesWithImages = recommendedWines.map(wine => ({
+        ...wine,
+        imageUrl: `/attached_assets/${wine.type === 'red' ? 'red_1749966019645.jpg' : 
+                   wine.type === 'white' ? 'white_1749966019645.jpeg' : 
+                   wine.type === 'rose' || wine.type === 'rosé' ? 'rose_1749966019645.png' : 
+                   wine.type === 'sparkling' ? 'sparkling_1749966019645.jpg' : 
+                   wine.type === 'dessert' ? 'images_1750043730760.jpeg' : 'red_1749966019645.jpg'}`
+      }));
 
-      // Update user's recommendation count
-      await storage.updateUserRecommendationCount(user.id);
-
-      // Save recommendation record
-      await storage.saveWineRecommendation({
-        userId: user.id,
-        occasion: preferences.occasion || null,
-        budget: preferences.budget || null,
-        foodPairing: preferences.foodPairing || null,
-        wineType: preferences.wineType || null,
-        preferences: preferences.preferences || null,
-        recommendations: JSON.stringify(savedWines.map(w => w.id)),
+      res.json({ 
+        wines: winesWithImages, 
+        isGuest: true, 
+        guestRecommendationsUsed: currentGuestCount + 1,
+        guestRecommendationsRemaining: 2 - (currentGuestCount + 1)
       });
-
-      res.json({ wines: savedWines });
     } catch (error) {
       console.error("Error getting recommendations:", error);
       res.status(500).json({ 

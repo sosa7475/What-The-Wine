@@ -20,6 +20,12 @@ export default function WineRecommendations() {
   const [recommendations, setRecommendations] = useState<Wine[]>([]);
   const [savedWines, setSavedWines] = useState<Set<number>>(new Set());
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [guestRecommendationCount, setGuestRecommendationCount] = useState(() => {
+    // Get guest recommendation count from localStorage
+    const count = localStorage.getItem('guestRecommendationCount');
+    return count ? parseInt(count, 10) : 0;
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -37,17 +43,39 @@ export default function WineRecommendations() {
 
   const recommendationMutation = useMutation({
     mutationFn: async (data: WinePreferences) => {
-      const response = await apiRequest("POST", "/api/recommendations", data);
+      const requestData = isAuthenticated ? data : { ...data, guestUsageCount: guestRecommendationCount };
+      const response = await apiRequest("POST", "/api/recommendations", requestData);
       return response.json();
     },
     onSuccess: (data) => {
       setRecommendations(data.wines);
-      toast({
-        title: "Recommendations Generated",
-        description: `Found ${data.wines.length} perfect wines for you!`,
-      });
-      // Invalidate auth to get updated recommendation count
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
+      // Handle guest users
+      if (data.isGuest) {
+        const newCount = data.guestRecommendationsUsed;
+        setGuestRecommendationCount(newCount);
+        localStorage.setItem('guestRecommendationCount', newCount.toString());
+        
+        toast({
+          title: "Recommendations Generated",
+          description: `Found ${data.wines.length} wines for you! ${data.guestRecommendationsRemaining} free recommendations remaining.`,
+        });
+        
+        // Show auth prompt after using both free recommendations
+        if (data.guestRecommendationsRemaining === 0) {
+          setTimeout(() => {
+            setShowAuthDialog(true);
+          }, 2000);
+        }
+      } else {
+        // Handle authenticated users
+        toast({
+          title: "Recommendations Generated",
+          description: `Found ${data.wines.length} perfect wines for you!`,
+        });
+        // Invalidate auth to get updated recommendation count
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      }
     },
     onError: (error: any) => {
       if (error.message?.includes("Usage limit reached")) {
@@ -57,11 +85,17 @@ export default function WineRecommendations() {
           description: "You've used your 5 free recommendations. Upgrade to premium for unlimited access.",
           variant: "destructive",
         });
+      } else if (error.message?.includes("Guest limit reached")) {
+        setShowAuthDialog(true);
+        toast({
+          title: "Free Trial Complete",
+          description: "You've used your 2 free guest recommendations. Sign up for 5 more free recommendations!",
+        });
       } else if (error.message?.includes("Authentication required")) {
+        setShowAuthDialog(true);
         toast({
           title: "Sign In Required",
           description: "Please sign in to get wine recommendations.",
-          variant: "destructive",
         });
       } else {
         toast({
@@ -75,6 +109,9 @@ export default function WineRecommendations() {
 
   const saveWineMutation = useMutation({
     mutationFn: async ({ wineId }: { wineId: number }) => {
+      if (!isAuthenticated) {
+        throw new Error("Please sign in to save wines to your library");
+      }
       const response = await apiRequest("POST", "/api/library", { wineId });
       return response.json();
     },
@@ -87,11 +124,19 @@ export default function WineRecommendations() {
       });
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to save wine",
-        variant: "destructive",
-      });
+      if (error.message?.includes("sign in")) {
+        setShowAuthDialog(true);
+        toast({
+          title: "Sign In Required",
+          description: "Create an account to save wines to your library.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to save wine",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -117,20 +162,47 @@ export default function WineRecommendations() {
           </p>
         </div>
 
-        {/* Authentication prompt for non-authenticated users */}
+        {/* Guest Usage Status for non-authenticated users */}
         {!isAuthenticated && !isLoading && (
-          <Card className="bg-gradient-to-r from-[#722F37]/10 to-[#F5F5DC]/20 rounded-2xl p-6 mb-8 max-w-4xl mx-auto border-2 border-[#722F37]/10">
-            <CardContent className="text-center">
-              <Lock className="w-12 h-12 text-[#722F37] mx-auto mb-4" />
-              <h4 className="text-xl font-semibold text-[#722F37] mb-2">Sign In Required</h4>
-              <p className="text-gray-600 mb-4">
-                Please sign in to get personalized wine recommendations and save wines to your library.
-              </p>
-              <AuthDialog defaultMode="register">
-                <Button className="bg-[#722F37] hover:bg-[#5d252a] text-white">
-                  Get Started - It's Free
-                </Button>
-              </AuthDialog>
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mb-8 max-w-4xl mx-auto border-2 border-blue-200">
+            <CardContent>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-blue-700">Try Our AI Wine Recommendations</h4>
+                <Sparkles className="w-6 h-6 text-blue-500" />
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-700">Free Guest Recommendations Used:</span>
+                  <span className="font-semibold text-blue-700">{guestRecommendationCount} / 2</span>
+                </div>
+                <div className="w-full bg-blue-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min((guestRecommendationCount / 2) * 100, 100)}%` }}
+                  ></div>
+                </div>
+                {guestRecommendationCount >= 2 ? (
+                  <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-orange-700 mb-2">
+                      <Lock className="w-4 h-4" />
+                      <span className="font-medium">Free trial complete</span>
+                    </div>
+                    <p className="text-sm text-orange-600 mb-3">
+                      Sign up now to get 5 more free recommendations plus the ability to save wines to your library.
+                    </p>
+                    <AuthDialog defaultMode="register">
+                      <Button className="bg-[#722F37] hover:bg-[#5d252a] text-white" size="sm">
+                        <Crown className="w-4 h-4 mr-2" />
+                        Sign Up for Free
+                      </Button>
+                    </AuthDialog>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    Get {2 - guestRecommendationCount} more free recommendation{2 - guestRecommendationCount > 1 ? 's' : ''}, then sign up for 5 additional free recommendations!
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}
