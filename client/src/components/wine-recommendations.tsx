@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,6 +29,14 @@ export default function WineRecommendations() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user, isAuthenticated, isLoading } = useAuth();
+
+  // Clear guest count when user signs in
+  useEffect(() => {
+    if (isAuthenticated && guestRecommendationCount > 0) {
+      setGuestRecommendationCount(0);
+      localStorage.removeItem('guestRecommendationCount');
+    }
+  }, [isAuthenticated, guestRecommendationCount]);
 
   const form = useForm<WinePreferences>({
     resolver: zodResolver(winePreferencesSchema),
@@ -141,6 +149,16 @@ export default function WineRecommendations() {
   });
 
   const onSubmit = (data: WinePreferences) => {
+    // Check if guest user has reached limit
+    if (!isAuthenticated && guestRecommendationCount >= 2) {
+      setShowAuthDialog(true);
+      toast({
+        title: "Sign up required",
+        description: "You've used your 2 free guest recommendations. Sign up for 5 more free recommendations!",
+      });
+      return;
+    }
+    
     recommendationMutation.mutate(data);
   };
 
@@ -384,8 +402,8 @@ export default function WineRecommendations() {
               <div className="text-center">
                 <Button
                   type="submit"
-                  disabled={recommendationMutation.isPending}
-                  className="bg-burgundy-600 hover:bg-burgundy-700 text-white font-medium px-8 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  disabled={recommendationMutation.isPending || (!isAuthenticated && guestRecommendationCount >= 2)}
+                  className="bg-burgundy-600 hover:bg-burgundy-700 text-white font-medium px-8 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {recommendationMutation.isPending ? (
                     <>
@@ -423,6 +441,17 @@ export default function WineRecommendations() {
           isOpen={showPaymentDialog}
           onClose={() => setShowPaymentDialog(false)}
         />
+
+        {/* Auth Dialog for Guest Users */}
+        {showAuthDialog && (
+          <AuthDialog
+            open={showAuthDialog}
+            onOpenChange={setShowAuthDialog}
+            defaultMode="register"
+          >
+            <Button style={{ display: 'none' }}>Hidden</Button>
+          </AuthDialog>
+        )}
       </div>
     </section>
   );
