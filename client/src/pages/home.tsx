@@ -55,9 +55,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-burgundy-900/70 to-burgundy-600/70"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center max-w-3xl mx-auto">
-            <h2 className="font-playfair text-5xl sm:text-6xl font-bold mb-6 text-[#391316]">
-              What the Wine Should I Drink?
-            </h2>
+            <h2 className="font-playfair text-5xl sm:text-6xl font-bold mb-6 text-[#391316]">What Wine Should I Drink?</h2>
             <p className="text-xl text-gray-100 mb-8 leading-relaxed">
               Let our AI sommelier guide you to exceptional wines tailored to your taste, occasion, and culinary preferences
             </p>
