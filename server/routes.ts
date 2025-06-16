@@ -392,13 +392,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const subscription = subscriptions.data[0];
       
-      // Use billing_cycle_anchor for the next billing date
+      // Debug: Log all date fields to understand what Stripe provides
+      console.log('Subscription date fields:', {
+        current_period_start: (subscription as any).current_period_start,
+        current_period_end: (subscription as any).current_period_end,
+        billing_cycle_anchor: subscription.billing_cycle_anchor,
+        cancel_at: subscription.cancel_at,
+        created: subscription.created
+      });
+      
+      // Try to get current_period_end first, fallback to billing_cycle_anchor
       let nextBillingDate = null;
-      if (subscription.billing_cycle_anchor) {
+      if ((subscription as any).current_period_end) {
         try {
-          nextBillingDate = new Date(subscription.billing_cycle_anchor * 1000).toISOString();
+          nextBillingDate = new Date((subscription as any).current_period_end * 1000).toISOString();
         } catch (e) {
-          console.error('Error converting billing cycle anchor date:', e);
+          console.error('Error converting current_period_end:', e);
+        }
+      } else if (subscription.billing_cycle_anchor) {
+        try {
+          // If current_period_end is not available, calculate next billing from billing_cycle_anchor
+          const billingAnchor = new Date(subscription.billing_cycle_anchor * 1000);
+          const now = new Date();
+          
+          // Add months until we get a date in the future
+          let nextBilling = new Date(billingAnchor);
+          while (nextBilling <= now) {
+            nextBilling.setMonth(nextBilling.getMonth() + 1);
+          }
+          
+          nextBillingDate = nextBilling.toISOString();
+        } catch (e) {
+          console.error('Error calculating next billing from anchor:', e);
         }
       }
       
