@@ -78,6 +78,7 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 
 ```
 Changelog:
+- June 16, 2025. Removed redundant subscription details section and streamlined Account tab layout
 - June 16, 2025. Added clean subscription status banner to Account tab showing key billing information
 - June 16, 2025. Moved subscription management interface from main dashboard to Account tab for less prominent access
 - June 16, 2025. Fixed subscription cancellation date conversion errors causing API failures
