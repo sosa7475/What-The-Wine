@@ -301,45 +301,94 @@ export default function Dashboard() {
           </Collapsible>
         )}
 
-        {/* Premium Status Card */}
+        {/* Subscription Details Card */}
         {user.isPremium && (
-          <Card className="mb-8 border-2 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-yellow-500" />
-                  <span className="text-green-800">Premium Active</span>
+          <div className="mb-8 space-y-4">
+            {/* Subscription Status */}
+            <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-amber-600" />
+                    <span className="text-amber-800">Premium Subscription</span>
+                  </div>
+                  {subscriptionData?.cancelAtPeriodEnd && (
+                    <span className="px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full">
+                      Cancelled
+                    </span>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Plan Details</span>
+                    <span className="text-sm font-medium">Premium Monthly - $3.99/month</span>
+                  </div>
+                  {subscriptionData?.currentPeriodEnd && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">
+                        {subscriptionData.cancelAtPeriodEnd ? 'Cancels on' : 'Next billing'}
+                      </span>
+                      <span className="text-sm font-medium">
+                        {new Date(subscriptionData.currentPeriodEnd).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                  {subscriptionData?.cancelAtPeriodEnd && (
+                    <div className="mt-3 p-3 bg-yellow-100 rounded-lg">
+                      <p className="text-sm text-amber-800">
+                        You'll continue to have access until the end of your current billing period. 
+                        You can reactivate anytime.
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <Button
-                  onClick={() => setShowCancelDialog(true)}
-                  variant="outline"
-                  size="sm"
-                  className="border-red-300 text-red-700 hover:bg-red-50"
-                >
-                  Cancel Plan
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-green-700">Unlimited wine recommendations</span>
+              </CardContent>
+            </Card>
+
+            {/* Premium Features */}
+            <Card className="border-2 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-yellow-500" />
+                    <span className="text-green-800">Premium Active</span>
+                  </div>
+                  {!subscriptionData?.cancelAtPeriodEnd && (
+                    <Button
+                      onClick={() => setShowCancelDialog(true)}
+                      variant="outline"
+                      size="sm"
+                      className="border-red-300 text-red-700 hover:bg-red-50"
+                    >
+                      Cancel Plan
+                    </Button>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-green-700">Unlimited wine recommendations</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-green-700">Advanced bottle scanning</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-green-700">Personal wine library</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-green-700">Expert wine insights</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-green-700">Advanced bottle scanning</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-green-700">Personal wine library</span>
-                </div>
-                <p className="text-sm text-green-600 mt-4">
-                  Next billing: $6.95 on {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Quick Stats */}

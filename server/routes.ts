@@ -302,17 +302,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Cancel the subscription at period end (so they keep access until end of billing cycle)
       const subscription = subscriptions.data[0];
       
-      // Debug: Log the subscription object to understand its structure
-      console.log('Subscription object keys:', Object.keys(subscription));
-      console.log('Subscription current_period_end:', (subscription as any).current_period_end);
-      
+      // Get the updated subscription after cancellation to get correct period end date
       await stripe.subscriptions.update(subscription.id, {
         cancel_at_period_end: true,
       });
       
+      // Fetch the updated subscription to get proper billing cycle info
+      const updatedSubscription = await stripe.subscriptions.retrieve(subscription.id);
+      
+      // Use billing_cycle_anchor as the period end date
+      let cancelAtDate = null;
+      if (updatedSubscription.billing_cycle_anchor) {
+        try {
+          cancelAtDate = new Date(updatedSubscription.billing_cycle_anchor * 1000).toISOString();
+        } catch (e) {
+          console.error('Error converting billing cycle anchor date:', e);
+        }
+      }
+      
       res.json({ 
         success: true, 
-        message: "Subscription will be cancelled at the end of your current billing period"
+        message: "Subscription will be cancelled at the end of your current billing period",
+        cancelAt: cancelAtDate
       });
     } catch (error) {
       console.error('Error cancelling subscription:', error);
@@ -340,15 +351,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const subscription = subscriptions.data[0];
       
-      // Debug: Log the subscription object to understand its structure
-      console.log('Subscription details object keys:', Object.keys(subscription));
-      console.log('Subscription details current_period_end:', (subscription as any).current_period_end);
+      // Use billing_cycle_anchor for the next billing date
+      let nextBillingDate = null;
+      if (subscription.billing_cycle_anchor) {
+        try {
+          nextBillingDate = new Date(subscription.billing_cycle_anchor * 1000).toISOString();
+        } catch (e) {
+          console.error('Error converting billing cycle anchor date:', e);
+        }
+      }
+      
+      // Get cancellation date if subscription is set to cancel
+      let cancellationDate = null;
+      if (subscription.cancel_at_period_end && nextBillingDate) {
+        cancellationDate = nextBillingDate; // Same as next billing since it cancels at period end
+      }
       
       res.json({
         hasSubscription: true,
         status: subscription.status,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        currentPeriodEnd: null, // Temporarily remove problematic date conversion
+        currentPeriodEnd: nextBillingDate,
+        cancellationDate: cancellationDate,
         amount: subscription.items.data[0].price.unit_amount,
         currency: subscription.items.data[0].price.currency,
       });
