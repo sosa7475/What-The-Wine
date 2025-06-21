@@ -227,11 +227,13 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 bg-[391316]">
           <div className="mb-8">
             <h2 className="font-playfair text-4xl font-bold mb-6 text-[#391316]">
-              Ready to Discover Your Perfect Wine?
+              Ready to Be the Host Who Always Gets the Wine Right?
             </h2>
             <p className="text-lg max-w-2xl mx-auto mb-8 text-[#391316]">
-              Join thousands of wine enthusiasts who trust What the Wine for personalized recommendations, 
-              expert insights, and unforgettable wine experiences.
+              Join hosts everywhere using What the Wine to take the stress out of picking bottles and add a touch of elegance to every occasion—brunches, birthdays, dinner parties, and more.
+            </p>
+            <p className="text-lg font-semibold max-w-2xl mx-auto mb-8 text-[#391316]">
+              Start Curating Your Signature Wine Style Today
             </p>
           </div>
           

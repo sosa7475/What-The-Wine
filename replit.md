@@ -90,6 +90,7 @@ Changelog:
 - June 21, 2025. Updated first feature card to "Why Choose What The Wine?" emphasizing not needing to be a wine expert to serve like one, focusing on removing guesswork for effortless elegance
 - June 21, 2025. Switched content between main section and first feature card: section header now shows "Why Choose What The Wine?" while first card shows "Confident Recommendations, Powered by AI"
 - June 21, 2025. Moved tagline "From casual brunch to elegant dinner, we've got your bottle" from section header to underneath first feature card content, then moved back to original position under section header
+- June 21, 2025. Updated secondary CTA section with gender-neutral copy: "Ready to Be the Host Who Always Gets the Wine Right?" replacing "women" with "hosts everywhere" and removing emojis
 - June 16, 2025. Added Google Analytics gtag.js (G-QQV6YL3FJ7) alongside Google Tag Manager for comprehensive tracking
 - June 16, 2025. Installed Google Tag Manager (GTM-PDCNGPD9) for tracking page views and user interactions
 - June 16, 2025. Added custom dessert wine image to wine recommendation display system
