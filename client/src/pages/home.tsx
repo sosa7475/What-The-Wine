@@ -56,7 +56,7 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#391316] leading-tight">Want to Impress Your Guests with the Perfect Wine—Every Time?</h2>
-            <p className="text-xl mb-8 leading-relaxed text-[#391316]">Discover the Secret Sophisticated Women Use to Pair the Right Bottle with Every Dish & Occasion</p>
+            <p className="text-xl mb-8 leading-relaxed text-[#391316]">Discover the Secret Sophisticated Hosts Use to Pair the Right Bottle with Every Dish & Occasion</p>
             <Button
               onClick={() => scrollToSection('recommendations')}
               className="bg-gold-400 hover:bg-gold-500 text-burgundy-900 font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
@@ -97,7 +97,7 @@ export default function Home() {
             <div className="space-y-6 text-lg leading-relaxed text-gray-700 max-w-3xl mx-auto">
               <p>
                 We get it. You're not trying to be a sommelier—you just want to feel confident 
-                that the wine you serve will wow your guests and make you look like the woman 
+                that the wine you serve will wow your guests and make you look like the host 
                 who has it all together.
               </p>
               <p className="text-xl font-semibold text-burgundy-700">
