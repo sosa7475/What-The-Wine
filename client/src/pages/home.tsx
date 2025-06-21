@@ -130,6 +130,9 @@ export default function Home() {
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
               Because you don't have to be a wine expert to serve like one. WTW takes the guesswork out of wine so you can focus on what matters: great company, delicious food, and effortless elegance.
             </p>
+            <p className="text-burgundy-600 font-medium text-lg mt-4">
+              From casual brunch to elegant dinner, we've got your bottle.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -142,9 +145,6 @@ export default function Home() {
               </h4>
               <p className="text-gray-600">
                 Our smart wine assistant learns your taste, the vibe you're going for, and what's on the menu—so you always serve something that impresses.
-              </p>
-              <p className="text-burgundy-600 font-medium text-lg mt-4">
-                From casual brunch to elegant dinner, we've got your bottle.
               </p>
             </div>
 
