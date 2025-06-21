@@ -80,6 +80,7 @@ The Vite configuration includes Replit-specific plugins for development tooling 
 Changelog:
 - June 21, 2025. Updated main header banner text to "Want to Impress Your Guests with the Perfect Wine—Every Time?" for improved guest-focused messaging
 - June 21, 2025. Fixed mobile font sizing for header banner with responsive typography (text-3xl on mobile, scaling up to text-6xl on desktop) and improved line spacing
+- June 21, 2025. Added relatable story section below banner featuring emotional journey from dinner planning to wine selection hesitation, positioning app as personal wine stylist solution
 - June 16, 2025. Added Google Analytics gtag.js (G-QQV6YL3FJ7) alongside Google Tag Manager for comprehensive tracking
 - June 16, 2025. Installed Google Tag Manager (GTM-PDCNGPD9) for tracking page views and user interactions
 - June 16, 2025. Added custom dessert wine image to wine recommendation display system

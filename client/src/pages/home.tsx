@@ -66,6 +66,48 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Relatable Story Section */}
+      <section className="py-20 bg-gradient-to-br from-creme-50 to-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-6">
+            <div className="space-y-4 text-lg leading-relaxed text-gray-700">
+              <p className="font-medium">You've spent hours planning the meal…</p>
+              <p className="font-medium">The table is beautifully set…</p>
+              <p className="font-medium">Your friends are laughing in the kitchen…</p>
+            </div>
+            
+            <div className="my-8">
+              <div className="w-16 h-0.5 bg-burgundy-300 mx-auto"></div>
+            </div>
+            
+            <div className="space-y-4 text-lg leading-relaxed text-gray-700">
+              <p className="font-medium text-burgundy-700">But when it's time to pour the wine—</p>
+              <p className="font-medium text-burgundy-700">you hesitate.</p>
+            </div>
+            
+            <div className="bg-burgundy-50 rounded-2xl p-8 my-8">
+              <div className="space-y-3 text-burgundy-600 italic">
+                <p>"Will this go with the salmon?"</p>
+                <p>"Is this too sweet for dinner?"</p>
+                <p>"Do they even like red?"</p>
+              </div>
+            </div>
+            
+            <div className="space-y-6 text-lg leading-relaxed text-gray-700 max-w-3xl mx-auto">
+              <p>
+                We get it. You're not trying to be a sommelier—you just want to feel confident 
+                that the wine you serve will wow your guests and make you look like the woman 
+                who has it all together.
+              </p>
+              <p className="text-xl font-semibold text-burgundy-700">
+                That's why we created What the Wine—your personal wine stylist for every occasion.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Wine Recommendations Section */}
       <div id="recommendations">
         <WineRecommendations />
