@@ -125,10 +125,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-              Why Choose What the Wine?
+              Confident Recommendations, Powered by AI
             </h3>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Discover the perfect wine experience with our intelligent recommendations and comprehensive wine knowledge
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
+              Our smart wine assistant learns your taste, the vibe you're going for, and what's on the menu—so you always serve something that impresses.
+            </p>
+            <p className="text-burgundy-600 font-medium text-lg mt-4">
+              From casual brunch to elegant dinner, we've got your bottle.
             </p>
           </div>
 
@@ -138,10 +141,10 @@ export default function Home() {
                 <Brain className="text-white h-8 w-8" />
               </div>
               <h4 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
-                AI-Powered Recommendations
+                Smart Recommendations
               </h4>
               <p className="text-gray-600">
-                Our advanced AI analyzes your preferences, occasion, and food pairings to suggest the perfect wines for any moment.
+                Our smart wine assistant learns your taste, the vibe you're going for, and what's on the menu—so you always serve something that impresses.
               </p>
             </div>
 
@@ -150,10 +153,13 @@ export default function Home() {
                 <Camera className="text-white h-8 w-8" />
               </div>
               <h4 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
-                Instant Wine Recognition
+                Snap & Learn in Seconds
               </h4>
+              <p className="text-gray-600 mb-4 font-medium">
+                Point, shoot, impress.
+              </p>
               <p className="text-gray-600">
-                Simply snap a photo of any wine bottle to get detailed information, tasting notes, and expert pairing suggestions.
+                Scan any wine label to instantly see flavor notes, expert pairings, and when to serve it. No more guessing in the wine aisle or second-guessing at dinner.
               </p>
             </div>
 
@@ -162,10 +168,13 @@ export default function Home() {
                 <Bookmark className="text-white h-8 w-8" />
               </div>
               <h4 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
-                Personal Wine Library
+                Your Go-To Wine Collection
               </h4>
+              <p className="text-gray-600 mb-4 font-medium">
+                Save every favorite you find.
+              </p>
               <p className="text-gray-600">
-                Build your personal collection, track your favorite wines, and never forget that perfect bottle you discovered.
+                Keep track of the bottles that wowed your guests, paired perfectly with your meals, or made a night unforgettable. Build your own collection of show-stopping wines.
               </p>
             </div>
           </div>
