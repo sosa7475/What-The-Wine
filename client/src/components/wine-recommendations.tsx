@@ -173,7 +173,7 @@ export default function WineRecommendations() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-            AI Wine Recommendations
+            How It Works
           </h3>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Tell us about your preferences and we'll suggest three perfect wines for you
