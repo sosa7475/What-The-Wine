@@ -125,10 +125,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-              Confident Recommendations, Powered by AI
+              Why Choose What The Wine?
             </h3>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              Our smart wine assistant learns your taste, the vibe you're going for, and what's on the menu—so you always serve something that impresses.
+              Because you don't have to be a wine expert to serve like one. WTW takes the guesswork out of wine so you can focus on what matters: great company, delicious food, and effortless elegance.
             </p>
             <p className="text-burgundy-600 font-medium text-lg mt-4">
               From casual brunch to elegant dinner, we've got your bottle.
@@ -141,10 +141,10 @@ export default function Home() {
                 <Brain className="text-white h-8 w-8" />
               </div>
               <h4 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
-                Why Choose What The Wine?
+                Confident Recommendations, Powered by AI
               </h4>
               <p className="text-gray-600">
-                Because you don't have to be a wine expert to serve like one. WTW takes the guesswork out of wine so you can focus on what matters: great company, delicious food, and effortless elegance.
+                Our smart wine assistant learns your taste, the vibe you're going for, and what's on the menu—so you always serve something that impresses.
               </p>
             </div>
 
