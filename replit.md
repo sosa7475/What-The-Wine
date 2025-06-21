@@ -85,6 +85,7 @@ Changelog:
 - June 21, 2025. Made language gender-neutral throughout landing page by replacing "women" with "hosts" and "woman" with "host" to be inclusive for all users
 - June 21, 2025. Changed wine recommendations section title from "AI Wine Recommendations" to "How It Works" for clearer user guidance
 - June 21, 2025. Updated wine scanner description copy to emphasize instant insights with "Snap a photo of any wine bottle and get instant insights—flavor notes, perfect food pairings, and when to serve it"
+- June 21, 2025. Updated wine library section with new heading "Your Personal Wine Library" and enhanced copy emphasizing tracking loved wines, bringing/pouring/gifting confidence, and signature wine list curation
 - June 16, 2025. Added Google Analytics gtag.js (G-QQV6YL3FJ7) alongside Google Tag Manager for comprehensive tracking
 - June 16, 2025. Installed Google Tag Manager (GTM-PDCNGPD9) for tracking page views and user interactions
 - June 16, 2025. Added custom dessert wine image to wine recommendation display system

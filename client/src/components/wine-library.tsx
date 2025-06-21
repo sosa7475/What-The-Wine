@@ -90,10 +90,11 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-              My Wine Library
+              Your Personal Wine Library
             </h3>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Build your personal collection and track your favorite wines
+              Keep track of every wine you've loved—so you always know what to bring, pour, or gift.<br />
+              Save your favorites, add tasting notes, and feel confident curating your signature wine list.
             </p>
           </div>
 
@@ -135,7 +136,7 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
     <section id="library" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-12 space-y-6 lg:space-y-0">
-          <h3 className="font-playfair text-3xl sm:text-4xl font-bold text-burgundy-700">My Wine Library</h3>
+          <h3 className="font-playfair text-3xl sm:text-4xl font-bold text-burgundy-700">Your Personal Wine Library</h3>
           
           <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
             <div className="relative flex-1 sm:flex-initial">
