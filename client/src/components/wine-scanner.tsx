@@ -149,7 +149,7 @@ export default function WineScanner() {
             Scan Wine Bottles
           </h3>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Take a photo of any wine bottle to get detailed information, tasting notes, and food pairing suggestions
+            Snap a photo of any wine bottle and get instant insights—flavor notes, perfect food pairings, and when to serve it.
           </p>
         </div>
 
