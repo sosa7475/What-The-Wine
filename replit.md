@@ -87,6 +87,7 @@ Changelog:
 - June 21, 2025. Updated wine scanner description copy to emphasize instant insights with "Snap a photo of any wine bottle and get instant insights—flavor notes, perfect food pairings, and when to serve it"
 - June 21, 2025. Updated wine library section with new heading "Your Personal Wine Library" and enhanced copy emphasizing tracking loved wines, bringing/pouring/gifting confidence, and signature wine list curation
 - June 21, 2025. Replaced "Why Choose What the Wine" section with "Confident Recommendations, Powered by AI" featuring enhanced copy about smart wine assistant, point-shoot-impress scanning, and saving favorite wines for memorable occasions
+- June 21, 2025. Updated first feature card to "Why Choose What The Wine?" emphasizing not needing to be a wine expert to serve like one, focusing on removing guesswork for effortless elegance
 - June 16, 2025. Added Google Analytics gtag.js (G-QQV6YL3FJ7) alongside Google Tag Manager for comprehensive tracking
 - June 16, 2025. Installed Google Tag Manager (GTM-PDCNGPD9) for tracking page views and user interactions
 - June 16, 2025. Added custom dessert wine image to wine recommendation display system

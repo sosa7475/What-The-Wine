@@ -141,10 +141,10 @@ export default function Home() {
                 <Brain className="text-white h-8 w-8" />
               </div>
               <h4 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
-                Smart Recommendations
+                Why Choose What The Wine?
               </h4>
               <p className="text-gray-600">
-                Our smart wine assistant learns your taste, the vibe you're going for, and what's on the menu—so you always serve something that impresses.
+                Because you don't have to be a wine expert to serve like one. WTW takes the guesswork out of wine so you can focus on what matters: great company, delicious food, and effortless elegance.
               </p>
             </div>
 
