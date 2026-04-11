@@ -55,6 +55,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.user = user;
 
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => { if (err) reject(err); else resolve(); });
+      });
+
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } catch (error) {
       console.error("Registration error:", error);
@@ -73,6 +77,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       req.session.userId = user.id;
       req.session.user = user;
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => { if (err) reject(err); else resolve(); });
+      });
 
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } catch (error) {

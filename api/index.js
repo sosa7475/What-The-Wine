@@ -752,6 +752,12 @@ async function registerRoutes(app2) {
       });
       req.session.userId = user.id;
       req.session.user = user;
+      await new Promise((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } catch (error) {
       console.error("Registration error:", error);
@@ -767,6 +773,12 @@ async function registerRoutes(app2) {
       }
       req.session.userId = user.id;
       req.session.user = user;
+      await new Promise((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } catch (error) {
       console.error("Login error:", error);
