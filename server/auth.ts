@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import { pool } from "./db";
 import { storage } from "./storage";
 import type { Request, Response, NextFunction } from "express";
 import type { User } from "@shared/schema";
@@ -11,14 +13,22 @@ declare module "express-session" {
   }
 }
 
+const PgStore = connectPgSimple(session);
+
 export function getSession() {
   return session({
+    store: new PgStore({
+      pool: pool as any,
+      tableName: "user_sessions",
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET || "wine-app-secret-key-development",
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // Set to true in production with HTTPS
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
     },
   });
