@@ -1,56 +1,80 @@
 import bcrypt from "bcryptjs";
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import pg from "pg";
+import { createHmac, timingSafeEqual } from "crypto";
 import { storage } from "./storage";
 import type { Request, Response, NextFunction } from "express";
 import type { User } from "@shared/schema";
 
-declare module "express-session" {
-  interface SessionData {
-    userId?: number;
+declare module "express-serve-static-core" {
+  interface Request {
     user?: User;
   }
 }
 
-// connect-pg-simple requires callback-based pg.Pool, not Neon's Promise-only pool.
-// Also strip channel_binding which the pg driver does not support.
-function buildSessionPool() {
-  const raw = process.env.DATABASE_URL || "";
-  let url: string;
+const SECRET = process.env.SESSION_SECRET || "wine-app-secret-key-development";
+const COOKIE_NAME = "wtw_auth";
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 1 week in ms
+
+// ---------------------------------------------------------------------------
+// Minimal HMAC-signed token — no external JWT library needed
+// ---------------------------------------------------------------------------
+
+function sign(payload: object): string {
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const sig = createHmac("sha256", SECRET).update(body).digest("base64url");
+  return `${body}.${sig}`;
+}
+
+function verify(token: string): Record<string, unknown> | null {
+  const dot = token.lastIndexOf(".");
+  if (dot < 0) return null;
+  const body = token.slice(0, dot);
+  const sig = token.slice(dot + 1);
+  const expected = createHmac("sha256", SECRET).update(body).digest("base64url");
   try {
-    const u = new URL(raw);
-    u.searchParams.delete("channel_binding");
-    url = u.toString();
+    const a = Buffer.from(expected);
+    const b = Buffer.from(sig);
+    if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+    return JSON.parse(Buffer.from(body, "base64url").toString());
   } catch {
-    url = raw;
+    return null;
   }
-  return new pg.Pool({
-    connectionString: url,
-    ssl: { rejectUnauthorized: false },
-    max: 2,
+}
+
+function parseCookies(req: Request): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const part of (req.headers.cookie || "").split(";")) {
+    const eq = part.indexOf("=");
+    if (eq < 0) continue;
+    out[part.slice(0, eq).trim()] = part.slice(eq + 1).trim();
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Public helpers used by routes
+// ---------------------------------------------------------------------------
+
+export function setAuthCookie(res: Response, userId: number): void {
+  const token = sign({ userId, iat: Date.now() });
+  res.cookie(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: COOKIE_MAX_AGE,
+    path: "/",
   });
 }
 
-const PgStore = connectPgSimple(session);
+export function clearAuthCookie(res: Response): void {
+  res.clearCookie(COOKIE_NAME, { path: "/" });
+}
 
-export function getSession() {
-  return session({
-    store: new PgStore({
-      pool: buildSessionPool(),
-      tableName: "user_sessions",
-      createTableIfMissing: true,
-    }),
-    secret: process.env.SESSION_SECRET || "wine-app-secret-key-development",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    },
-  });
+export function getAuthUserId(req: Request): number | null {
+  const token = parseCookies(req)[COOKIE_NAME];
+  if (!token) return null;
+  const payload = verify(token);
+  if (!payload || typeof payload.userId !== "number") return null;
+  return payload.userId;
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -61,19 +85,22 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
+// ---------------------------------------------------------------------------
+// Express middleware
+// ---------------------------------------------------------------------------
+
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.session.userId) {
+  const userId = getAuthUserId(req);
+  if (!userId) {
     return res.status(401).json({ message: "Authentication required" });
   }
-
   try {
-    const user = await storage.getUser(req.session.userId);
+    const user = await storage.getUser(userId);
     if (!user) {
-      req.session.destroy(() => {});
+      clearAuthCookie(res);
       return res.status(401).json({ message: "User not found" });
     }
-
-    req.session.user = user;
+    req.user = user;
     next();
   } catch (error) {
     console.error("Auth middleware error:", error);
@@ -82,12 +109,11 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
 };
 
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.session.userId) {
+  const userId = getAuthUserId(req);
+  if (userId) {
     try {
-      const user = await storage.getUser(req.session.userId);
-      if (user) {
-        req.session.user = user;
-      }
+      const user = await storage.getUser(userId);
+      if (user) req.user = user;
     } catch (error) {
       console.error("Optional auth error:", error);
     }

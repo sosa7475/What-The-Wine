@@ -647,44 +647,58 @@ Identify the wine from the label and provide accurate information including tast
 
 // server/auth.ts
 import bcrypt from "bcryptjs";
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import pg from "pg";
-function buildSessionPool() {
-  const raw = process.env.DATABASE_URL || "";
-  let url;
+import { createHmac, timingSafeEqual } from "crypto";
+var SECRET = process.env.SESSION_SECRET || "wine-app-secret-key-development";
+var COOKIE_NAME = "wtw_auth";
+var COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1e3;
+function sign(payload) {
+  const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const sig = createHmac("sha256", SECRET).update(body).digest("base64url");
+  return `${body}.${sig}`;
+}
+function verify(token) {
+  const dot = token.lastIndexOf(".");
+  if (dot < 0) return null;
+  const body = token.slice(0, dot);
+  const sig = token.slice(dot + 1);
+  const expected = createHmac("sha256", SECRET).update(body).digest("base64url");
   try {
-    const u = new URL(raw);
-    u.searchParams.delete("channel_binding");
-    url = u.toString();
+    const a = Buffer.from(expected);
+    const b = Buffer.from(sig);
+    if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+    return JSON.parse(Buffer.from(body, "base64url").toString());
   } catch {
-    url = raw;
+    return null;
   }
-  return new pg.Pool({
-    connectionString: url,
-    ssl: { rejectUnauthorized: false },
-    max: 2
+}
+function parseCookies(req) {
+  const out = {};
+  for (const part of (req.headers.cookie || "").split(";")) {
+    const eq2 = part.indexOf("=");
+    if (eq2 < 0) continue;
+    out[part.slice(0, eq2).trim()] = part.slice(eq2 + 1).trim();
+  }
+  return out;
+}
+function setAuthCookie(res, userId) {
+  const token = sign({ userId, iat: Date.now() });
+  res.cookie(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: COOKIE_MAX_AGE,
+    path: "/"
   });
 }
-var PgStore = connectPgSimple(session);
-function getSession() {
-  return session({
-    store: new PgStore({
-      pool: buildSessionPool(),
-      tableName: "user_sessions",
-      createTableIfMissing: true
-    }),
-    secret: process.env.SESSION_SECRET || "wine-app-secret-key-development",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1e3
-      // 1 week
-    }
-  });
+function clearAuthCookie(res) {
+  res.clearCookie(COOKIE_NAME, { path: "/" });
+}
+function getAuthUserId(req) {
+  const token = parseCookies(req)[COOKIE_NAME];
+  if (!token) return null;
+  const payload = verify(token);
+  if (!payload || typeof payload.userId !== "number") return null;
+  return payload.userId;
 }
 async function hashPassword(password) {
   return bcrypt.hash(password, 12);
@@ -693,17 +707,17 @@ async function verifyPassword(password, hash) {
   return bcrypt.compare(password, hash);
 }
 var requireAuth = async (req, res, next) => {
-  if (!req.session.userId) {
+  const userId = getAuthUserId(req);
+  if (!userId) {
     return res.status(401).json({ message: "Authentication required" });
   }
   try {
-    const user = await storage.getUser(req.session.userId);
+    const user = await storage.getUser(userId);
     if (!user) {
-      req.session.destroy(() => {
-      });
+      clearAuthCookie(res);
       return res.status(401).json({ message: "User not found" });
     }
-    req.session.user = user;
+    req.user = user;
     next();
   } catch (error) {
     console.error("Auth middleware error:", error);
@@ -711,12 +725,11 @@ var requireAuth = async (req, res, next) => {
   }
 };
 var optionalAuth = async (req, res, next) => {
-  if (req.session.userId) {
+  const userId = getAuthUserId(req);
+  if (userId) {
     try {
-      const user = await storage.getUser(req.session.userId);
-      if (user) {
-        req.session.user = user;
-      }
+      const user = await storage.getUser(userId);
+      if (user) req.user = user;
     } catch (error) {
       console.error("Optional auth error:", error);
     }
@@ -737,7 +750,6 @@ var upload = multer({
   }
 });
 async function registerRoutes(app2) {
-  app2.use(getSession());
   app2.post("/api/auth/register", async (req, res) => {
     try {
       const userData = registerUserSchema.parse(req.body);
@@ -750,14 +762,7 @@ async function registerRoutes(app2) {
         ...userData,
         password: hashedPassword
       });
-      req.session.userId = user.id;
-      req.session.user = user;
-      await new Promise((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
+      setAuthCookie(res, user.id);
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } catch (error) {
       console.error("Registration error:", error);
@@ -771,14 +776,7 @@ async function registerRoutes(app2) {
       if (!user || !await verifyPassword(password, user.password)) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
-      req.session.userId = user.id;
-      req.session.user = user;
-      await new Promise((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
+      setAuthCookie(res, user.id);
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } catch (error) {
       console.error("Login error:", error);
@@ -786,13 +784,13 @@ async function registerRoutes(app2) {
     }
   });
   app2.post("/api/auth/logout", (req, res) => {
-    req.session.destroy(() => {
-      res.json({ message: "Logged out" });
-    });
+    clearAuthCookie(res);
+    res.json({ message: "Logged out" });
   });
   app2.get("/api/auth/me", optionalAuth, (req, res) => {
-    if (req.session.user) {
-      const user = req.session.user;
+    res.set("Cache-Control", "no-store");
+    if (req.user) {
+      const user = req.user;
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } else {
       res.json({ user: null });
@@ -802,8 +800,8 @@ async function registerRoutes(app2) {
     try {
       const preferences = winePreferencesSchema.parse(req.body);
       const { guestUsageCount } = req.body;
-      if (req.session.user) {
-        const user = req.session.user;
+      if (req.user) {
+        const user = req.user;
         if (!user.isPremium && (user.recommendationCount || 0) >= 5) {
           return res.status(402).json({
             error: "Usage limit reached",
@@ -861,7 +859,7 @@ async function registerRoutes(app2) {
       if (!req.file) {
         return res.status(400).json({ error: "No image file provided" });
       }
-      const userId = req.session.userId;
+      const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({ error: "User not authenticated" });
       }
@@ -890,7 +888,7 @@ async function registerRoutes(app2) {
   });
   app2.get("/api/user/wines", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId;
+      const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({ error: "User not authenticated" });
       }
@@ -903,7 +901,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/create-checkout-session", requireAuth, async (req, res) => {
     try {
-      const session2 = await stripe.checkout.sessions.create({
+      const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
           {
@@ -926,10 +924,10 @@ async function registerRoutes(app2) {
         success_url: `${req.headers.origin}/dashboard?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${req.headers.origin}/dashboard?upgrade=cancelled`,
         metadata: {
-          userId: req.session.userId?.toString() || ""
+          userId: req.user?.id?.toString() || ""
         }
       });
-      res.json({ url: session2.url });
+      res.json({ url: session.url });
     } catch (error) {
       console.error("Error creating checkout session:", error);
       res.status(500).json({ error: "Failed to create checkout session" });
@@ -937,18 +935,18 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/check-subscription", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
       const { sessionId } = req.body;
       if (!sessionId) {
         return res.status(400).json({ error: "Session ID required" });
       }
-      const session2 = await stripe.checkout.sessions.retrieve(sessionId);
-      if (session2.payment_status === "paid" && session2.mode === "subscription") {
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (session.payment_status === "paid" && session.mode === "subscription") {
         await storage.updateUserPremiumStatus(user.id, true);
-        if (session2.customer) {
-          await storage.updateUserStripeCustomerId(user.id, session2.customer);
+        if (session.customer) {
+          await storage.updateUserStripeCustomerId(user.id, session.customer);
         }
-        req.session.user = { ...user, isPremium: true };
+        req.user = { ...user, isPremium: true };
         res.json({ success: true, isPremium: true });
       } else {
         res.json({ success: false, isPremium: false });
@@ -960,7 +958,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/cancel-subscription", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
       if (!user.isPremium || !user.stripeCustomerId) {
         return res.status(400).json({ error: "No active subscription found" });
       }
@@ -996,7 +994,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/reactivate-subscription", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
       if (!user.isPremium || !user.stripeCustomerId) {
         return res.status(400).json({ error: "No subscription found to reactivate" });
       }
@@ -1025,7 +1023,7 @@ async function registerRoutes(app2) {
   });
   app2.get("/api/subscription-details", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
       if (!user.isPremium || !user.stripeCustomerId) {
         return res.json({ hasSubscription: false });
       }
@@ -1133,7 +1131,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/create-payment-intent", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
       const paymentIntent = await stripe.paymentIntents.create({
         amount: 999,
         // $9.99 for premium access
@@ -1151,11 +1149,11 @@ async function registerRoutes(app2) {
   app2.post("/api/confirm-payment", requireAuth, async (req, res) => {
     try {
       const { paymentIntentId } = req.body;
-      const user = req.session.user;
+      const user = req.user;
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
       if (paymentIntent.status === "succeeded") {
         await storage.updateUserPremiumStatus(user.id, true);
-        req.session.user = { ...user, isPremium: true };
+        req.user = { ...user, isPremium: true };
         res.json({ success: true, message: "Payment successful! You now have unlimited access." });
       } else {
         res.status(400).json({ error: "Payment not completed" });
@@ -1167,7 +1165,7 @@ async function registerRoutes(app2) {
   });
   app2.get("/api/library", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
       const library = await storage.getUserWineLibrary(user.id);
       res.json({ library });
     } catch (error) {
@@ -1177,7 +1175,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/library", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
       const { wineId, personalNotes } = req.body;
       const exists = await storage.isWineInLibrary(user.id, wineId);
       if (exists) {
@@ -1196,7 +1194,7 @@ async function registerRoutes(app2) {
   });
   app2.delete("/api/library/:wineId", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
       const wineId = parseInt(req.params.wineId);
       if (isNaN(wineId)) {
         return res.status(400).json({ error: "Invalid wine ID" });
@@ -1226,7 +1224,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/community/reviews", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user.id;
+      const userId = req.user.id;
       const reviewData = insertWineReviewSchema.parse(req.body);
       const review = await storage.createWineReview(reviewData, userId);
       res.json(review);
@@ -1247,7 +1245,7 @@ async function registerRoutes(app2) {
   });
   app2.get("/api/community/reviews/user", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user.id;
+      const userId = req.user.id;
       const reviews = await storage.getUserReviews(userId);
       res.json(reviews);
     } catch (error) {
@@ -1257,7 +1255,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/community/recommendations", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user.id;
+      const userId = req.user.id;
       const recommendationData = insertCommunityRecommendationSchema.parse(req.body);
       const recommendation = await storage.createCommunityRecommendation(recommendationData, userId);
       res.json(recommendation);
@@ -1279,7 +1277,7 @@ async function registerRoutes(app2) {
   });
   app2.get("/api/community/recommendations/user", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user.id;
+      const userId = req.user.id;
       const recommendations = await storage.getUserCommunityRecommendations(userId);
       res.json(recommendations);
     } catch (error) {
@@ -1289,7 +1287,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/community/recommendations/:id/like", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user.id;
+      const userId = req.user.id;
       const recommendationId = parseInt(req.params.id);
       const liked = await storage.toggleRecommendationLike(userId, recommendationId);
       res.json({ liked });
@@ -1300,7 +1298,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/community/reviews/:reviewId/comments", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user.id;
+      const userId = req.user.id;
       const reviewId = parseInt(req.params.reviewId);
       const commentData = insertReviewCommentSchema.parse(req.body);
       const comment = await storage.createReviewComment({
@@ -1326,7 +1324,7 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/community/recommendations/:recommendationId/comments", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user.id;
+      const userId = req.user.id;
       const recommendationId = parseInt(req.params.recommendationId);
       const commentData = insertRecommendationCommentSchema.parse(req.body);
       const comment = await storage.createRecommendationComment({

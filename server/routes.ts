@@ -15,7 +15,7 @@ import {
   insertReviewCommentSchema,
   insertRecommendationCommentSchema
 } from "@shared/schema";
-import { getSession, hashPassword, verifyPassword, requireAuth, optionalAuth } from "./auth";
+import { setAuthCookie, clearAuthCookie, hashPassword, verifyPassword, requireAuth, optionalAuth } from "./auth";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -30,14 +30,11 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session middleware
-  app.use(getSession());
-
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
     try {
       const userData = registerUserSchema.parse(req.body);
-      
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
@@ -51,14 +48,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: hashedPassword,
       });
 
-      // Set session
-      req.session.userId = user.id;
-      req.session.user = user;
-
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => { if (err) reject(err); else resolve(); });
-      });
-
+      setAuthCookie(res, user.id);
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } catch (error) {
       console.error("Registration error:", error);
@@ -69,19 +59,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = loginUserSchema.parse(req.body);
-      
+
       const user = await storage.getUserByEmail(email);
       if (!user || !(await verifyPassword(password, user.password))) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      req.session.userId = user.id;
-      req.session.user = user;
-
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => { if (err) reject(err); else resolve(); });
-      });
-
+      setAuthCookie(res, user.id);
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } catch (error) {
       console.error("Login error:", error);
@@ -90,14 +74,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/logout", (req, res) => {
-    req.session.destroy(() => {
-      res.json({ message: "Logged out" });
-    });
+    clearAuthCookie(res);
+    res.json({ message: "Logged out" });
   });
 
   app.get("/api/auth/me", optionalAuth, (req, res) => {
-    if (req.session.user) {
-      const user = req.session.user;
+    res.set("Cache-Control", "no-store");
+    if (req.user) {
+      const user = req.user;
       res.json({ user: { id: user.id, email: user.email, username: user.username, firstName: user.firstName, isPremium: user.isPremium, recommendationCount: user.recommendationCount } });
     } else {
       res.json({ user: null });
@@ -111,8 +95,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { guestUsageCount } = req.body;
       
       // Handle authenticated users
-      if (req.session.user) {
-        const user = req.session.user;
+      if (req.user) {
+        const user = req.user;
 
         // Check usage limits for non-premium users
         if (!user.isPremium && (user.recommendationCount || 0) >= 5) {
@@ -194,7 +178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No image file provided" });
       }
 
-      const userId = req.session.userId;
+      const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({ error: "User not authenticated" });
       }
@@ -231,7 +215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user-specific wines
   app.get("/api/user/wines", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.userId;
+      const userId = req.user?.id;
       if (!userId) {
         return res.status(401).json({ error: "User not authenticated" });
       }
@@ -269,7 +253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success_url: `${req.headers.origin}/dashboard?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${req.headers.origin}/dashboard?upgrade=cancelled`,
         metadata: {
-          userId: req.session.userId?.toString() || '',
+          userId: req.user?.id?.toString() || '',
         },
       });
 
@@ -283,7 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Check subscription status endpoint for manual verification
   app.post("/api/check-subscription", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user!;
+      const user = req.user!;
       const { sessionId } = req.body;
       
       if (!sessionId) {
@@ -303,7 +287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Update session
-        req.session.user = { ...user, isPremium: true };
+        req.user = { ...user, isPremium: true };
         
         res.json({ success: true, isPremium: true });
       } else {
@@ -318,7 +302,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cancel subscription endpoint
   app.post("/api/cancel-subscription", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user!;
+      const user = req.user!;
       
       if (!user.isPremium || !user.stripeCustomerId) {
         return res.status(400).json({ error: "No active subscription found" });
@@ -369,7 +353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Reactivate subscription endpoint
   app.post("/api/reactivate-subscription", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user!;
+      const user = req.user!;
       
       if (!user.isPremium || !user.stripeCustomerId) {
         return res.status(400).json({ error: "No subscription found to reactivate" });
@@ -410,7 +394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get subscription details endpoint
   app.get("/api/subscription-details", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user!;
+      const user = req.user!;
       
       if (!user.isPremium || !user.stripeCustomerId) {
         return res.json({ hasSubscription: false });
@@ -547,7 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Stripe payment routes
   app.post("/api/create-payment-intent", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user!;
+      const user = req.user!;
       
       const paymentIntent = await stripe.paymentIntents.create({
         amount: 999, // $9.99 for premium access
@@ -567,7 +551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/confirm-payment", requireAuth, async (req, res) => {
     try {
       const { paymentIntentId } = req.body;
-      const user = req.session.user!;
+      const user = req.user!;
       
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
       
@@ -576,7 +560,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateUserPremiumStatus(user.id, true);
         
         // Update session
-        req.session.user = { ...user, isPremium: true };
+        req.user = { ...user, isPremium: true };
         
         res.json({ success: true, message: "Payment successful! You now have unlimited access." });
       } else {
@@ -591,7 +575,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user wine library (requires auth)
   app.get("/api/library", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user!;
+      const user = req.user!;
       const library = await storage.getUserWineLibrary(user.id);
       res.json({ library });
     } catch (error) {
@@ -603,7 +587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add wine to library (requires auth)
   app.post("/api/library", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user!;
+      const user = req.user!;
       const { wineId, personalNotes } = req.body;
       
       // Check if wine is already in library
@@ -627,7 +611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Remove wine from library (requires auth)
   app.delete("/api/library/:wineId", requireAuth, async (req, res) => {
     try {
-      const user = req.session.user!;
+      const user = req.user!;
       const wineId = parseInt(req.params.wineId);
       
       if (isNaN(wineId)) {
@@ -665,7 +649,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Community Features - Wine Reviews
   app.post("/api/community/reviews", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user!.id;
+      const userId = req.user!.id;
       const reviewData = insertWineReviewSchema.parse(req.body);
       
       const review = await storage.createWineReview(reviewData, userId);
@@ -690,7 +674,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/community/reviews/user", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user!.id;
+      const userId = req.user!.id;
       const reviews = await storage.getUserReviews(userId);
       res.json(reviews);
     } catch (error) {
@@ -702,7 +686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Community Features - Wine Recommendations
   app.post("/api/community/recommendations", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user!.id;
+      const userId = req.user!.id;
       const recommendationData = insertCommunityRecommendationSchema.parse(req.body);
       
       const recommendation = await storage.createCommunityRecommendation(recommendationData, userId);
@@ -729,7 +713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/community/recommendations/user", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user!.id;
+      const userId = req.user!.id;
       const recommendations = await storage.getUserCommunityRecommendations(userId);
       res.json(recommendations);
     } catch (error) {
@@ -740,7 +724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/community/recommendations/:id/like", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user!.id;
+      const userId = req.user!.id;
       const recommendationId = parseInt(req.params.id);
       
       const liked = await storage.toggleRecommendationLike(userId, recommendationId);
@@ -754,7 +738,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Community Features - Comments
   app.post("/api/community/reviews/:reviewId/comments", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user!.id;
+      const userId = req.user!.id;
       const reviewId = parseInt(req.params.reviewId);
       const commentData = insertReviewCommentSchema.parse(req.body);
       
@@ -784,7 +768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/community/recommendations/:recommendationId/comments", requireAuth, async (req, res) => {
     try {
-      const userId = req.session.user!.id;
+      const userId = req.user!.id;
       const recommendationId = parseInt(req.params.recommendationId);
       const commentData = insertRecommendationCommentSchema.parse(req.body);
       
