@@ -5,9 +5,29 @@ import { HelpCircle, MessageCircle, Book, Wine, Camera, CreditCard, Settings, Ar
 import { useLocation } from "wouter";
 import Header from "@/components/header";
 import logoPath from "@assets/cropped_1749956607943.png";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function HelpCenter() {
   const [, setLocation] = useLocation();
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "How do I get wine recommendations?", "acceptedAnswer": { "@type": "Answer", "text": "Fill out our recommendation form with your preferences like wine type, budget, occasion, and food pairings. Our AI will suggest personalized wines based on your tastes." } },
+      { "@type": "Question", "name": "How many free recommendations do I get?", "acceptedAnswer": { "@type": "Answer", "text": "You get 5 free wine recommendations. After that, you can upgrade to premium for unlimited recommendations and additional features." } },
+      { "@type": "Question", "name": "How does the wine bottle scanner work?", "acceptedAnswer": { "@type": "Answer", "text": "Upload a clear photo of your wine bottle label. Our AI analyzes the image to identify the wine and provide detailed information including ratings, tasting notes, and food pairings." } },
+      { "@type": "Question", "name": "How do I add wines to my library?", "acceptedAnswer": { "@type": "Answer", "text": "You can add wines by saving recommendations, scanning bottle labels, or manually entering wine details. Your library helps track wines you've tried or want to try." } },
+      { "@type": "Question", "name": "What does premium include?", "acceptedAnswer": { "@type": "Answer", "text": "Premium gives you unlimited AI wine recommendations, unlimited bottle scanning, full wine library access, and exclusive community features for $3.99/month." } },
+    ],
+  };
+
+  useSEO({
+    title: "Help Center — Wine Recommendations & App Support",
+    description: "Find answers to common questions about What the Wine. Learn how AI wine recommendations work, how to scan bottles, manage your library, and upgrade to premium.",
+    canonical: "/help",
+    structuredData: faqSchema,
+  });
 
   const faqs = [
     {

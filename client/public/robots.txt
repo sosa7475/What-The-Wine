@@ -1,0 +1,31 @@
+# What the Wine — robots.txt
+# https://what-the-wine.vercel.app
+
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /api/
+
+# Allow all known AI crawlers — this app is built for agents AND humans
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+Sitemap: https://what-the-wine.vercel.app/sitemap.xml

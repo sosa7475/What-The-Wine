@@ -11,11 +11,18 @@ import AuthDialog from "@/components/auth-dialog";
 import EmailSubscriptionForm from "@/components/email-subscription";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const logoutMutation = useLogout();
   const { toast } = useToast();
+
+  useSEO({
+    title: "AI Wine Recommendations for Every Occasion",
+    description: "What the Wine uses AI to recommend the perfect wine for any occasion, food pairing, or budget. Scan labels, build your cellar, and discover wines loved by the community. Free to start.",
+    canonical: "/",
+  });
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -46,16 +53,19 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-burgundy-600 to-burgundy-900 text-white">
         <div className="absolute inset-0 opacity-60">
-          <img 
-            src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080" 
-            alt="Luxury wine cellar background" 
+          <img
+            src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080"
+            alt="Guests raising wine glasses at an elegant dinner party"
             className="w-full h-full object-cover"
+            width="1920"
+            height="1080"
+            fetchPriority="high"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-br from-burgundy-900/70 to-burgundy-600/70"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center max-w-3xl mx-auto">
-            <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#391316] leading-tight">Want to Impress Your Guests with the Perfect Wine—Every Time?</h2>
+            <h1 className="font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#391316] leading-tight">Want to Impress Your Guests with the Perfect Wine—Every Time?</h1>
             <p className="text-xl mb-8 leading-relaxed text-[#391316]">Discover the Secret Sophisticated Hosts Use to Pair the Right Bottle with Every Dish & Occasion</p>
             <Button
               onClick={() => scrollToSection('recommendations')}
@@ -124,9 +134,9 @@ export default function Home() {
       <section className="py-20 bg-creme-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
+            <h2 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
               Why Choose What The Wine?
-            </h3>
+            </h2>
             <p className="text-gray-600 text-lg max-w-3xl mx-auto">
               Because you don't have to be a wine expert to serve like one. WTW takes the guesswork out of wine so you can focus on what matters: great company, delicious food, and effortless elegance.
             </p>
@@ -140,9 +150,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-burgundy-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Brain className="text-white h-8 w-8" />
               </div>
-              <h4 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
+              <h3 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
                 Confident Recommendations, Powered by AI
-              </h4>
+              </h3>
               <p className="text-gray-600">
                 Our smart wine assistant learns your taste, the vibe you're going for, and what's on the menu—so you always serve something that impresses.
               </p>
@@ -152,9 +162,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-burgundy-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Camera className="text-white h-8 w-8" />
               </div>
-              <h4 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
+              <h3 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
                 Snap & Learn in Seconds
-              </h4>
+              </h3>
               <p className="text-gray-600 mb-4 font-medium">
                 Point, shoot, impress.
               </p>
@@ -167,9 +177,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-burgundy-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Bookmark className="text-white h-8 w-8" />
               </div>
-              <h4 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
+              <h3 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
                 Your Go-To Wine Collection
-              </h4>
+              </h3>
               <p className="text-gray-600 mb-4 font-medium">
                 Save every favorite you find.
               </p>
@@ -229,6 +239,7 @@ export default function Home() {
             <h2 className="font-playfair text-4xl font-bold mb-6 text-[#391316]">
               Ready to Be the Host Who Always Gets the Wine Right?
             </h2>
+
             <p className="text-lg max-w-2xl mx-auto mb-8 text-[#391316]">
               Join hosts everywhere using What the Wine to take the stress out of picking bottles and add a touch of elegance to every occasion—brunches, birthdays, dinner parties, and more.
             </p>
@@ -264,9 +275,9 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
             <div className="text-center mb-8">
-              <h3 className="font-playfair text-3xl font-bold text-burgundy-700 mb-4">
+              <h2 className="font-playfair text-3xl font-bold text-burgundy-700 mb-4">
                 Stay in the Know
-              </h3>
+              </h2>
               <p className="text-gray-600 text-lg">
                 Get weekly wine recommendations, expert tips, and exclusive offers delivered to your inbox.
               </p>
@@ -279,21 +290,21 @@ export default function Home() {
                 <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Wine className="w-6 h-6 text-burgundy-600" />
                 </div>
-                <h4 className="font-semibold text-burgundy-700 mb-2">Weekly Picks</h4>
+                <h3 className="font-semibold text-burgundy-700 mb-2">Weekly Picks</h3>
                 <p className="text-sm text-gray-600">Curated wine selections based on trending tastes</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Star className="w-6 h-6 text-burgundy-600" />
                 </div>
-                <h4 className="font-semibold text-burgundy-700 mb-2">Expert Tips</h4>
+                <h3 className="font-semibold text-burgundy-700 mb-2">Expert Tips</h3>
                 <p className="text-sm text-gray-600">Professional advice from certified sommeliers</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <TrendingUp className="w-6 h-6 text-burgundy-600" />
                 </div>
-                <h4 className="font-semibold text-burgundy-700 mb-2">Exclusive Offers</h4>
+                <h3 className="font-semibold text-burgundy-700 mb-2">Exclusive Offers</h3>
                 <p className="text-sm text-gray-600">Special discounts and early access to features</p>
               </div>
             </div>

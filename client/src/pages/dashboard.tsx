@@ -16,8 +16,11 @@ import WineScanner from "@/components/wine-scanner";
 import WineLibrary from "@/components/wine-library";
 import CommunityHub from "@/components/community-hub";
 import PaymentDialog from "@/components/payment-dialog";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function Dashboard() {
+  useSEO({ title: "My Dashboard", canonical: "/dashboard", noindex: true });
+
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [isUsageStatsOpen, setIsUsageStatsOpen] = useState(true);

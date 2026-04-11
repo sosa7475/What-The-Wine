@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useLocation } from "wouter";
 import Header from "@/components/header";
 import logoPath from "@assets/cropped_1749956607943.png";
+import { useSEO } from "@/hooks/useSEO";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -24,6 +25,12 @@ const contactSchema = z.object({
 type ContactForm = z.infer<typeof contactSchema>;
 
 export default function Contact() {
+  useSEO({
+    title: "Contact Us — Get Support for What the Wine",
+    description: "Have a question or need help? Contact the What the Wine team. We typically respond within 24 hours.",
+    canonical: "/contact",
+  });
+
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();

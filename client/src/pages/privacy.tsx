@@ -4,8 +4,15 @@ import { Shield, Eye, Lock, Database, Mail, UserCheck, ArrowLeft } from "lucide-
 import { useLocation } from "wouter";
 import Header from "@/components/header";
 import logoPath from "@assets/cropped_1749956607943.png";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function Privacy() {
+  useSEO({
+    title: "Privacy Policy",
+    description: "Learn how What the Wine collects, uses, and protects your personal information and wine preference data.",
+    canonical: "/privacy",
+  });
+
   const [, setLocation] = useLocation();
   
   const sections = [

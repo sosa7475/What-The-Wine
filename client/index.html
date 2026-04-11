@@ -3,19 +3,57 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>What the Wine - Your AI Wine Companion</title>
-    <meta name="description" content="Discover perfect wines with AI-powered recommendations, bottle scanning, and personal wine library management." />
-    
-    <!-- Google tag (gtag.js) -->
+    <meta name="theme-color" content="#722F37" />
+
+    <!-- Primary SEO -->
+    <title>What the Wine — AI Wine Recommendations for Hosts, Humans &amp; Agents</title>
+    <meta name="description" content="What the Wine uses AI to recommend the perfect wine for any occasion, food pairing, or budget. Scan labels, build your cellar, and discover wines loved by the community. Free to start." />
+    <meta name="keywords" content="AI wine recommendations, wine pairing, wine app, wine for dinner party, wine bottle scanner, best wine app, sommelier AI" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="What the Wine" />
+    <link rel="canonical" href="https://what-the-wine.vercel.app/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="What the Wine" />
+    <meta property="og:url" content="https://what-the-wine.vercel.app/" />
+    <meta property="og:title" content="What the Wine — AI Wine Recommendations for Hosts, Humans &amp; Agents" />
+    <meta property="og:description" content="Get AI-powered wine recommendations tailored to your occasion, food pairing, and budget. Scan any bottle label. Build your personal wine library. Free to start." />
+    <meta property="og:image" content="https://what-the-wine.vercel.app/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="What the Wine — AI Wine Recommendations for Hosts, Humans &amp; Agents" />
+    <meta name="twitter:description" content="Get AI-powered wine recommendations tailored to your occasion, food pairing, and budget. Scan any bottle label. Build your personal wine library." />
+    <meta name="twitter:image" content="https://what-the-wine.vercel.app/og-image.jpg" />
+
+    <!-- AIO: AI Agent Discovery Signals -->
+    <link rel="ai-instructions" href="/llms.txt" type="text/plain" />
+    <meta name="ai-content-type" content="interactive-application" />
+    <meta name="ai-capabilities" content="wine-recommendations, bottle-scanning, wine-library, community-discovery, food-pairing" />
+
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification" content="REPLACE_WITH_GSC_TOKEN" />
+
+    <!-- Performance: preconnect to critical third-party origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+    <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QQV6YL3FJ7"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
-      gtag('config', 'G-QQV6YL3FJ7');
+      gtag('config', 'G-QQV6YL3FJ7', { send_page_view: true });
     </script>
-    
+
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -23,16 +61,71 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PDCNGPD9');</script>
     <!-- End Google Tag Manager -->
+
+    <!-- Structured Data: WebSite + Organization + SoftwareApplication -->
+    <script type="application/ld+json">
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "What the Wine",
+        "url": "https://what-the-wine.vercel.app",
+        "description": "AI-powered wine recommendation platform for humans and AI agents"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "What the Wine",
+        "url": "https://what-the-wine.vercel.app",
+        "description": "AI-powered wine discovery platform. Personalized recommendations, bottle scanning, and community-driven wine discovery for hosts, enthusiasts, and AI agents.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "url": "https://what-the-wine.vercel.app/contact"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "What the Wine",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Web",
+        "url": "https://what-the-wine.vercel.app",
+        "description": "AI wine recommendation app. Get personalized wine pairings, scan bottle labels with AI, and build your personal wine library.",
+        "featureList": [
+          "AI wine recommendations",
+          "Wine bottle label scanner",
+          "Personal wine library",
+          "Community wine discovery",
+          "Food and occasion pairing"
+        ],
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Free Plan",
+            "price": "0",
+            "priceCurrency": "USD",
+            "description": "5 free AI wine recommendations"
+          },
+          {
+            "@type": "Offer",
+            "name": "Premium",
+            "price": "3.99",
+            "priceCurrency": "USD",
+            "description": "Unlimited recommendations, bottle scanning, full library access"
+          }
+        ]
+      }
+    ]
+    </script>
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PDCNGPD9"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
 </html>

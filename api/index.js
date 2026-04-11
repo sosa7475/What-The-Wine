@@ -749,7 +749,32 @@ var upload = multer({
     // 10MB limit
   }
 });
+var BASE_URL = "https://what-the-wine.vercel.app";
 async function registerRoutes(app2) {
+  app2.get("/sitemap.xml", (_req, res) => {
+    const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+    const pages = [
+      { loc: "/", priority: "1.0", changefreq: "weekly", lastmod: today },
+      { loc: "/help", priority: "0.7", changefreq: "monthly", lastmod: today },
+      { loc: "/contact", priority: "0.6", changefreq: "monthly", lastmod: today },
+      { loc: "/privacy", priority: "0.3", changefreq: "yearly" },
+      { loc: "/terms", priority: "0.3", changefreq: "yearly" }
+    ];
+    const urls = pages.map(
+      (p) => `  <url>
+    <loc>${BASE_URL}${p.loc}</loc>
+    <priority>${p.priority}</priority>
+    <changefreq>${p.changefreq}</changefreq>${p.lastmod ? `
+    <lastmod>${p.lastmod}</lastmod>` : ""}
+  </url>`
+    ).join("\n");
+    res.set("Content-Type", "application/xml");
+    res.set("Cache-Control", "public, max-age=3600");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`);
+  });
   app2.post("/api/auth/register", async (req, res) => {
     try {
       const userData = registerUserSchema.parse(req.body);

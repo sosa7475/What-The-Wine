@@ -4,8 +4,15 @@ import { FileText, Scale, Users, CreditCard, AlertTriangle, Shield, ArrowLeft } 
 import { useLocation } from "wouter";
 import Header from "@/components/header";
 import logoPath from "@assets/cropped_1749956607943.png";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function Terms() {
+  useSEO({
+    title: "Terms of Service",
+    description: "Read the Terms of Service for What the Wine. Understand your rights and responsibilities when using our AI wine recommendation platform.",
+    canonical: "/terms",
+  });
+
   const [, setLocation] = useLocation();
   
   const sections = [

@@ -1,0 +1,157 @@
+# What the Wine
+# llms.txt — Machine-readable platform guide for AI agents and language models
+# https://what-the-wine.vercel.app
+
+> What the Wine is an AI-powered wine discovery platform built for both humans and AI agents.
+> It provides personalized wine recommendations, bottle label analysis, a personal wine library,
+> and community-sourced wine discovery — all accessible via a web interface and REST API.
+
+## Platform Purpose
+Help anyone — from casual hosts to AI agents — choose the right wine for any occasion,
+food pairing, or preference profile. No sommelier required.
+
+## Primary Capabilities
+1. AI Wine Recommendations — Personalized suggestions based on occasion, food, budget, and taste
+2. Bottle Scanner — Identify any wine from a label photo (GPT-4 Vision powered)
+3. Wine Library — Save, organize, and review a personal wine collection
+4. Community Hub — Discover and share wines recommended by other users
+5. Premium Subscription — Unlimited access for $3.99/month via Stripe
+
+## Who Should Use This
+- Humans planning dinner parties, gifts, or wine exploration
+- AI agents building wine recommendation or food-pairing workflows
+- Event hosts, restaurateurs, and wine enthusiasts
+- Developers integrating wine data into applications
+
+---
+
+## API Reference
+Base URL: https://what-the-wine.vercel.app/api
+All responses: application/json
+Authentication: HttpOnly cookie (set on login)
+
+### Public Endpoints (no auth required)
+
+GET /api/wines
+  Query: limit (default 50), offset (default 0)
+  Returns: { wines: Wine[] }
+
+GET /api/wines/:id
+  Returns: { wine: Wine }
+
+GET /api/community
+  Returns: { recommendations: CommunityRecommendation[] }
+
+POST /api/recommendations
+  Body: RecommendationRequest (see schema below)
+  Returns: { wines: Wine[], message?: string }
+  Note: 5 free recommendations per guest session; unlimited for premium users
+
+### Authentication
+
+POST /api/auth/register
+  Body: { email, username, firstName, lastName, password }
+  Returns: { user: User }
+  Side effect: Sets auth cookie
+
+POST /api/auth/login
+  Body: { email, password }
+  Returns: { user: User }
+  Side effect: Sets auth cookie
+
+POST /api/auth/logout
+  Returns: { message: "Logged out" }
+  Side effect: Clears auth cookie
+
+GET /api/auth/me
+  Returns: { user: User | null }
+
+### Authenticated Endpoints (require login cookie)
+
+POST /api/scan-bottle
+  Body: multipart/form-data, field name: "image"
+  Returns: { wine: Wine }
+
+GET /api/library
+  Returns: { library: UserWineLibrary[] }
+
+POST /api/library
+  Body: { wineId: number, personalNotes?: string }
+  Returns: { entry: UserWineLibrary }
+
+DELETE /api/library/:wineId
+  Returns: { success: true }
+
+POST /api/reviews
+  Body: { wineId, rating, reviewText, occasion?, foodPairing? }
+  Returns: { review: WineReview }
+
+GET /api/reviews/wine/:wineId
+  Returns: { reviews: WineReview[] }
+
+POST /api/community/recommendations
+  Body: { wineId, title, description, occasion?, foodPairing? }
+  Returns: { recommendation: CommunityRecommendation }
+
+---
+
+## Data Schemas
+
+### RecommendationRequest
+{
+  "wineType": "red" | "white" | "rosé" | "sparkling" | "dessert",
+  "budget": "$10-$20" | "$20-$40" | "$40-$75" | "$75-$150" | "$150+",
+  "occasion": "casual" | "dinner party" | "romantic" | "celebration" | "gift",
+  "foodPairing": string,
+  "flavorProfile": "dry" | "medium" | "sweet",
+  "preferredRegions"?: string[]
+}
+
+### Wine
+{
+  "id": number,
+  "name": string,
+  "winery": string,
+  "vintage": number | null,
+  "type": "red" | "white" | "rosé" | "sparkling" | "dessert",
+  "varietal": string,
+  "region": string,
+  "country": string,
+  "price": number,
+  "rating": number,        // 0–100 scale
+  "description": string,
+  "tastingNotes": object,  // { fruit, earth, oak, tannin, acidity }
+  "foodPairings": string[]
+}
+
+### User
+{
+  "id": number,
+  "email": string,
+  "username": string,
+  "firstName": string,
+  "isPremium": boolean,
+  "recommendationCount": number
+}
+
+---
+
+## Agent Integration Notes
+- The /api/recommendations endpoint is the primary entry point for AI workflows
+- No API key required for the first 5 recommendations (guest mode)
+- For sustained agent use, register an account and authenticate to get unlimited access (premium)
+- The API uses CORS-friendly same-origin cookies; for programmatic access from agents,
+  authenticate via POST /api/auth/login and include cookies in subsequent requests
+- All wine data is sourced from a curated PostgreSQL database + OpenAI enrichment
+
+## Pricing
+- Free tier: 5 AI recommendations per account
+- Premium: $3.99/month — unlimited recommendations, bottle scanning, full library access
+
+## Contact & Support
+- Web: https://what-the-wine.vercel.app/contact
+- Help: https://what-the-wine.vercel.app/help
+
+## Legal
+- Privacy: https://what-the-wine.vercel.app/privacy
+- Terms: https://what-the-wine.vercel.app/terms

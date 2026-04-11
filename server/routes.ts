@@ -29,7 +29,30 @@ const upload = multer({
   },
 });
 
+const BASE_URL = "https://what-the-wine.vercel.app";
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // SEO & discoverability routes
+  app.get("/sitemap.xml", (_req, res) => {
+    const today = new Date().toISOString().split("T")[0];
+    const pages = [
+      { loc: "/", priority: "1.0", changefreq: "weekly", lastmod: today },
+      { loc: "/help", priority: "0.7", changefreq: "monthly", lastmod: today },
+      { loc: "/contact", priority: "0.6", changefreq: "monthly", lastmod: today },
+      { loc: "/privacy", priority: "0.3", changefreq: "yearly" },
+      { loc: "/terms", priority: "0.3", changefreq: "yearly" },
+    ];
+    const urls = pages
+      .map(
+        (p) =>
+          `  <url>\n    <loc>${BASE_URL}${p.loc}</loc>\n    <priority>${p.priority}</priority>\n    <changefreq>${p.changefreq}</changefreq>${p.lastmod ? `\n    <lastmod>${p.lastmod}</lastmod>` : ""}\n  </url>`
+      )
+      .join("\n");
+    res.set("Content-Type", "application/xml");
+    res.set("Cache-Control", "public, max-age=3600");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`);
+  });
+
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
     try {
