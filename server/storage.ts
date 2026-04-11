@@ -287,7 +287,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(wineReviews.userId, users.id))
       .where(eq(wineReviews.wineId, wineId))
       .orderBy(desc(wineReviews.createdAt));
-    return reviews;
+    return reviews as any;
   }
 
   async getUserReviews(userId: number): Promise<(WineReview & { wine: Wine })[]> {
@@ -307,7 +307,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(wines, eq(wineReviews.wineId, wines.id))
       .where(eq(wineReviews.userId, userId))
       .orderBy(desc(wineReviews.createdAt));
-    return reviews;
+    return reviews as any;
   }
 
   async updateWineReview(reviewId: number, userId: number, review: Partial<InsertWineReview>): Promise<WineReview | null> {
@@ -352,7 +352,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(reviewComments.userId, users.id))
       .where(eq(reviewComments.reviewId, reviewId))
       .orderBy(reviewComments.createdAt);
-    return comments;
+    return comments as any;
   }
 
   async deleteReviewComment(commentId: number, userId: number): Promise<boolean> {
@@ -397,7 +397,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(communityRecommendations.createdAt))
       .limit(limit)
       .offset(offset);
-    return recommendations;
+    return recommendations as any;
   }
 
   async getUserCommunityRecommendations(userId: number): Promise<(CommunityRecommendation & { wine: Wine })[]> {
@@ -420,7 +420,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(wines, eq(communityRecommendations.wineId, wines.id))
       .where(eq(communityRecommendations.userId, userId))
       .orderBy(desc(communityRecommendations.createdAt));
-    return recommendations;
+    return recommendations as any;
   }
 
   async updateCommunityRecommendation(recommendationId: number, userId: number, recommendation: Partial<InsertCommunityRecommendation>): Promise<CommunityRecommendation | null> {
@@ -465,7 +465,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(recommendationComments.userId, users.id))
       .where(eq(recommendationComments.recommendationId, recommendationId))
       .orderBy(recommendationComments.createdAt);
-    return comments;
+    return comments as any;
   }
 
   async deleteRecommendationComment(commentId: number, userId: number): Promise<boolean> {

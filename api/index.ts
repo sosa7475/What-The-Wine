@@ -5,7 +5,19 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// registerRoutes sets up session middleware and all API routes
-await registerRoutes(app);
+let initPromise: Promise<void> | null = null;
 
-export default app;
+function init() {
+  if (!initPromise) {
+    initPromise = registerRoutes(app).then(() => {});
+  }
+  return initPromise;
+}
+
+// Pre-warm on cold start
+init();
+
+export default async function handler(req: any, res: any) {
+  await init();
+  app(req, res);
+}
