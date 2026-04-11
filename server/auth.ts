@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
-import { pool } from "./db";
+import pg from "pg";
 import { storage } from "./storage";
 import type { Request, Response, NextFunction } from "express";
 import type { User } from "@shared/schema";
@@ -13,12 +13,31 @@ declare module "express-session" {
   }
 }
 
+// connect-pg-simple requires callback-based pg.Pool, not Neon's Promise-only pool.
+// Also strip channel_binding which the pg driver does not support.
+function buildSessionPool() {
+  const raw = process.env.DATABASE_URL || "";
+  let url: string;
+  try {
+    const u = new URL(raw);
+    u.searchParams.delete("channel_binding");
+    url = u.toString();
+  } catch {
+    url = raw;
+  }
+  return new pg.Pool({
+    connectionString: url,
+    ssl: { rejectUnauthorized: false },
+    max: 2,
+  });
+}
+
 const PgStore = connectPgSimple(session);
 
 export function getSession() {
   return session({
     store: new PgStore({
-      pool: pool as any,
+      pool: buildSessionPool(),
       tableName: "user_sessions",
       createTableIfMissing: true,
     }),
