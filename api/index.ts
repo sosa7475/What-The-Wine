@@ -14,7 +14,6 @@ function init() {
   return initPromise;
 }
 
-// Pre-warm on cold start
 init();
 
 export default async function handler(req: any, res: any) {
