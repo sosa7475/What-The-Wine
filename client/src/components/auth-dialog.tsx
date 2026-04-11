@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 
 import { useLogin, useRegister } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -50,6 +51,7 @@ export default function AuthDialog({
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setIsOpen = controlledOnOpenChange !== undefined ? controlledOnOpenChange : setInternalOpen;
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   const loginMutation = useLogin();
   const registerMutation = useRegister();
@@ -81,6 +83,7 @@ export default function AuthDialog({
         title: "Welcome back!",
         description: "You've been successfully logged in.",
       });
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Login failed",
@@ -98,6 +101,7 @@ export default function AuthDialog({
         title: "Account created!",
         description: "Welcome to What the Wine!",
       });
+      navigate("/dashboard");
     } catch (error) {
       toast({
         title: "Registration failed",
