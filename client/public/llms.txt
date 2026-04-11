@@ -28,7 +28,19 @@ food pairing, or preference profile. No sommelier required.
 ## API Reference
 Base URL: https://what-the-wine.vercel.app/api
 All responses: application/json
-Authentication: HttpOnly cookie (set on login)
+OpenAPI spec: https://what-the-wine.vercel.app/api/openapi.json
+Agent docs: https://what-the-wine.vercel.app/for-agents
+
+### Authentication for Agents (API Key)
+
+Agents authenticate using a Bearer token in the Authorization header:
+  Authorization: Bearer wtw_<your_api_key>
+
+To obtain an API key:
+1. Register an account: POST /api/auth/register
+2. Retrieve your key: GET /api/user/api-key (include your session cookie or Bearer token)
+
+The API key is stable — store it once and reuse it across all requests.
 
 ### Public Endpoints (no auth required)
 
@@ -36,41 +48,23 @@ GET /api/wines
   Query: limit (default 50), offset (default 0)
   Returns: { wines: Wine[] }
 
-GET /api/wines/:id
-  Returns: { wine: Wine }
+GET /api/wines/search?q=<query>
+  Returns: { wines: Wine[] }
 
-GET /api/community
-  Returns: { recommendations: CommunityRecommendation[] }
+GET /api/wines/type/:type
+  type: red | white | rose | sparkling | dessert
+  Returns: { wines: Wine[] }
+
+GET /api/community/recommendations
+  Query: limit (default 20), offset (default 0)
+  Returns: CommunityRecommendation[]
+
+### Authenticated Endpoints (require Bearer token)
 
 POST /api/recommendations
   Body: RecommendationRequest (see schema below)
-  Returns: { wines: Wine[], message?: string }
-  Note: 5 free recommendations per guest session; unlimited for premium users
-
-### Authentication
-
-POST /api/auth/register
-  Body: { email, username, firstName, lastName, password }
-  Returns: { user: User }
-  Side effect: Sets auth cookie
-
-POST /api/auth/login
-  Body: { email, password }
-  Returns: { user: User }
-  Side effect: Sets auth cookie
-
-POST /api/auth/logout
-  Returns: { message: "Logged out" }
-  Side effect: Clears auth cookie
-
-GET /api/auth/me
-  Returns: { user: User | null }
-
-### Authenticated Endpoints (require login cookie)
-
-POST /api/scan-bottle
-  Body: multipart/form-data, field name: "image"
-  Returns: { wine: Wine }
+  Returns: { wines: Wine[] }
+  Limits: 5 free per account; unlimited for premium ($3.99/month)
 
 GET /api/library
   Returns: { library: UserWineLibrary[] }
@@ -82,16 +76,13 @@ POST /api/library
 DELETE /api/library/:wineId
   Returns: { success: true }
 
-POST /api/reviews
-  Body: { wineId, rating, reviewText, occasion?, foodPairing? }
-  Returns: { review: WineReview }
+POST /api/analyze-bottle
+  Body: multipart/form-data, field: "image" (JPEG/PNG, max 10MB)
+  Returns: { wine: Wine }
+  Note: Premium only
 
-GET /api/reviews/wine/:wineId
-  Returns: { reviews: WineReview[] }
-
-POST /api/community/recommendations
-  Body: { wineId, title, description, occasion?, foodPairing? }
-  Returns: { recommendation: CommunityRecommendation }
+GET /api/user/api-key
+  Returns: { apiKey: string, format: string, docs: string, openapi: string }
 
 ---
 
@@ -99,12 +90,11 @@ POST /api/community/recommendations
 
 ### RecommendationRequest
 {
-  "wineType": "red" | "white" | "rosé" | "sparkling" | "dessert",
+  "wineType": "red" | "white" | "rose" | "rosé" | "sparkling" | "dessert",
   "budget": "$10-$20" | "$20-$40" | "$40-$75" | "$75-$150" | "$150+",
   "occasion": "casual" | "dinner party" | "romantic" | "celebration" | "gift",
   "foodPairing": string,
-  "flavorProfile": "dry" | "medium" | "sweet",
-  "preferredRegions"?: string[]
+  "preferences": string   // free-text taste preferences
 }
 
 ### Wine
@@ -113,15 +103,18 @@ POST /api/community/recommendations
   "name": string,
   "winery": string,
   "vintage": number | null,
-  "type": "red" | "white" | "rosé" | "sparkling" | "dessert",
-  "varietal": string,
+  "type": "red" | "white" | "rose" | "sparkling" | "dessert",
   "region": string,
   "country": string,
-  "price": number,
-  "rating": number,        // 0–100 scale
-  "description": string,
-  "tastingNotes": object,  // { fruit, earth, oak, tannin, acidity }
-  "foodPairings": string[]
+  "price": number | null,
+  "rating": number | null,       // 0–10 scale
+  "description": string | null,
+  "tasteProfile": string | null,
+  "foodPairings": string[],
+  "imageUrl": string | null,
+  "alcoholContent": number | null,
+  "servingTemp": string | null,
+  "source": "recommendation" | "scanned" | "manual"
 }
 
 ### User
@@ -136,19 +129,38 @@ POST /api/community/recommendations
 
 ---
 
+## Quick Start (curl)
+
+# 1. Register
+curl -X POST https://what-the-wine.vercel.app/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"agent@example.com","username":"myagent","firstName":"My","lastName":"Agent","password":"securepass"}'
+
+# 2. Get API key (using session cookie from register response, or log in first)
+curl https://what-the-wine.vercel.app/api/user/api-key \
+  -H "Cookie: wtw_auth=<your_cookie>"
+
+# 3. Get recommendations (using API key)
+curl -X POST https://what-the-wine.vercel.app/api/recommendations \
+  -H "Authorization: Bearer wtw_<your_key>" \
+  -H "Content-Type: application/json" \
+  -d '{"wineType":"red","budget":"$20-$40","occasion":"dinner party","foodPairing":"grilled lamb"}'
+
+---
+
 ## Agent Integration Notes
 - The /api/recommendations endpoint is the primary entry point for AI workflows
-- No API key required for the first 5 recommendations (guest mode)
-- For sustained agent use, register an account and authenticate to get unlimited access (premium)
-- The API uses CORS-friendly same-origin cookies; for programmatic access from agents,
-  authenticate via POST /api/auth/login and include cookies in subsequent requests
-- All wine data is sourced from a curated PostgreSQL database + OpenAI enrichment
+- API keys are stable Bearer tokens — no OAuth flow, no redirects
+- All endpoints return structured JSON; no scraping required
+- Full machine-readable spec: https://what-the-wine.vercel.app/api/openapi.json
+- For tool-use agents: the RecommendationRequest schema maps cleanly to function call parameters
 
 ## Pricing
 - Free tier: 5 AI recommendations per account
 - Premium: $3.99/month — unlimited recommendations, bottle scanning, full library access
 
 ## Contact & Support
+- Agent docs: https://what-the-wine.vercel.app/for-agents
 - Web: https://what-the-wine.vercel.app/contact
 - Help: https://what-the-wine.vercel.app/help
 

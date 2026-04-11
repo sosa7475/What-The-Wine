@@ -10,6 +10,7 @@ import HelpCenter from "@/pages/help-center";
 import Contact from "@/pages/contact";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
+import ForAgents from "@/pages/for-agents";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
+      <Route path="/for-agents" component={ForAgents} />
       <Route component={NotFound} />
     </Switch>
   );

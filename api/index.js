@@ -700,16 +700,34 @@ function getAuthUserId(req) {
   if (!payload || typeof payload.userId !== "number") return null;
   return payload.userId;
 }
+var API_KEY_PREFIX = "wtw_";
+function generateApiKey(userId) {
+  const raw = sign({ userId, type: "apikey" });
+  return `${API_KEY_PREFIX}${raw}`;
+}
+function getApiKeyUserId(req) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) return null;
+  const token = authHeader.slice(7).trim();
+  if (!token.startsWith(API_KEY_PREFIX)) return null;
+  const raw = token.slice(API_KEY_PREFIX.length);
+  const payload = verify(raw);
+  if (!payload || typeof payload.userId !== "number" || payload.type !== "apikey") return null;
+  return payload.userId;
+}
 async function hashPassword(password) {
   return bcrypt.hash(password, 12);
 }
 async function verifyPassword(password, hash) {
   return bcrypt.compare(password, hash);
 }
+function resolveUserId(req) {
+  return getApiKeyUserId(req) ?? getAuthUserId(req);
+}
 var requireAuth = async (req, res, next) => {
-  const userId = getAuthUserId(req);
+  const userId = resolveUserId(req);
   if (!userId) {
-    return res.status(401).json({ message: "Authentication required" });
+    return res.status(401).json({ message: "Authentication required. Use a session cookie or Authorization: Bearer <api_key>." });
   }
   try {
     const user = await storage.getUser(userId);
@@ -725,7 +743,7 @@ var requireAuth = async (req, res, next) => {
   }
 };
 var optionalAuth = async (req, res, next) => {
-  const userId = getAuthUserId(req);
+  const userId = resolveUserId(req);
   if (userId) {
     try {
       const user = await storage.getUser(userId);
@@ -757,6 +775,7 @@ async function registerRoutes(app2) {
       { loc: "/", priority: "1.0", changefreq: "weekly", lastmod: today },
       { loc: "/help", priority: "0.7", changefreq: "monthly", lastmod: today },
       { loc: "/contact", priority: "0.6", changefreq: "monthly", lastmod: today },
+      { loc: "/for-agents", priority: "0.8", changefreq: "monthly", lastmod: today },
       { loc: "/privacy", priority: "0.3", changefreq: "yearly" },
       { loc: "/terms", priority: "0.3", changefreq: "yearly" }
     ];
@@ -774,6 +793,194 @@ async function registerRoutes(app2) {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
 </urlset>`);
+  });
+  app2.get("/api/user/api-key", requireAuth, (req, res) => {
+    const apiKey = generateApiKey(req.user.id);
+    res.json({
+      apiKey,
+      format: "Authorization: Bearer <api_key>",
+      docs: `${BASE_URL}/for-agents`,
+      openapi: `${BASE_URL}/api/openapi.json`
+    });
+  });
+  app2.get("/api/openapi.json", (_req, res) => {
+    res.set("Content-Type", "application/json");
+    res.set("Cache-Control", "public, max-age=3600");
+    res.json({
+      openapi: "3.1.0",
+      info: {
+        title: "What the Wine API",
+        version: "1.0.0",
+        description: "AI-powered wine recommendations, bottle identification, and wine discovery. Built for humans and AI agents.",
+        contact: { url: `${BASE_URL}/contact` },
+        license: { name: "Proprietary" }
+      },
+      servers: [{ url: `${BASE_URL}/api`, description: "Production" }],
+      security: [{ BearerAuth: [] }],
+      components: {
+        securitySchemes: {
+          BearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "WTW",
+            description: "API key obtained from GET /api/user/api-key after account login. Format: wtw_<token>"
+          }
+        },
+        schemas: {
+          Wine: {
+            type: "object",
+            properties: {
+              id: { type: "integer" },
+              name: { type: "string" },
+              winery: { type: "string" },
+              region: { type: "string" },
+              country: { type: "string" },
+              vintage: { type: "integer", nullable: true },
+              type: { type: "string", enum: ["red", "white", "rose", "sparkling", "dessert"] },
+              price: { type: "number", nullable: true },
+              rating: { type: "number", nullable: true, description: "0\u201310 scale" },
+              description: { type: "string", nullable: true },
+              tasteProfile: { type: "string", nullable: true },
+              foodPairings: { type: "array", items: { type: "string" } },
+              imageUrl: { type: "string", nullable: true },
+              alcoholContent: { type: "number", nullable: true },
+              servingTemp: { type: "string", nullable: true },
+              source: { type: "string", enum: ["recommendation", "scanned", "manual"] }
+            }
+          },
+          RecommendationRequest: {
+            type: "object",
+            properties: {
+              wineType: { type: "string", enum: ["red", "white", "rose", "ros\xE9", "sparkling", "dessert"], description: "Type of wine" },
+              budget: { type: "string", example: "$20-$40", description: "Budget range e.g. '$10-$20', '$20-$40', '$40-$75', '$75-$150', '$150+'" },
+              occasion: { type: "string", example: "dinner party", description: "Event context e.g. casual, dinner party, romantic, celebration, gift" },
+              foodPairing: { type: "string", example: "grilled salmon", description: "Food being served" },
+              preferences: { type: "string", example: "I prefer dry, earthy reds with low tannins", description: "Free-text taste preferences" }
+            }
+          },
+          Error: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+              message: { type: "string" }
+            }
+          }
+        }
+      },
+      paths: {
+        "/recommendations": {
+          post: {
+            summary: "Get AI wine recommendations",
+            description: "Returns 3\u20135 personalized wine suggestions based on occasion, food, budget, and taste preferences. Premium accounts get unlimited calls; free accounts get 5.",
+            operationId: "getRecommendations",
+            requestBody: {
+              required: true,
+              content: { "application/json": { schema: { $ref: "#/components/schemas/RecommendationRequest" } } }
+            },
+            responses: {
+              200: {
+                description: "Recommended wines",
+                content: { "application/json": { schema: { type: "object", properties: { wines: { type: "array", items: { $ref: "#/components/schemas/Wine" } } } } } }
+              },
+              402: { description: "Usage limit reached \u2014 upgrade to premium", content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } },
+              401: { description: "Invalid or missing API key" }
+            }
+          }
+        },
+        "/wines": {
+          get: {
+            summary: "List wines",
+            description: "Returns paginated wine records from the database. No auth required.",
+            operationId: "listWines",
+            security: [],
+            parameters: [
+              { name: "limit", in: "query", schema: { type: "integer", default: 50 } },
+              { name: "offset", in: "query", schema: { type: "integer", default: 0 } }
+            ],
+            responses: {
+              200: { description: "Wine list", content: { "application/json": { schema: { type: "object", properties: { wines: { type: "array", items: { $ref: "#/components/schemas/Wine" } } } } } } }
+            }
+          }
+        },
+        "/wines/search": {
+          get: {
+            summary: "Search wines",
+            description: "Full-text search across wine name, winery, region, and description.",
+            operationId: "searchWines",
+            security: [],
+            parameters: [{ name: "q", in: "query", required: true, schema: { type: "string" }, description: "Search query" }],
+            responses: {
+              200: { description: "Matching wines", content: { "application/json": { schema: { type: "object", properties: { wines: { type: "array", items: { $ref: "#/components/schemas/Wine" } } } } } } }
+            }
+          }
+        },
+        "/wines/type/{type}": {
+          get: {
+            summary: "Get wines by type",
+            operationId: "getWinesByType",
+            security: [],
+            parameters: [{ name: "type", in: "path", required: true, schema: { type: "string", enum: ["red", "white", "rose", "sparkling", "dessert"] } }],
+            responses: {
+              200: { description: "Wines of the specified type", content: { "application/json": { schema: { type: "object", properties: { wines: { type: "array", items: { $ref: "#/components/schemas/Wine" } } } } } } }
+            }
+          }
+        },
+        "/community/recommendations": {
+          get: {
+            summary: "Get community recommendations",
+            description: "Returns community-shared wine recommendations with optional pagination.",
+            operationId: "listCommunityRecommendations",
+            security: [],
+            parameters: [
+              { name: "limit", in: "query", schema: { type: "integer", default: 20 } },
+              { name: "offset", in: "query", schema: { type: "integer", default: 0 } }
+            ],
+            responses: {
+              200: { description: "Community recommendations list" }
+            }
+          }
+        },
+        "/library": {
+          get: {
+            summary: "Get user wine library",
+            description: "Returns the authenticated user's saved wine library.",
+            operationId: "getUserLibrary",
+            responses: {
+              200: { description: "User wine library" },
+              401: { description: "Authentication required" }
+            }
+          },
+          post: {
+            summary: "Add wine to library",
+            operationId: "addToLibrary",
+            requestBody: {
+              required: true,
+              content: { "application/json": { schema: { type: "object", required: ["wineId"], properties: { wineId: { type: "integer" }, personalNotes: { type: "string" } } } } }
+            },
+            responses: {
+              200: { description: "Library entry created" },
+              400: { description: "Wine already in library" },
+              401: { description: "Authentication required" }
+            }
+          }
+        },
+        "/user/api-key": {
+          get: {
+            summary: "Get your API key",
+            description: "Returns the Bearer API key for this account. Use it in the Authorization header for all API calls.",
+            operationId: "getApiKey",
+            security: [{ BearerAuth: [] }],
+            responses: {
+              200: {
+                description: "API key",
+                content: { "application/json": { schema: { type: "object", properties: { apiKey: { type: "string" }, format: { type: "string" }, docs: { type: "string" }, openapi: { type: "string" } } } } }
+              },
+              401: { description: "Authentication required" }
+            }
+          }
+        }
+      }
+    });
   });
   app2.post("/api/auth/register", async (req, res) => {
     try {

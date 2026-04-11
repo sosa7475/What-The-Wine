@@ -77,6 +77,29 @@ export function getAuthUserId(req: Request): number | null {
   return payload.userId;
 }
 
+// ---------------------------------------------------------------------------
+// API key auth — for programmatic / agent access via Bearer token
+// Format: wtw_<signed_payload>
+// ---------------------------------------------------------------------------
+
+const API_KEY_PREFIX = "wtw_";
+
+export function generateApiKey(userId: number): string {
+  const raw = sign({ userId, type: "apikey" });
+  return `${API_KEY_PREFIX}${raw}`;
+}
+
+export function getApiKeyUserId(req: Request): number | null {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) return null;
+  const token = authHeader.slice(7).trim();
+  if (!token.startsWith(API_KEY_PREFIX)) return null;
+  const raw = token.slice(API_KEY_PREFIX.length);
+  const payload = verify(raw);
+  if (!payload || typeof payload.userId !== "number" || payload.type !== "apikey") return null;
+  return payload.userId;
+}
+
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
@@ -89,10 +112,14 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 // Express middleware
 // ---------------------------------------------------------------------------
 
+function resolveUserId(req: Request): number | null {
+  return getApiKeyUserId(req) ?? getAuthUserId(req);
+}
+
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = getAuthUserId(req);
+  const userId = resolveUserId(req);
   if (!userId) {
-    return res.status(401).json({ message: "Authentication required" });
+    return res.status(401).json({ message: "Authentication required. Use a session cookie or Authorization: Bearer <api_key>." });
   }
   try {
     const user = await storage.getUser(userId);
@@ -109,7 +136,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
 };
 
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = getAuthUserId(req);
+  const userId = resolveUserId(req);
   if (userId) {
     try {
       const user = await storage.getUser(userId);
