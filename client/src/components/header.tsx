@@ -21,8 +21,9 @@ export default function Header({ onScrollTo }: HeaderProps) {
   const [location, setLocation] = useLocation();
   
   // Check if we're on a support page
-  const isSupportPage = location.includes('/help') || location.includes('/contact') || 
-                       location.includes('/privacy') || location.includes('/terms');
+  const isSupportPage = location.includes('/help') || location.includes('/contact') ||
+                       location.includes('/privacy') || location.includes('/terms') ||
+                       location.includes('/for-agents');
 
   const navigation = isAuthenticated ? [
     { name: "Dashboard", id: "dashboard", isRoute: true },

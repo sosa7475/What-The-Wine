@@ -54,7 +54,7 @@ def recommend_wine(occasion, food, budget="$20-$40", wine_type="red"):
 
 wines = recommend_wine("dinner party", "grilled salmon", wine_type="white")
 for w in wines:
-    print(f"{w['name']} by {w['winery']} — ${w['price']}")`;
+    print(f"{w['name']} by {w['winery']} — \${w['price']}")`;
 
 function CodeBlock({ code, language = "bash" }: { code: string; language?: string }) {
   const [copied, setCopied] = useState(false);

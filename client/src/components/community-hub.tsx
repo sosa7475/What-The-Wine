@@ -102,7 +102,7 @@ export default function CommunityHub() {
   const queryClient = useQueryClient();
 
   // Fetch community recommendations
-  const { data: recommendations = [], isLoading: loadingRecommendations } = useQuery({
+  const { data: recommendations = [], isLoading: loadingRecommendations } = useQuery<CommunityRecommendation[]>({
     queryKey: ["/api/community/recommendations"],
     enabled: isAuthenticated,
   });
