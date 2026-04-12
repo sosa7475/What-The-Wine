@@ -130,4 +130,41 @@
   .bg-gold-400 { background-color: var(--gold-400); }
   .bg-gold-500 { background-color: var(--gold-500); }
   .hover\:bg-gold-500:hover { background-color: var(--gold-500); }
+
+  /* ── Luxury dark theme ── */
+  --ink-950: #050203;
+  --ink-900: #0a0408;
+  --ink-800: #130810;
+  --ink-700: #1c0e17;
+  --ink-600: #271219;
+  --champagne: #F5EDD6;
+  --champagne-muted: #C5B59A;
+  --champagne-subtle: #7A6A5A;
+  --gold-bright: #D4B86A;
+  --gold-border: rgba(201, 168, 76, 0.18);
+  --gold-glow: rgba(201, 168, 76, 0.10);
+  --burgundy-glow: rgba(139, 32, 48, 0.35);
+  --burgundy-800: hsl(355, 65%, 22%);
+
+  .bg-ink-950 { background-color: var(--ink-950); }
+  .bg-ink-900 { background-color: var(--ink-900); }
+  .bg-ink-800 { background-color: var(--ink-800); }
+  .bg-ink-700 { background-color: var(--ink-700); }
+  .bg-ink-600 { background-color: var(--ink-600); }
+
+  .text-champagne { color: var(--champagne); }
+  .text-champagne-muted { color: var(--champagne-muted); }
+  .text-champagne-subtle { color: var(--champagne-subtle); }
+  .text-gold-bright { color: var(--gold-bright); }
+
+  .border-gold { border-color: var(--gold-400); }
+  .border-gold-subtle { border-color: var(--gold-border); }
+
+  .bg-gold-glow { background-color: var(--gold-glow); }
+  .bg-burgundy-800 { background-color: var(--burgundy-800); }
+
+  .hover\:bg-ink-700:hover { background-color: var(--ink-700); }
+  .hover\:text-champagne:hover { color: var(--champagne); }
+  .hover\:text-gold-bright:hover { color: var(--gold-bright); }
+  .hover\:border-gold-400:hover { border-color: var(--gold-400); }
 }

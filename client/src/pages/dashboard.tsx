@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Wine, BookOpen, Camera, User, Crown, Star, TrendingUp, Calendar, LogOut, ChevronDown, ChevronUp, Users } from "lucide-react";
+import { Wine, BookOpen, Camera, User, Crown, Star, LogOut, ChevronDown, ChevronUp, Users } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
@@ -18,12 +16,31 @@ import CommunityHub from "@/components/community-hub";
 import PaymentDialog from "@/components/payment-dialog";
 import { useSEO } from "@/hooks/useSEO";
 
+const GOLD = "#C9A84C";
+const GOLD_BRIGHT = "#D4B86A";
+const CHAMPAGNE = "#F5EDD6";
+const CHAMPAGNE_MUTED = "#C5B59A";
+const CHAMPAGNE_SUBTLE = "#7A6A5A";
+const INK_950 = "#050203";
+const INK_900 = "#0a0408";
+const INK_800 = "#130810";
+const INK_700 = "#1c0e17";
+const GOLD_BORDER = "rgba(201, 168, 76, 0.15)";
+
+const TABS = [
+  { id: "recommendations", label: "Recommendations", shortLabel: "Recs", icon: Star },
+  { id: "scanner", label: "Scanner", shortLabel: "Scan", icon: Camera },
+  { id: "library", label: "My Library", shortLabel: "Library", icon: BookOpen },
+  { id: "community", label: "Community", shortLabel: "Community", icon: Users },
+  { id: "account", label: "Account", shortLabel: "Account", icon: User },
+];
+
 export default function Dashboard() {
   useSEO({ title: "My Dashboard", canonical: "/dashboard", noindex: true });
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [isUsageStatsOpen, setIsUsageStatsOpen] = useState(true);
+  const [isUsageOpen, setIsUsageOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("recommendations");
   const { user, isAuthenticated } = useAuth();
   const logoutMutation = useLogout();
@@ -31,7 +48,6 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
-  // Fetch library data for wine count
   const { data: libraryData } = useQuery({
     queryKey: ["/api/library"],
     queryFn: async () => {
@@ -41,7 +57,6 @@ export default function Dashboard() {
     enabled: isAuthenticated,
   });
 
-  // Fetch subscription details for premium users
   const { data: subscriptionData } = useQuery({
     queryKey: ["/api/subscription-details"],
     queryFn: async () => {
@@ -51,63 +66,35 @@ export default function Dashboard() {
     enabled: isAuthenticated && user?.isPremium,
   });
 
-  // Handle Stripe checkout success/failure and verify subscription
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const upgrade = urlParams.get('upgrade');
-    const sessionId = urlParams.get('session_id');
-    
-    if (upgrade === 'success' && sessionId) {
-      // Verify subscription with backend
+    const upgrade = urlParams.get("upgrade");
+    const sessionId = urlParams.get("session_id");
+
+    if (upgrade === "success" && sessionId) {
       const verifySubscription = async () => {
         try {
-          const response = await apiRequest("POST", "/api/check-subscription", {
-            sessionId: sessionId
-          });
+          const response = await apiRequest("POST", "/api/check-subscription", { sessionId });
           const result = await response.json();
-          
           if (result.success && result.isPremium) {
-            toast({
-              title: "Welcome to Premium!",
-              description: "Your subscription is now active. Enjoy unlimited wine recommendations!",
-            });
-            // Invalidate auth cache to refresh user data
+            toast({ title: "Welcome to Premium!", description: "Your subscription is now active. Enjoy unlimited wine recommendations!" });
             queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
-            // Refresh page to ensure all components update
             setTimeout(() => window.location.reload(), 1000);
           } else {
-            toast({
-              title: "Subscription Verification",
-              description: "Please refresh the page to see your updated subscription status.",
-            });
+            toast({ title: "Subscription Verification", description: "Please refresh the page to see your updated subscription status." });
           }
-        } catch (error) {
-          console.error("Error verifying subscription:", error);
-          toast({
-            title: "Subscription Update",
-            description: "Your payment was successful. Please refresh the page to see your premium status.",
-          });
+        } catch {
+          toast({ title: "Subscription Update", description: "Your payment was successful. Please refresh the page to see your premium status." });
         }
       };
-      
       verifySubscription();
-      // Clean up URL
-      window.history.replaceState({}, '', '/dashboard');
-    } else if (upgrade === 'success') {
-      toast({
-        title: "Welcome to Premium!",
-        description: "Your subscription is now active. Enjoy unlimited wine recommendations!",
-      });
-      // Clean up URL
-      window.history.replaceState({}, '', '/dashboard');
-    } else if (upgrade === 'cancelled') {
-      toast({
-        title: "Upgrade Cancelled",
-        description: "You can upgrade to premium anytime from your dashboard.",
-        variant: "destructive",
-      });
-      // Clean up URL
-      window.history.replaceState({}, '', '/dashboard');
+      window.history.replaceState({}, "", "/dashboard");
+    } else if (upgrade === "success") {
+      toast({ title: "Welcome to Premium!", description: "Your subscription is now active. Enjoy unlimited wine recommendations!" });
+      window.history.replaceState({}, "", "/dashboard");
+    } else if (upgrade === "cancelled") {
+      toast({ title: "Upgrade Cancelled", description: "You can upgrade to premium anytime from your dashboard.", variant: "destructive" });
+      window.history.replaceState({}, "", "/dashboard");
     }
   }, [toast]);
 
@@ -115,16 +102,9 @@ export default function Dashboard() {
     try {
       await logoutMutation.mutateAsync();
       setLocation("/");
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-        variant: "destructive",
-      });
+      toast({ title: "Logged out", description: "You've been successfully logged out." });
+    } catch {
+      toast({ title: "Error", description: "Failed to log out. Please try again.", variant: "destructive" });
     }
   };
 
@@ -132,30 +112,15 @@ export default function Dashboard() {
     try {
       const response = await apiRequest("POST", "/api/cancel-subscription");
       const result = await response.json();
-      
       if (result.success) {
-        toast({
-          title: "Subscription Cancelled",
-          description: result.message,
-        });
-        
-        // Refresh subscription data
+        toast({ title: "Subscription Cancelled", description: result.message });
         queryClient.invalidateQueries({ queryKey: ["/api/subscription-details"] });
         setShowCancelDialog(false);
       } else {
-        toast({
-          title: "Cancellation Failed",
-          description: result.error || "Unable to cancel subscription",
-          variant: "destructive",
-        });
+        toast({ title: "Cancellation Failed", description: result.error || "Unable to cancel subscription", variant: "destructive" });
       }
-    } catch (error) {
-      console.error("Error cancelling subscription:", error);
-      toast({
-        title: "Error",
-        description: "Failed to cancel subscription. Please try again.",
-        variant: "destructive",
-      });
+    } catch {
+      toast({ title: "Error", description: "Failed to cancel subscription. Please try again.", variant: "destructive" });
     }
   };
 
@@ -163,501 +128,460 @@ export default function Dashboard() {
     try {
       const response = await apiRequest("POST", "/api/reactivate-subscription");
       const result = await response.json();
-      
       if (result.success) {
-        toast({
-          title: "Subscription Reactivated",
-          description: result.message,
-        });
-        
-        // Refresh subscription data
+        toast({ title: "Subscription Reactivated", description: result.message });
         queryClient.invalidateQueries({ queryKey: ["/api/subscription-details"] });
       } else {
-        toast({
-          title: "Reactivation Failed",
-          description: result.error || "Unable to reactivate subscription",
-          variant: "destructive",
-        });
+        toast({ title: "Reactivation Failed", description: result.error || "Unable to reactivate subscription", variant: "destructive" });
       }
-    } catch (error) {
-      console.error("Error reactivating subscription:", error);
-      toast({
-        title: "Error",
-        description: "Failed to reactivate subscription. Please try again.",
-        variant: "destructive",
-      });
+    } catch {
+      toast({ title: "Error", description: "Failed to reactivate subscription. Please try again.", variant: "destructive" });
     }
   };
 
+  if (!isAuthenticated || !user) return null;
 
-
-  if (!isAuthenticated || !user) {
-    return null; // This will be handled by routing
-  }
-
-  const usagePercentage = Math.min(((user.recommendationCount || 0) / 3) * 100, 100);
+  const usedRecs = user.recommendationCount || 0;
+  const usagePercent = Math.min((usedRecs / 5) * 100, 100);
+  const wineCount = libraryData?.library?.length || 0;
 
   return (
-    <div className="min-h-screen bg-creme-50 pt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen pt-16" style={{ background: INK_900 }}>
+
+      {/* ── GREETING BAR ── */}
+      <div style={{ background: INK_800, borderBottom: `1px solid ${GOLD_BORDER}` }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-burgundy-700 mb-2">
-                Welcome back, {user.firstName}!
-                {user.isPremium && <Crown className="inline w-6 h-6 text-yellow-500 ml-2" />}
-              </h1>
-              <p className="text-gray-600">
-                Discover exceptional wines tailored to your taste
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="font-playfair text-2xl md:text-3xl font-bold" style={{ color: CHAMPAGNE }}>
+                  Welcome back, {user.firstName}
+                </h1>
+                {user.isPremium && (
+                  <Badge
+                    className="text-xs px-3 py-1 font-medium uppercase tracking-wider rounded-none"
+                    style={{ background: `rgba(201,168,76,0.15)`, color: GOLD, border: `1px solid ${GOLD_BORDER}` }}
+                  >
+                    <Crown className="w-3 h-3 mr-1.5" />
+                    Premium
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm" style={{ color: CHAMPAGNE_SUBTLE }}>
+                Your personal wine intelligence dashboard
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              {user.isPremium && (
-                <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-yellow-900 px-4 py-2">
-                  <Crown className="w-4 h-4 mr-2" />
-                  Premium Member
-                </Badge>
-              )}
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                size="sm"
-                className="border-burgundy-300 text-burgundy-700 hover:bg-burgundy-50"
-                disabled={logoutMutation.isPending}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                {logoutMutation.isPending ? "Logging out..." : "Logout"}
-              </Button>
-            </div>
+            <Button
+              onClick={handleLogout}
+              disabled={logoutMutation.isPending}
+              className="rounded-none text-xs uppercase tracking-widest px-6 py-2.5"
+              style={{ border: `1px solid ${GOLD_BORDER}`, color: CHAMPAGNE_MUTED, background: "transparent" }}
+            >
+              <LogOut className="w-3.5 h-3.5 mr-2" />
+              {logoutMutation.isPending ? "Signing out…" : "Sign Out"}
+            </Button>
           </div>
         </div>
+      </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
+        {/* ── STATS ROW ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            {
+              icon: <Wine className="w-5 h-5" />,
+              label: "Recommendations",
+              value: user.isPremium ? String(usedRecs) : `${usedRecs} / 5`,
+              sub: user.isPremium ? "Unlimited" : `${Math.max(0, 5 - usedRecs)} remaining`,
+            },
+            {
+              icon: <BookOpen className="w-5 h-5" />,
+              label: "Cellar Size",
+              value: String(wineCount),
+              sub: wineCount === 1 ? "bottle saved" : "bottles saved",
+            },
+            {
+              icon: <Crown className="w-5 h-5" />,
+              label: "Membership",
+              value: user.isPremium ? "Premium" : "Free",
+              sub: user.isPremium ? "All features unlocked" : "Upgrade for unlimited",
+            },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="px-6 py-5 flex items-center gap-5"
+              style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}
+            >
+              <div
+                className="w-10 h-10 flex items-center justify-center flex-shrink-0"
+                style={{ background: `rgba(201,168,76,0.1)`, color: GOLD }}
+              >
+                {stat.icon}
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-widest mb-1" style={{ color: CHAMPAGNE_SUBTLE }}>
+                  {stat.label}
+                </p>
+                <p className="font-playfair text-2xl font-bold" style={{ color: CHAMPAGNE }}>
+                  {stat.value}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: CHAMPAGNE_SUBTLE }}>
+                  {stat.sub}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
 
-        {/* Usage Status Card - Collapsible */}
+        {/* ── FREE USAGE BANNER ── */}
         {!user.isPremium && (
-          <Collapsible open={isUsageStatsOpen} onOpenChange={setIsUsageStatsOpen}>
-            <Card className="mb-8 border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="flex items-center gap-2 text-orange-800 hover:bg-orange-100 p-0 h-auto font-bold text-lg justify-start"
-                    >
-                      {isUsageStatsOpen ? (
-                        <ChevronUp className="w-5 h-5" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5" />
-                      )}
-                      Your Usage Status
-                    </Button>
-                  </CollapsibleTrigger>
-                  <Button
-                    onClick={() => setShowPaymentDialog(true)}
-                    size="sm"
-                    className="bg-burgundy-600 hover:bg-burgundy-700 text-white flex-shrink-0"
+          <Collapsible open={isUsageOpen} onOpenChange={setIsUsageOpen}>
+            <div style={{ background: INK_800, border: `1px solid rgba(201,168,76,0.25)` }}>
+              <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <CollapsibleTrigger asChild>
+                  <button
+                    className="flex items-center gap-2 text-left text-sm font-medium uppercase tracking-widest"
+                    style={{ color: GOLD }}
                   >
-                    <Crown className="w-4 h-4 mr-2" />
-                    Upgrade to Premium
-                  </Button>
-                </div>
-              </CardHeader>
+                    {isUsageOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    Free Tier Usage
+                  </button>
+                </CollapsibleTrigger>
+                <Button
+                  onClick={() => setShowPaymentDialog(true)}
+                  className="rounded-none text-xs uppercase tracking-widest px-6 py-2.5 font-semibold"
+                  style={{ background: GOLD, color: INK_950 }}
+                >
+                  <Crown className="w-3.5 h-3.5 mr-2" />
+                  Upgrade — $3.99/mo
+                </Button>
+              </div>
               <CollapsibleContent>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-orange-700">Free Recommendations Used:</span>
-                      <span className="font-semibold text-orange-800">
-                        {user.recommendationCount || 0} / 5
-                      </span>
-                    </div>
-                    <div className="w-full bg-orange-200 rounded-full h-3">
-                      <div 
-                        className="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min(100, ((user.recommendationCount || 0) / 5) * 100)}%` }}
-                      ></div>
-                    </div>
-                    {(user.recommendationCount || 0) >= 5 && (
-                      <div className="text-sm text-orange-700 font-medium">
-                        You've reached your free limit. Upgrade for unlimited recommendations!
-                      </div>
-                    )}
+                <div className="px-6 pb-5 space-y-3">
+                  <div className="flex justify-between text-sm" style={{ color: CHAMPAGNE_MUTED }}>
+                    <span>Recommendations used</span>
+                    <span style={{ color: CHAMPAGNE }}>{usedRecs} of 5</span>
                   </div>
-                </CardContent>
+                  <div className="w-full h-1 rounded-full" style={{ background: `rgba(201,168,76,0.1)` }}>
+                    <div
+                      className="h-1 rounded-full transition-all duration-500"
+                      style={{ width: `${usagePercent}%`, background: `linear-gradient(to right, ${GOLD}, ${GOLD_BRIGHT})` }}
+                    />
+                  </div>
+                  {usedRecs >= 5 && (
+                    <p className="text-xs" style={{ color: "#e07b40" }}>
+                      You've reached your free limit. Upgrade for unlimited recommendations.
+                    </p>
+                  )}
+                </div>
               </CollapsibleContent>
-            </Card>
+            </div>
           </Collapsible>
         )}
 
-
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-burgundy-100">
-                  <Wine className="w-6 h-6 text-burgundy-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Recommendations Used</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {user.recommendationCount || 0}
-                    {user.isPremium ? "" : " / 5"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-blue-100">
-                  <BookOpen className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Wines in Library</p>
-                  <p className="text-2xl font-bold text-gray-900">{libraryData?.library?.length || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-3 rounded-full bg-green-100">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Account Status</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {user.isPremium ? "Premium" : "Free"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* ── TAB NAVIGATION ── */}
+        <div style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
+          <div className="flex overflow-x-auto">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className="flex items-center gap-2 px-6 py-4 text-xs uppercase tracking-widest font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0"
+                  style={{
+                    color: isActive ? GOLD : CHAMPAGNE_SUBTLE,
+                    borderBottom: isActive ? `2px solid ${GOLD}` : "2px solid transparent",
+                    background: "transparent",
+                    marginBottom: "-1px",
+                  }}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.shortLabel}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Main Dashboard Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
-            <TabsTrigger value="recommendations" className="flex items-center gap-2">
-              <Star className="w-4 h-4" />
-              <span className="hidden sm:inline">Recommendations</span>
-            </TabsTrigger>
-            <TabsTrigger value="scanner" className="flex items-center gap-2">
-              <Camera className="w-4 h-4" />
-              <span className="hidden sm:inline">Scanner</span>
-            </TabsTrigger>
-            <TabsTrigger value="library" className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">My Library</span>
-            </TabsTrigger>
-            <TabsTrigger value="community" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Community</span>
-            </TabsTrigger>
-            <TabsTrigger value="account" className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">Account</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="recommendations" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-burgundy-600" />
+        {/* ── TAB CONTENT ── */}
+        {activeTab === "recommendations" && (
+          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+            <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
+              <div className="flex items-center gap-3">
+                <Star className="w-4 h-4" style={{ color: GOLD }} />
+                <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
                   Wine Recommendations
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <WineRecommendations />
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </h2>
+              </div>
+            </div>
+            <WineRecommendations />
+          </div>
+        )}
 
-          <TabsContent value="scanner" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Camera className="w-5 h-5 text-burgundy-600" />
-                  Wine Bottle Scanner
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <WineScanner />
-              </CardContent>
-            </Card>
-          </TabsContent>
+        {activeTab === "scanner" && (
+          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+            <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
+              <div className="flex items-center gap-3">
+                <Camera className="w-4 h-4" style={{ color: GOLD }} />
+                <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
+                  Bottle Scanner
+                </h2>
+              </div>
+            </div>
+            <WineScanner />
+          </div>
+        )}
 
-          <TabsContent value="library" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-burgundy-600" />
+        {activeTab === "library" && (
+          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+            <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
+              <div className="flex items-center gap-3">
+                <BookOpen className="w-4 h-4" style={{ color: GOLD }} />
+                <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
                   My Wine Library
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <WineLibrary onNavigateToRecommendations={() => setActiveTab("recommendations")} />
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </h2>
+              </div>
+            </div>
+            <WineLibrary onNavigateToRecommendations={() => setActiveTab("recommendations")} />
+          </div>
+        )}
 
-          <TabsContent value="community" className="space-y-6">
+        {activeTab === "community" && (
+          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+            <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
+              <div className="flex items-center gap-3">
+                <Users className="w-4 h-4" style={{ color: GOLD }} />
+                <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
+                  Community
+                </h2>
+              </div>
+            </div>
             <CommunityHub />
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="account" className="space-y-6">
-            <div className="grid gap-6">
-              {/* Subscription Status Banner */}
-              {user.isPremium && subscriptionData && (
-                <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Crown className="w-5 h-5 text-amber-600" />
-                        <div>
-                          <h3 className="font-semibold text-amber-800">Premium Subscription</h3>
-                          <p className="text-sm text-gray-600">Plan Details</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {subscriptionData.cancelAtPeriodEnd && (
-                          <>
-                            <Button
-                              onClick={handleReactivatePlan}
-                              size="sm"
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              Reactivate
-                            </Button>
-                            <span className="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full">
-                              Cancelled
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">Premium Monthly - $3.99/month</p>
-                      </div>
+        {activeTab === "account" && (
+          <div className="space-y-6">
+            {/* Subscription status banner */}
+            {user.isPremium && subscriptionData && (
+              <div
+                className="px-6 py-5"
+                style={{ background: INK_800, border: `1px solid rgba(201,168,76,0.3)` }}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <Crown className="w-5 h-5" style={{ color: GOLD }} />
+                    <div>
+                      <p className="font-semibold text-sm" style={{ color: CHAMPAGNE }}>
+                        Premium Monthly — $3.99/month
+                      </p>
                       {subscriptionData.currentPeriodEnd && (
-                        <div>
-                          <p className="text-sm text-gray-600">
-                            {subscriptionData.cancelAtPeriodEnd ? 'Cancels on' : 'Next billing'}: {' '}
-                            <span className="font-medium text-gray-900">
-                              {new Date(subscriptionData.currentPeriodEnd).toLocaleDateString()}
-                            </span>
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5 text-burgundy-600" />
-                    Account Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">First Name</label>
-                      <p className="text-gray-900 font-medium">{user.firstName}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">Email</label>
-                      <p className="text-gray-900 font-medium">{user.email}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">Username</label>
-                      <p className="text-gray-900 font-medium">{user.username}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">Account Type</label>
-                      <div className="flex items-center gap-2">
-                        <p className="text-gray-900 font-medium">
-                          {user.isPremium ? "Premium" : "Free"}
+                        <p className="text-xs mt-0.5" style={{ color: CHAMPAGNE_SUBTLE }}>
+                          {subscriptionData.cancelAtPeriodEnd ? "Cancels" : "Next billing"}:{" "}
+                          {new Date(subscriptionData.currentPeriodEnd).toLocaleDateString()}
                         </p>
-                        {user.isPremium && <Crown className="w-4 h-4 text-yellow-500" />}
-                      </div>
+                      )}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Premium Features and Management */}
-              {user.isPremium && (
-                <Card className="border-2 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Crown className="w-5 h-5 text-yellow-500" />
-                        <span className="text-green-800">Premium Benefits</span>
-                      </div>
-                      {!subscriptionData?.cancelAtPeriodEnd ? (
-                        <Button
-                          onClick={() => setShowCancelDialog(true)}
-                          variant="outline"
-                          size="sm"
-                          className="border-red-300 text-red-700 hover:bg-red-50"
-                        >
-                          Cancel Plan
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={handleReactivatePlan}
-                          variant="outline"
-                          size="sm"
-                          className="border-green-300 text-green-700 hover:bg-green-50"
-                        >
-                          Reactivate Plan
-                        </Button>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-green-700">Unlimited wine recommendations</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-green-700">Advanced bottle scanning</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-green-700">Personal wine library</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-green-700">Expert wine insights</span>
-                      </div>
+                  {subscriptionData.cancelAtPeriodEnd ? (
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs px-3 py-1.5 uppercase tracking-widest" style={{ color: "#e07b40", border: "1px solid rgba(224,123,64,0.3)" }}>
+                        Cancelling
+                      </span>
+                      <Button
+                        onClick={handleReactivatePlan}
+                        className="rounded-none text-xs uppercase tracking-widest px-5 py-2"
+                        style={{ background: GOLD, color: INK_950 }}
+                      >
+                        Reactivate
+                      </Button>
                     </div>
-                    {subscriptionData?.cancelAtPeriodEnd && (
-                      <div className="mt-4 p-3 bg-yellow-100 rounded-lg">
-                        <p className="text-sm text-amber-800">
-                          You'll continue to have access until the end of your current billing period. 
-                          You can reactivate anytime.
-                        </p>
-                      </div>
+                  ) : null}
+                </div>
+              </div>
+            )}
+
+            {/* Account info */}
+            <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+              <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4" style={{ color: GOLD }} />
+                  <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
+                    Account Information
+                  </h2>
+                </div>
+              </div>
+              <div className="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  { label: "First Name", value: user.firstName },
+                  { label: "Email", value: user.email },
+                  { label: "Username", value: user.username },
+                  { label: "Membership", value: user.isPremium ? "Premium" : "Free" },
+                ].map((field) => (
+                  <div key={field.label}>
+                    <p className="text-xs uppercase tracking-widest mb-1.5" style={{ color: CHAMPAGNE_SUBTLE }}>
+                      {field.label}
+                    </p>
+                    <p className="text-sm font-medium" style={{ color: CHAMPAGNE }}>
+                      {field.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Premium benefits */}
+            {user.isPremium ? (
+              <div style={{ background: INK_800, border: `1px solid rgba(201,168,76,0.25)` }}>
+                <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Crown className="w-4 h-4" style={{ color: GOLD }} />
+                      <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
+                        Premium Benefits
+                      </h2>
+                    </div>
+                    {!subscriptionData?.cancelAtPeriodEnd ? (
+                      <button
+                        onClick={() => setShowCancelDialog(true)}
+                        className="text-xs uppercase tracking-widest transition-colors"
+                        style={{ color: CHAMPAGNE_SUBTLE }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = "#e07b40")}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = CHAMPAGNE_SUBTLE)}
+                      >
+                        Cancel plan
+                      </button>
+                    ) : (
+                      <Button
+                        onClick={handleReactivatePlan}
+                        className="rounded-none text-xs uppercase tracking-widest px-5 py-2"
+                        style={{ border: `1px solid ${GOLD_BORDER}`, color: GOLD, background: "transparent" }}
+                      >
+                        Reactivate
+                      </Button>
                     )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {!user.isPremium && (
-                <Card className="border-2 border-burgundy-200 bg-gradient-to-r from-burgundy-50 to-purple-50">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-burgundy-700">
-                      <Crown className="w-5 h-5 text-yellow-500" />
-                      Upgrade to Premium
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Unlimited wine recommendations</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Advanced food pairing suggestions</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Priority support</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Unlimited wine library storage</span>
-                      </div>
+                  </div>
+                </div>
+                <div className="px-6 py-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    "Unlimited wine recommendations",
+                    "Advanced bottle scanning",
+                    "Personal wine library",
+                    "Expert wine insights",
+                    "Community access",
+                    "Priority support",
+                  ].map((benefit) => (
+                    <div key={benefit} className="flex items-center gap-3">
+                      <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: GOLD }} />
+                      <span className="text-sm" style={{ color: CHAMPAGNE_MUTED }}>
+                        {benefit}
+                      </span>
                     </div>
-                    <Button
-                      onClick={() => setShowPaymentDialog(true)}
-                      className="w-full bg-burgundy-600 hover:bg-burgundy-700 text-white"
-                    >
-                      <Crown className="w-4 h-4 mr-2" />
-                      Upgrade Now - $3.99
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        {/* Payment Dialog */}
-        <PaymentDialog
-          isOpen={showPaymentDialog}
-          onClose={() => setShowPaymentDialog(false)}
-        />
-
-        {/* Cancel Plan Dialog */}
-        <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-red-700">Cancel Premium Plan</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to cancel your premium subscription? You'll lose access to:
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-3 py-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                <span className="text-sm">Unlimited wine recommendations</span>
+                  ))}
+                </div>
+                {subscriptionData?.cancelAtPeriodEnd && (
+                  <div className="mx-6 mb-6 px-4 py-3 text-xs" style={{ background: `rgba(201,168,76,0.08)`, border: `1px solid ${GOLD_BORDER}`, color: CHAMPAGNE_MUTED }}>
+                    You'll retain full access until the end of your current billing period. You can reactivate anytime.
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                <span className="text-sm">Advanced bottle scanning</span>
+            ) : (
+              <div style={{ background: INK_800, border: `1px solid rgba(201,168,76,0.3)` }}>
+                <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
+                  <div className="flex items-center gap-3">
+                    <Crown className="w-4 h-4" style={{ color: GOLD }} />
+                    <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
+                      Upgrade to Premium
+                    </h2>
+                  </div>
+                </div>
+                <div className="px-6 py-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                    {[
+                      "Unlimited wine recommendations",
+                      "Advanced food pairing",
+                      "Bottle scanning",
+                      "Unlimited library storage",
+                      "Community features",
+                      "Priority support",
+                    ].map((benefit) => (
+                      <div key={benefit} className="flex items-center gap-3">
+                        <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: GOLD }} />
+                        <span className="text-sm" style={{ color: CHAMPAGNE_MUTED }}>
+                          {benefit}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    onClick={() => setShowPaymentDialog(true)}
+                    className="w-full rounded-none py-4 font-semibold text-sm uppercase tracking-widest"
+                    style={{ background: GOLD, color: INK_950 }}
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Upgrade Now — $3.99/month
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                <span className="text-sm">Personal wine library</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                <span className="text-sm">Expert wine insights</span>
-              </div>
-            </div>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-yellow-800">
-                You'll continue to have access until the end of your current billing period.
-                You can reactivate anytime.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowCancelDialog(false)}
-                className="flex-1"
-              >
-                Keep Premium
-              </Button>
-              <Button
-                onClick={handleCancelPlan}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-              >
-                Cancel Plan
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* ── PAYMENT DIALOG ── */}
+      <PaymentDialog isOpen={showPaymentDialog} onClose={() => setShowPaymentDialog(false)} />
+
+      {/* ── CANCEL DIALOG ── */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent
+          className="sm:max-w-md rounded-none"
+          style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}
+        >
+          <DialogHeader>
+            <DialogTitle className="font-playfair text-xl" style={{ color: CHAMPAGNE }}>
+              Cancel Premium Plan
+            </DialogTitle>
+            <DialogDescription style={{ color: CHAMPAGNE_SUBTLE }}>
+              You'll lose access to all premium features. You can reactivate at any time.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-2">
+            {["Unlimited wine recommendations", "Advanced bottle scanning", "Personal wine library", "Expert wine insights"].map((item) => (
+              <div key={item} className="flex items-center gap-3">
+                <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: "#e07b40" }} />
+                <span className="text-sm" style={{ color: CHAMPAGNE_MUTED }}>{item}</span>
+              </div>
+            ))}
+          </div>
+          <div
+            className="px-4 py-3 mb-4 text-xs"
+            style={{ background: `rgba(201,168,76,0.06)`, border: `1px solid ${GOLD_BORDER}`, color: CHAMPAGNE_MUTED }}
+          >
+            You'll keep access until the end of your current billing period.
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelDialog(false)}
+              className="flex-1 rounded-none"
+              style={{ border: `1px solid ${GOLD_BORDER}`, color: CHAMPAGNE_MUTED, background: "transparent" }}
+            >
+              Keep Premium
+            </Button>
+            <Button
+              onClick={handleCancelPlan}
+              className="flex-1 rounded-none"
+              style={{ background: "transparent", border: "1px solid rgba(224,123,64,0.5)", color: "#e07b40" }}
+            >
+              Cancel Plan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
