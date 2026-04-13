@@ -105,8 +105,8 @@ export default function Home() {
             className="absolute inset-0"
             style={{
               background: c.isDark
-                ? `linear-gradient(to bottom, ${INK_950}cc 0%, ${INK_950}99 40%, ${INK_900}f0 100%)`
-                : `linear-gradient(to bottom, rgba(58,18,24,0.82) 0%, rgba(58,18,24,0.65) 40%, ${INK_900}ee 100%)`,
+                ? `linear-gradient(to bottom, rgba(18,8,16,0.85) 0%, rgba(18,8,16,0.65) 40%, rgba(18,8,16,0.92) 100%)`
+                : `linear-gradient(to bottom, rgba(46,18,24,0.88) 0%, rgba(46,18,24,0.72) 40%, rgba(46,18,24,0.90) 100%)`,
             }}
           />
         </div>
@@ -142,8 +142,8 @@ export default function Home() {
               onClick={() => scrollToSection("recommendations")}
               className="px-10 py-6 text-base font-medium rounded-none transition-all duration-300"
               style={{
-                border: `1px solid ${GOLD}`,
-                color: GOLD,
+                border: "1px solid #C9A84C",
+                color: "#C9A84C",
                 background: "transparent",
                 letterSpacing: "0.05em",
               }}
@@ -154,7 +154,7 @@ export default function Home() {
               <Button
                 className="px-10 py-6 text-base font-semibold rounded-none transition-all duration-300"
                 style={{
-                  background: GOLD,
+                  background: "#C9A84C",
                   color: "#120810",
                   letterSpacing: "0.05em",
                 }}
@@ -166,22 +166,22 @@ export default function Home() {
 
           <div
             className="mt-16 flex flex-wrap items-center justify-center gap-8 text-xs uppercase tracking-widest"
-            style={{ color: "#9A8A7A" }}
+            style={{ color: "rgba(245,237,214,0.65)" }}
           >
             <span>Free to start</span>
-            <span style={{ color: GOLD }}>·</span>
+            <span style={{ color: "#C9A84C" }}>·</span>
             <span>AI-powered</span>
-            <span style={{ color: GOLD }}>·</span>
+            <span style={{ color: "#C9A84C" }}>·</span>
             <span>No sommelier required</span>
           </div>
         </div>
 
         <div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-          style={{ color: "#9A8A7A" }}
+          style={{ color: "rgba(245,237,214,0.55)" }}
         >
           <span className="text-xs uppercase tracking-widest">Explore</span>
-          <div className="w-px h-12 animate-pulse" style={{ background: `linear-gradient(to bottom, ${GOLD}, transparent)` }} />
+          <div className="w-px h-12 animate-pulse" style={{ background: "linear-gradient(to bottom, #C9A84C, transparent)" }} />
         </div>
       </section>
 
