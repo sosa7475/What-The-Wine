@@ -8,39 +8,27 @@ import WineLibrary from "@/components/wine-library";
 import Testimonials from "@/components/testimonials";
 import AuthDialog from "@/components/auth-dialog";
 import EmailSubscriptionForm from "@/components/email-subscription";
-import { useAuth } from "@/hooks/useAuth";
 import { useSEO } from "@/hooks/useSEO";
+import { useTheme } from "@/contexts/theme-context";
 
-const GOLD = "#C9A84C";
-const GOLD_BRIGHT = "#D4B86A";
-const CHAMPAGNE = "#F5EDD6";
-const CHAMPAGNE_MUTED = "#C5B59A";
-const CHAMPAGNE_SUBTLE = "#7A6A5A";
-const INK_950 = "#050203";
-const INK_900 = "#0a0408";
-const INK_800 = "#130810";
-const INK_700 = "#1c0e17";
-const GOLD_BORDER = "rgba(201, 168, 76, 0.15)";
-const BURGUNDY_GLOW = "rgba(139, 32, 48, 0.4)";
-
-function GoldDivider() {
+function GoldDivider({ gold }: { gold: string }) {
   return (
     <div className="flex items-center justify-center gap-4 mb-6">
-      <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${GOLD})` }} />
-      <div className="w-1.5 h-1.5 rounded-full" style={{ background: GOLD }} />
-      <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${GOLD})` }} />
+      <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${gold})` }} />
+      <div className="w-1.5 h-1.5 rounded-full" style={{ background: gold }} />
+      <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${gold})` }} />
     </div>
   );
 }
 
-function SectionLabel({ label }: { label: string }) {
+function SectionLabel({ label, gold }: { label: string; gold: string }) {
   return (
     <div className="flex items-center justify-center gap-3 mb-5">
-      <div className="h-px w-8" style={{ background: GOLD }} />
-      <span className="uppercase tracking-[0.2em] text-[11px] font-medium" style={{ color: GOLD }}>
+      <div className="h-px w-8" style={{ background: gold }} />
+      <span className="uppercase tracking-[0.2em] text-[11px] font-medium" style={{ color: gold }}>
         {label}
       </span>
-      <div className="h-px w-8" style={{ background: GOLD }} />
+      <div className="h-px w-8" style={{ background: gold }} />
     </div>
   );
 }
@@ -51,6 +39,20 @@ export default function Home() {
     description: "What the Wine uses AI to recommend the perfect wine for any occasion, food pairing, or budget. Scan labels, build your cellar, and discover wines loved by the community. Free to start.",
     canonical: "/",
   });
+
+  const { colors: c } = useTheme();
+
+  const GOLD = c.gold;
+  const GOLD_BRIGHT = c.goldBright;
+  const CHAMPAGNE = c.textPrimary;
+  const CHAMPAGNE_MUTED = c.textMuted;
+  const CHAMPAGNE_SUBTLE = c.textSubtle;
+  const INK_950 = c.shade950;
+  const INK_900 = c.shade900;
+  const INK_800 = c.shade800;
+  const INK_700 = c.shade700;
+  const GOLD_BORDER = c.goldBorder;
+  const BURGUNDY_GLOW = c.burgundyGlow;
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -83,7 +85,6 @@ export default function Home() {
 
       {/* ── HERO ── */}
       <section className="relative flex items-center justify-center" style={{ minHeight: "100vh" }}>
-        {/* Background image */}
         <div className="absolute inset-0 overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080"
@@ -96,12 +97,13 @@ export default function Home() {
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(to bottom, ${INK_950}cc 0%, ${INK_950}99 40%, ${INK_900}f0 100%)`,
+              background: c.isDark
+                ? `linear-gradient(to bottom, ${INK_950}cc 0%, ${INK_950}99 40%, ${INK_900}f0 100%)`
+                : `linear-gradient(to bottom, rgba(58,18,24,0.82) 0%, rgba(58,18,24,0.65) 40%, ${INK_900}ee 100%)`,
             }}
           />
         </div>
 
-        {/* Content */}
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
           <div className="flex items-center justify-center gap-4 mb-10">
             <div className="h-px w-16" style={{ background: `linear-gradient(to right, transparent, ${GOLD})` }} />
@@ -113,7 +115,7 @@ export default function Home() {
 
           <h1
             className="font-playfair font-bold leading-tight mb-8"
-            style={{ color: CHAMPAGNE, fontSize: "clamp(2.5rem, 7vw, 5rem)" }}
+            style={{ color: "#F5EDD6", fontSize: "clamp(2.5rem, 7vw, 5rem)" }}
           >
             The Art of the
             <br />
@@ -122,7 +124,7 @@ export default function Home() {
 
           <p
             className="text-lg md:text-xl leading-relaxed mb-12 max-w-2xl mx-auto"
-            style={{ color: CHAMPAGNE_MUTED, fontFamily: "Inter, sans-serif" }}
+            style={{ color: "#D4C4A8", fontFamily: "Inter, sans-serif" }}
           >
             AI-powered wine recommendations for hosts who refuse to guess.
             Discover the perfect bottle for every occasion, every time.
@@ -146,7 +148,7 @@ export default function Home() {
                 className="px-10 py-6 text-base font-semibold rounded-none transition-all duration-300"
                 style={{
                   background: GOLD,
-                  color: INK_950,
+                  color: "#120810",
                   letterSpacing: "0.05em",
                 }}
               >
@@ -157,7 +159,7 @@ export default function Home() {
 
           <div
             className="mt-16 flex flex-wrap items-center justify-center gap-8 text-xs uppercase tracking-widest"
-            style={{ color: CHAMPAGNE_SUBTLE }}
+            style={{ color: "#9A8A7A" }}
           >
             <span>Free to start</span>
             <span style={{ color: GOLD }}>·</span>
@@ -167,10 +169,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Scroll cue */}
         <div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-          style={{ color: CHAMPAGNE_SUBTLE }}
+          style={{ color: "#9A8A7A" }}
         >
           <span className="text-xs uppercase tracking-widest">Explore</span>
           <div className="w-px h-12 animate-pulse" style={{ background: `linear-gradient(to bottom, ${GOLD}, transparent)` }} />
@@ -180,7 +181,7 @@ export default function Home() {
       {/* ── HOOK ── */}
       <section className="py-28" style={{ background: INK_800 }}>
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <GoldDivider />
+          <GoldDivider gold={GOLD} />
           <blockquote
             className="font-playfair text-2xl md:text-3xl leading-relaxed italic mb-10"
             style={{ color: CHAMPAGNE }}
@@ -200,7 +201,7 @@ export default function Home() {
       <section className="py-28" style={{ background: INK_900 }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <SectionLabel label="Step One" />
+            <SectionLabel label="Step One" gold={GOLD} />
             <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-5" style={{ color: CHAMPAGNE }}>
               Tell Us Your Occasion
             </h2>
@@ -223,7 +224,7 @@ export default function Home() {
       <section className="py-28" style={{ background: INK_800 }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <SectionLabel label="Step Two" />
+            <SectionLabel label="Step Two" gold={GOLD} />
             <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-5" style={{ color: CHAMPAGNE }}>
               Scan Any Bottle
             </h2>
@@ -246,7 +247,7 @@ export default function Home() {
       <section className="py-28" style={{ background: INK_900 }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <SectionLabel label="Step Three" />
+            <SectionLabel label="Step Three" gold={GOLD} />
             <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-5" style={{ color: CHAMPAGNE }}>
               Build Your Cellar
             </h2>
@@ -269,7 +270,7 @@ export default function Home() {
       <section className="py-28" style={{ background: INK_800 }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-20">
-            <SectionLabel label="Why What the Wine" />
+            <SectionLabel label="Why What the Wine" gold={GOLD} />
             <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-5" style={{ color: CHAMPAGNE }}>
               Crafted for Connoisseurs
             </h2>
@@ -282,10 +283,9 @@ export default function Home() {
             {features.map((f) => (
               <div
                 key={f.title}
-                className="p-10 transition-all duration-300 group"
+                className="p-10 transition-all duration-300"
                 style={{
                   background: INK_700,
-                  borderTop: `2px solid ${GOLD}`,
                   border: `1px solid ${GOLD_BORDER}`,
                   borderTopWidth: "2px",
                   borderTopColor: GOLD,
@@ -310,7 +310,7 @@ export default function Home() {
       <section className="py-28" style={{ background: INK_900 }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <SectionLabel label="Members" />
+            <SectionLabel label="Members" gold={GOLD} />
             <h2 className="font-playfair text-4xl md:text-5xl font-bold" style={{ color: CHAMPAGNE }}>
               Voices from the Table
             </h2>
@@ -321,19 +321,14 @@ export default function Home() {
 
       {/* ── CTA ── */}
       <section className="py-32 relative overflow-hidden" style={{ background: INK_800 }}>
-        {/* Burgundy glow */}
-        <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        >
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
             className="w-[700px] h-[500px] rounded-full"
-            style={{
-              background: `radial-gradient(ellipse, ${BURGUNDY_GLOW} 0%, transparent 65%)`,
-            }}
+            style={{ background: `radial-gradient(ellipse, ${BURGUNDY_GLOW} 0%, transparent 65%)` }}
           />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
-          <GoldDivider />
+          <GoldDivider gold={GOLD} />
           <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-6 leading-tight" style={{ color: CHAMPAGNE }}>
             Ready to Be the Host<br />Who Always Gets It Right?
           </h2>
@@ -366,12 +361,9 @@ export default function Home() {
       {/* ── NEWSLETTER ── */}
       <section className="py-24" style={{ background: INK_900 }}>
         <div className="max-w-2xl mx-auto px-6">
-          <div
-            className="p-12"
-            style={{ border: `1px solid ${GOLD_BORDER}`, background: INK_800 }}
-          >
+          <div className="p-12" style={{ border: `1px solid ${GOLD_BORDER}`, background: INK_800 }}>
             <div className="text-center mb-10">
-              <SectionLabel label="Stay Informed" />
+              <SectionLabel label="Stay Informed" gold={GOLD} />
               <h2 className="font-playfair text-3xl font-bold mb-4" style={{ color: CHAMPAGNE }}>
                 Weekly Wine Intelligence
               </h2>
@@ -417,8 +409,8 @@ export default function Home() {
                 Your personal wine intelligence for every occasion. Powered by AI, guided by taste.
               </p>
               <div className="flex gap-1">
-                {[GOLD, GOLD, GOLD, "#7A6A5A", "#7A6A5A"].map((c, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" style={{ color: c }} />
+                {[GOLD, GOLD, GOLD, CHAMPAGNE_SUBTLE, CHAMPAGNE_SUBTLE].map((color, i) => (
+                  <Star key={i} className="w-4 h-4 fill-current" style={{ color }} />
                 ))}
                 <span className="ml-2 text-xs" style={{ color: CHAMPAGNE_SUBTLE }}>Loved by hosts everywhere</span>
               </div>

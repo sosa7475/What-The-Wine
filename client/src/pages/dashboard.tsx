@@ -15,17 +15,7 @@ import WineLibrary from "@/components/wine-library";
 import CommunityHub from "@/components/community-hub";
 import PaymentDialog from "@/components/payment-dialog";
 import { useSEO } from "@/hooks/useSEO";
-
-const GOLD = "#C9A84C";
-const GOLD_BRIGHT = "#D4B86A";
-const CHAMPAGNE = "#F5EDD6";
-const CHAMPAGNE_MUTED = "#C5B59A";
-const CHAMPAGNE_SUBTLE = "#7A6A5A";
-const INK_950 = "#050203";
-const INK_900 = "#0a0408";
-const INK_800 = "#130810";
-const INK_700 = "#1c0e17";
-const GOLD_BORDER = "rgba(201, 168, 76, 0.15)";
+import { useTheme } from "@/contexts/theme-context";
 
 const TABS = [
   { id: "recommendations", label: "Recommendations", shortLabel: "Recs", icon: Star },
@@ -37,6 +27,18 @@ const TABS = [
 
 export default function Dashboard() {
   useSEO({ title: "My Dashboard", canonical: "/dashboard", noindex: true });
+
+  const { colors: c } = useTheme();
+  const GOLD = c.gold;
+  const GOLD_BRIGHT = c.goldBright;
+  const CHAMPAGNE = c.textPrimary;
+  const CHAMPAGNE_MUTED = c.textMuted;
+  const CHAMPAGNE_SUBTLE = c.textSubtle;
+  const INK_950 = c.shade950;
+  const INK_900 = c.shade900;
+  const INK_800 = c.shade800;
+  const INK_700 = c.shade700;
+  const GOLD_BORDER = c.goldBorder;
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);

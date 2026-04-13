@@ -71,7 +71,7 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
 
   if (authLoading) {
     return (
-      <section id="library" className="py-20 bg-white">
+      <section id="library" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="animate-pulse">
@@ -86,7 +86,7 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
 
   if (!isAuthenticated) {
     return (
-      <section id="library" className="py-20 bg-white">
+      <section id="library" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
@@ -119,7 +119,7 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
 
   if (isLoading) {
     return (
-      <section id="library" className="py-20 bg-white">
+      <section id="library" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="animate-pulse">
@@ -133,7 +133,7 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
   }
 
   return (
-    <section id="library" className="py-20 bg-white">
+    <section id="library" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-12 space-y-6 lg:space-y-0">
           <h3 className="font-playfair text-3xl sm:text-4xl font-bold text-burgundy-700">Your Personal Wine Library</h3>

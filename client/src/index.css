@@ -4,65 +4,67 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── LIGHT LUXURY CREAM THEME ── */
 :root {
-  --background: hsl(45, 25%, 98%);
-  --foreground: hsl(355, 50%, 15%);
-  --muted: hsl(45, 15%, 94%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --background: hsl(38, 60%, 96%);
+  --foreground: hsl(355, 60%, 14%);
+  --muted: hsl(38, 45%, 92%);
+  --muted-foreground: hsl(355, 25%, 42%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(355, 50%, 15%);
+  --popover-foreground: hsl(355, 60%, 14%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(355, 50%, 15%);
-  --border: hsl(45, 20%, 90%);
-  --input: hsl(45, 20%, 90%);
-  --primary: hsl(355, 75%, 32%);
-  --primary-foreground: hsl(45, 25%, 98%);
-  --secondary: hsl(45, 15%, 94%);
-  --secondary-foreground: hsl(355, 50%, 15%);
-  --accent: hsl(45, 15%, 94%);
-  --accent-foreground: hsl(355, 50%, 15%);
+  --card-foreground: hsl(355, 60%, 14%);
+  --border: hsl(38, 40%, 85%);
+  --input: hsl(0, 0%, 100%);
+  --primary: hsl(355, 65%, 32%);
+  --primary-foreground: hsl(38, 60%, 96%);
+  --secondary: hsl(38, 45%, 92%);
+  --secondary-foreground: hsl(355, 60%, 14%);
+  --accent: hsl(38, 45%, 88%);
+  --accent-foreground: hsl(355, 60%, 14%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(355, 75%, 32%);
+  --ring: hsl(43, 56%, 45%);
   --radius: 0.5rem;
-  
-  /* Custom burgundy and creme colors */
+
+  /* Custom palette tokens */
   --burgundy-50: hsl(355, 100%, 97%);
   --burgundy-100: hsl(355, 100%, 94%);
-  --burgundy-500: hsl(355, 75%, 32%);
-  --burgundy-600: hsl(355, 100%, 25%);
-  --burgundy-700: hsl(355, 45%, 28%);
-  --burgundy-900: hsl(355, 65%, 18%);
-  
-  --creme-50: hsl(45, 25%, 98%);
-  --creme-100: hsl(48, 75%, 88%);
-  --creme-200: hsl(50, 60%, 85%);
-  --creme-300: hsl(48, 45%, 78%);
-  
-  --gold-400: hsl(43, 74%, 49%);
-  --gold-500: hsl(43, 89%, 38%);
+  --burgundy-500: hsl(355, 65%, 32%);
+  --burgundy-600: hsl(355, 65%, 28%);
+  --burgundy-700: hsl(355, 60%, 22%);
+  --burgundy-900: hsl(355, 65%, 12%);
+
+  --creme-50: hsl(38, 60%, 96%);
+  --creme-100: hsl(38, 55%, 92%);
+  --creme-200: hsl(38, 45%, 88%);
+  --creme-300: hsl(38, 40%, 82%);
+
+  --gold-400: hsl(43, 65%, 48%);
+  --gold-500: hsl(43, 72%, 38%);
 }
 
+/* ── DARK LUXURY PLUM THEME ── */
 .dark {
-  --background: hsl(355, 25%, 8%);
-  --foreground: hsl(45, 25%, 95%);
-  --muted: hsl(355, 15%, 15%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(355, 25%, 8%);
-  --popover-foreground: hsl(45, 25%, 95%);
-  --card: hsl(355, 25%, 8%);
-  --card-foreground: hsl(45, 25%, 95%);
-  --border: hsl(355, 15%, 20%);
-  --input: hsl(355, 15%, 20%);
-  --primary: hsl(355, 75%, 45%);
-  --primary-foreground: hsl(45, 25%, 98%);
-  --secondary: hsl(355, 15%, 15%);
-  --secondary-foreground: hsl(45, 25%, 95%);
-  --accent: hsl(355, 15%, 15%);
-  --accent-foreground: hsl(45, 25%, 95%);
+  --background: hsl(345, 32%, 8%);
+  --foreground: hsl(45, 72%, 90%);
+  --muted: hsl(340, 27%, 14%);
+  --muted-foreground: hsl(38, 35%, 72%);
+  --popover: hsl(340, 30%, 11%);
+  --popover-foreground: hsl(45, 72%, 90%);
+  --card: hsl(340, 30%, 11%);
+  --card-foreground: hsl(45, 72%, 90%);
+  --border: hsl(345, 22%, 24%);
+  --input: hsl(340, 30%, 11%);
+  --primary: hsl(43, 56%, 54%);
+  --primary-foreground: hsl(345, 70%, 6%);
+  --secondary: hsl(340, 27%, 14%);
+  --secondary-foreground: hsl(45, 72%, 90%);
+  --accent: hsl(340, 22%, 18%);
+  --accent-foreground: hsl(45, 72%, 90%);
   --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(45, 25%, 95%);
-  --ring: hsl(355, 75%, 45%);
+  --destructive-foreground: hsl(45, 72%, 90%);
+  --ring: hsl(43, 56%, 54%);
   --radius: 0.5rem;
 }
 
@@ -85,86 +87,102 @@
   .font-playfair {
     font-family: 'Playfair Display', serif;
   }
-  
+
   .font-inter {
     font-family: 'Inter', sans-serif;
   }
-  
+
   .text-burgundy-50 { color: var(--burgundy-50); }
   .text-burgundy-100 { color: var(--burgundy-100); }
   .text-burgundy-500 { color: var(--burgundy-500); }
-  .text-burgundy-600 { color: var(--burgundy-600); } 
+  .text-burgundy-600 { color: var(--burgundy-600); }
   .text-burgundy-700 { color: var(--burgundy-700); }
   .text-burgundy-900 { color: var(--burgundy-900); }
-  
+
   .bg-burgundy-50 { background-color: var(--burgundy-50); }
   .bg-burgundy-100 { background-color: var(--burgundy-100); }
   .bg-burgundy-500 { background-color: var(--burgundy-500); }
   .bg-burgundy-600 { background-color: var(--burgundy-600); }
   .bg-burgundy-700 { background-color: var(--burgundy-700); }
   .bg-burgundy-900 { background-color: var(--burgundy-900); }
-  
+
   .border-burgundy-600 { border-color: var(--burgundy-600); }
   .border-burgundy-500 { border-color: var(--burgundy-500); }
-  
+
   .hover\:bg-burgundy-50:hover { background-color: var(--burgundy-50); }
   .hover\:bg-burgundy-700:hover { background-color: var(--burgundy-700); }
   .hover\:text-burgundy-600:hover { color: var(--burgundy-600); }
   .hover\:text-burgundy-700:hover { color: var(--burgundy-700); }
-  
+
   .text-creme-50 { color: var(--creme-50); }
   .text-creme-100 { color: var(--creme-100); }
   .text-creme-200 { color: var(--creme-200); }
   .text-creme-300 { color: var(--creme-300); }
-  
+
   .bg-creme-50 { background-color: var(--creme-50); }
   .bg-creme-100 { background-color: var(--creme-100); }
   .bg-creme-200 { background-color: var(--creme-200); }
   .bg-creme-300 { background-color: var(--creme-300); }
-  
+
   .border-creme-200 { border-color: var(--creme-200); }
   .border-creme-300 { border-color: var(--creme-300); }
-  
+
   .text-gold-400 { color: var(--gold-400); }
   .text-gold-500 { color: var(--gold-500); }
   .bg-gold-400 { background-color: var(--gold-400); }
   .bg-gold-500 { background-color: var(--gold-500); }
   .hover\:bg-gold-500:hover { background-color: var(--gold-500); }
 
-  /* ── Luxury dark theme ── */
-  --ink-950: #050203;
-  --ink-900: #0a0408;
-  --ink-800: #130810;
-  --ink-700: #1c0e17;
-  --ink-600: #271219;
+  /* ── Luxury dark custom tokens ── */
+  --ink-950: #120810;
+  --ink-900: #1a0e18;
+  --ink-800: #241520;
+  --ink-700: #301d2b;
   --champagne: #F5EDD6;
-  --champagne-muted: #C5B59A;
-  --champagne-subtle: #7A6A5A;
+  --champagne-muted: #D4C4A8;
+  --champagne-subtle: #9A8A7A;
   --gold-bright: #D4B86A;
-  --gold-border: rgba(201, 168, 76, 0.18);
-  --gold-glow: rgba(201, 168, 76, 0.10);
-  --burgundy-glow: rgba(139, 32, 48, 0.35);
-  --burgundy-800: hsl(355, 65%, 22%);
+  --gold-border: rgba(201, 168, 76, 0.2);
 
   .bg-ink-950 { background-color: var(--ink-950); }
   .bg-ink-900 { background-color: var(--ink-900); }
   .bg-ink-800 { background-color: var(--ink-800); }
   .bg-ink-700 { background-color: var(--ink-700); }
-  .bg-ink-600 { background-color: var(--ink-600); }
-
   .text-champagne { color: var(--champagne); }
   .text-champagne-muted { color: var(--champagne-muted); }
   .text-champagne-subtle { color: var(--champagne-subtle); }
   .text-gold-bright { color: var(--gold-bright); }
-
-  .border-gold { border-color: var(--gold-400); }
   .border-gold-subtle { border-color: var(--gold-border); }
-
-  .bg-gold-glow { background-color: var(--gold-glow); }
-  .bg-burgundy-800 { background-color: var(--burgundy-800); }
-
-  .hover\:bg-ink-700:hover { background-color: var(--ink-700); }
-  .hover\:text-champagne:hover { color: var(--champagne); }
-  .hover\:text-gold-bright:hover { color: var(--gold-bright); }
-  .hover\:border-gold-400:hover { border-color: var(--gold-400); }
 }
+
+/* ── Dark mode auto-overrides for child components ── */
+/* These fix hardcoded Tailwind classes in wine-recommendations, wine-card, etc. */
+.dark .text-burgundy-700 { color: var(--foreground); }
+.dark .text-\[\#722F37\] { color: var(--foreground); }
+.dark .text-gray-600 { color: var(--muted-foreground); }
+.dark .text-gray-500 { color: var(--muted-foreground); }
+.dark .text-gray-400 { color: var(--muted-foreground); }
+.dark .text-gray-700 { color: var(--foreground); }
+.dark .border-creme-300 { border-color: var(--border); }
+.dark .border-\[\#722F37\]\/10 { border-color: var(--border); }
+.dark .bg-gradient-to-b.from-gray-50 { background: var(--card); }
+.dark .from-gray-50 { --tw-gradient-from: var(--card); }
+.dark .to-gray-100 { --tw-gradient-to: var(--card); }
+.dark .bg-gray-200 { background-color: var(--muted); }
+.dark .bg-orange-50 { background-color: var(--muted); }
+.dark .text-orange-700 { color: var(--muted-foreground); }
+.dark .text-orange-600 { color: var(--muted-foreground); }
+.dark .border-orange-200 { border-color: var(--border); }
+.dark .bg-blue-50 { background-color: var(--muted); }
+.dark .text-blue-700 { color: var(--foreground); }
+.dark .text-blue-500 { color: hsl(43, 56%, 54%); }
+.dark .border-blue-200 { border-color: var(--border); }
+.dark .bg-blue-200 { background-color: var(--muted); }
+.dark .bg-indigo-50 { background-color: var(--muted); }
+.dark .bg-gradient-to-r.from-blue-50 { background: var(--muted); }
+.dark .bg-\[\#722F37\]\/10 { background-color: rgba(201,168,76,0.08); }
+.dark .bg-\[#722F37\]\/10 { background-color: rgba(201,168,76,0.08); }
+.dark .text-green-600 { color: hsl(43, 56%, 54%); }
+.dark .text-yellow-500 { color: hsl(43, 65%, 55%); }
+.dark .bg-gradient-to-b.from-\[\#F5F5DC\] { background: var(--muted); }
+.dark .from-\[\#F5F5DC\] { --tw-gradient-from: var(--muted); }

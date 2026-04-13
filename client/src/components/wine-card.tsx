@@ -35,7 +35,7 @@ export default function WineCard({
   };
 
   return (
-    <Card className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+    <Card className="bg-card rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
       <div className="h-64 bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden">
         <img
           src={wine.imageUrl || generateWineImageUrl(wine)}
