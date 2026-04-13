@@ -2,11 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Loader2, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,13 +12,45 @@ import WineCard from "./wine-card";
 import AuthDialog from "./auth-dialog";
 import PaymentDialog from "./payment-dialog";
 
+const OCCASIONS = [
+  { value: "romantic dinner",      label: "Romantic",    icon: "🕯️" },
+  { value: "business dinner",      label: "Business",    icon: "💼" },
+  { value: "casual evening",       label: "Casual",      icon: "🌙" },
+  { value: "special celebration",  label: "Celebration", icon: "🥂" },
+  { value: "wine tasting",         label: "Tasting",     icon: "🍷" },
+];
+
+const BUDGETS = [
+  { value: "under-25", label: "Under $25" },
+  { value: "25-50",    label: "$25 – $50" },
+  { value: "50-100",   label: "$50 – $100" },
+  { value: "100+",     label: "$100+" },
+];
+
+const FOOD_PAIRINGS = [
+  { value: "red meat",   label: "Red Meat",    icon: "🥩" },
+  { value: "seafood",    label: "Seafood",     icon: "🐟" },
+  { value: "poultry",   label: "Poultry",     icon: "🍗" },
+  { value: "vegetarian", label: "Vegetarian", icon: "🥗" },
+  { value: "cheese",    label: "Cheese",      icon: "🧀" },
+  { value: "dessert",   label: "Dessert",     icon: "🍮" },
+];
+
+const WINE_STYLES = [
+  { value: "no-preference", label: "Any Style",  dot: null },
+  { value: "red",           label: "Red",        dot: "#722F37" },
+  { value: "white",         label: "White",      dot: "#D4C4A8" },
+  { value: "rose",          label: "Rosé",       dot: "#E8A0A0" },
+  { value: "sparkling",     label: "Sparkling",  dot: "#C9A84C" },
+  { value: "dessert",       label: "Dessert",    dot: "#B8720A" },
+];
+
 export default function WineRecommendations() {
   const [recommendations, setRecommendations] = useState<Wine[]>([]);
   const [savedWines, setSavedWines] = useState<Set<number>>(new Set());
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [guestRecommendationCount, setGuestRecommendationCount] = useState(() => {
-    // Get guest recommendation count from localStorage
     const count = localStorage.getItem('guestRecommendationCount');
     return count ? parseInt(count, 10) : 0;
   });
@@ -30,7 +58,6 @@ export default function WineRecommendations() {
   const queryClient = useQueryClient();
   const { user, isAuthenticated, isLoading } = useAuth();
 
-  // Clear guest count when user signs in
   useEffect(() => {
     if (isAuthenticated && guestRecommendationCount > 0) {
       setGuestRecommendationCount(0);
@@ -40,14 +67,10 @@ export default function WineRecommendations() {
 
   const form = useForm<WinePreferences>({
     resolver: zodResolver(winePreferencesSchema),
-    defaultValues: {
-      occasion: "",
-      budget: "",
-      foodPairing: "",
-      wineType: "",
-      preferences: "",
-    },
+    defaultValues: { occasion: "", budget: "", foodPairing: "", wineType: "", preferences: "" },
   });
+
+  const watched = form.watch();
 
   const recommendationMutation = useMutation({
     mutationFn: async (data: WinePreferences) => {
@@ -57,116 +80,70 @@ export default function WineRecommendations() {
     },
     onSuccess: (data) => {
       setRecommendations(data.wines);
-      
-      // Handle guest users
       if (data.isGuest) {
         const newCount = data.guestRecommendationsUsed;
         setGuestRecommendationCount(newCount);
         localStorage.setItem('guestRecommendationCount', newCount.toString());
-        
-        toast({
-          title: "Recommendations Generated",
-          description: `Found ${data.wines.length} wines for you! ${data.guestRecommendationsRemaining} free recommendations remaining.`,
-        });
-        
-        // Show auth prompt after using both free recommendations
+        toast({ title: "Selections ready", description: `${data.guestRecommendationsRemaining} guest selections remaining.` });
         if (data.guestRecommendationsRemaining === 0) {
-          setTimeout(() => {
-            setShowAuthDialog(true);
-          }, 2000);
+          setTimeout(() => setShowAuthDialog(true), 2000);
         }
       } else {
-        // Handle authenticated users
-        toast({
-          title: "Recommendations Generated",
-          description: `Found ${data.wines.length} perfect wines for you!`,
-        });
-        // Invalidate auth to get updated recommendation count
+        toast({ title: "Selections ready", description: `${data.wines.length} wines curated for you.` });
         queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       }
     },
     onError: (error: any) => {
       if (error.message?.includes("Usage limit reached")) {
         setShowPaymentDialog(true);
-        toast({
-          title: "Usage Limit Reached",
-          description: "You've used your 5 free recommendations. Upgrade to premium for unlimited access.",
-          variant: "destructive",
-        });
+        toast({ title: "Limit reached", description: "Upgrade to premium for unlimited selections.", variant: "destructive" });
       } else if (error.message?.includes("Guest limit reached")) {
         setShowAuthDialog(true);
-        toast({
-          title: "Free Trial Complete",
-          description: "You've used your 2 free guest recommendations. Sign up for 5 more free recommendations!",
-        });
+        toast({ title: "Guest trial complete", description: "Create an account for 5 more free selections." });
       } else if (error.message?.includes("Authentication required")) {
         setShowAuthDialog(true);
-        toast({
-          title: "Sign In Required",
-          description: "Please sign in to get wine recommendations.",
-        });
       } else {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to get recommendations",
-          variant: "destructive",
-        });
+        toast({ title: "Error", description: error.message || "Failed to get recommendations", variant: "destructive" });
       }
     },
   });
 
   const saveWineMutation = useMutation({
     mutationFn: async ({ wineId }: { wineId: number }) => {
-      if (!isAuthenticated) {
-        throw new Error("Please sign in to save wines to your library");
-      }
+      if (!isAuthenticated) throw new Error("Please sign in to save wines to your library");
       const response = await apiRequest("POST", "/api/library", { wineId });
       return response.json();
     },
     onSuccess: (_, { wineId }) => {
       setSavedWines(prev => new Set(Array.from(prev).concat(wineId)));
       queryClient.invalidateQueries({ queryKey: ["/api/library"] });
-      toast({
-        title: "Wine Saved",
-        description: "Added to your wine library!",
-      });
+      toast({ title: "Wine saved", description: "Added to your library." });
     },
     onError: (error: any) => {
       if (error.message?.includes("sign in")) {
         setShowAuthDialog(true);
-        toast({
-          title: "Sign In Required",
-          description: "Create an account to save wines to your library.",
-        });
       } else {
-        toast({
-          title: "Error",
-          description: error.message || "Failed to save wine",
-          variant: "destructive",
-        });
+        toast({ title: "Error", description: error.message || "Failed to save wine", variant: "destructive" });
       }
     },
   });
 
   const onSubmit = (data: WinePreferences) => {
-    // Check if guest user has reached limit
     if (!isAuthenticated && guestRecommendationCount >= 2) {
       setShowAuthDialog(true);
-      toast({
-        title: "Sign up required",
-        description: "You've used your 2 free guest recommendations. Sign up for 5 more free recommendations!",
-      });
       return;
     }
-    
     recommendationMutation.mutate(data);
   };
 
   const handleSaveWine = (wineId: number) => {
-    if (!savedWines.has(wineId)) {
-      saveWineMutation.mutate({ wineId });
-    }
+    if (!savedWines.has(wineId)) saveWineMutation.mutate({ wineId });
   };
+
+  const sel = (field: keyof WinePreferences, value: string) => form.setValue(field, value);
+
+  const GOLD = "#B8922A";
+  const isBlocked = !isAuthenticated && guestRecommendationCount >= 2;
 
   return (
     <section id="recommendations" className="py-20">
@@ -174,43 +151,34 @@ export default function WineRecommendations() {
 
         {/* Usage strip — authenticated premium */}
         {isAuthenticated && user?.isPremium && (
-          <div className="flex items-center justify-center gap-3 mb-10 text-xs uppercase tracking-widest text-[#722F37]">
+          <div className="flex items-center justify-center gap-3 mb-10 text-xs uppercase tracking-widest text-[#722F37] dark:text-[#C9A84C]">
             <Crown className="w-3.5 h-3.5" />
             <span>Unlimited · Premium Member</span>
           </div>
         )}
 
-        {/* Usage strip — authenticated free, approaching limit */}
+        {/* Usage strip — authenticated free */}
         {isAuthenticated && user && !user.isPremium && (
           <div className="max-w-4xl mx-auto mb-10">
             {(user.recommendationCount || 0) >= 5 ? (
               <div className="flex items-center justify-between px-6 py-4 border border-[#722F37]/20 bg-[#722F37]/5">
-                <span className="text-sm text-[#722F37]">You've used your 5 complimentary selections.</span>
-                <Button
-                  onClick={() => setShowPaymentDialog(true)}
-                  size="sm"
-                  className="bg-[#722F37] hover:bg-[#5d252a] text-white rounded-none text-xs tracking-wider px-5"
-                >
-                  <Crown className="w-3 h-3 mr-1.5" />
-                  Unlock Unlimited — $3.99
+                <span className="text-sm text-[#722F37] dark:text-[#C9A84C]">You've used your 5 complimentary selections.</span>
+                <Button onClick={() => setShowPaymentDialog(true)} size="sm"
+                  className="bg-[#722F37] hover:bg-[#5d252a] text-white rounded-none text-xs tracking-wider px-5">
+                  <Crown className="w-3 h-3 mr-1.5" />Unlock Unlimited — $3.99
                 </Button>
               </div>
             ) : (
               <div className="flex items-center justify-between px-6 py-3 border-b border-[#722F37]/15">
-                <span className="text-xs uppercase tracking-widest text-gray-400">
-                  Complimentary selections
-                </span>
+                <span className="text-xs uppercase tracking-widest text-muted-foreground">Complimentary selections</span>
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-5 h-0.5 transition-colors duration-300"
-                        style={{ background: i < (user.recommendationCount || 0) ? "#722F37" : "#E5E7EB" }}
-                      />
+                      <div key={i} className="w-5 h-0.5 transition-colors duration-300"
+                        style={{ background: i < (user.recommendationCount || 0) ? "#722F37" : "var(--border)" }} />
                     ))}
                   </div>
-                  <span className="text-xs text-gray-500">{user.recommendationCount || 0} / 5</span>
+                  <span className="text-xs text-muted-foreground">{user.recommendationCount || 0} / 5</span>
                 </div>
               </div>
             )}
@@ -222,7 +190,7 @@ export default function WineRecommendations() {
           <div className="max-w-4xl mx-auto mb-10">
             {guestRecommendationCount >= 2 ? (
               <div className="flex items-center justify-between px-6 py-4 border border-[#722F37]/20 bg-[#722F37]/5">
-                <span className="text-sm text-[#722F37]">You've used your 2 complimentary guest selections.</span>
+                <span className="text-sm text-[#722F37] dark:text-[#C9A84C]">You've used your 2 complimentary guest selections.</span>
                 <AuthDialog defaultMode="register">
                   <Button size="sm" className="bg-[#722F37] hover:bg-[#5d252a] text-white rounded-none text-xs tracking-wider px-5">
                     Create Account — Free
@@ -231,197 +199,156 @@ export default function WineRecommendations() {
               </div>
             ) : (
               <div className="flex items-center justify-between px-6 py-3 border-b border-[#722F37]/15">
-                <span className="text-xs uppercase tracking-widest text-gray-400">
-                  Guest selections remaining
-                </span>
+                <span className="text-xs uppercase tracking-widest text-muted-foreground">Guest selections remaining</span>
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1">
                     {[...Array(2)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-5 h-0.5 transition-colors duration-300"
-                        style={{ background: i < guestRecommendationCount ? "#722F37" : "#E5E7EB" }}
-                      />
+                      <div key={i} className="w-5 h-0.5 transition-colors duration-300"
+                        style={{ background: i < guestRecommendationCount ? "#722F37" : "var(--border)" }} />
                     ))}
                   </div>
-                  <span className="text-xs text-gray-500">{2 - guestRecommendationCount} remaining</span>
+                  <span className="text-xs text-muted-foreground">{2 - guestRecommendationCount} remaining</span>
                 </div>
               </div>
             )}
           </div>
         )}
 
-        {/* Preference Form */}
-        <Card className="bg-creme-50 rounded-2xl p-8 mb-12 max-w-4xl mx-auto shadow-sm">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="occasion"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Occasion</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-white border-creme-300 focus:ring-burgundy-500">
-                            <SelectValue placeholder="Select occasion..." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="romantic dinner">Romantic dinner</SelectItem>
-                          <SelectItem value="business dinner">Business dinner</SelectItem>
-                          <SelectItem value="casual evening">Casual evening</SelectItem>
-                          <SelectItem value="special celebration">Special celebration</SelectItem>
-                          <SelectItem value="wine tasting">Wine tasting</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
+        {/* Interactive preference form */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-10 mb-14">
 
-                <FormField
-                  control={form.control}
-                  name="budget"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Budget</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-white border-creme-300 focus:ring-burgundy-500">
-                            <SelectValue placeholder="Select budget..." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="under-25">Under $25</SelectItem>
-                          <SelectItem value="25-50">$25 – $50</SelectItem>
-                          <SelectItem value="50-100">$50 – $100</SelectItem>
-                          <SelectItem value="100+">$100+</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
+          {/* Occasion tiles */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>The Occasion</p>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {OCCASIONS.map(o => {
+                const active = watched.occasion === o.value;
+                return (
+                  <button type="button" key={o.value} onClick={() => sel("occasion", o.value)}
+                    className={`py-5 px-3 text-center border transition-all duration-200 ${
+                      active
+                        ? "border-[#722F37] bg-[#722F37]/10 dark:bg-[#722F37]/20"
+                        : "border-border hover:border-[#722F37]/50 bg-card"
+                    }`}
+                  >
+                    <span className="text-2xl block mb-2 leading-none">{o.icon}</span>
+                    <span className={`text-[11px] uppercase tracking-wider ${active ? "text-[#722F37] dark:text-[#C9A84C] font-medium" : "text-muted-foreground"}`}>
+                      {o.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                <FormField
-                  control={form.control}
-                  name="foodPairing"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Food Pairing</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-white border-creme-300 focus:ring-burgundy-500">
-                            <SelectValue placeholder="Select food pairing..." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="red meat">Red meat</SelectItem>
-                          <SelectItem value="seafood">Seafood</SelectItem>
-                          <SelectItem value="poultry">Poultry</SelectItem>
-                          <SelectItem value="vegetarian">Vegetarian</SelectItem>
-                          <SelectItem value="cheese">Cheese & charcuterie</SelectItem>
-                          <SelectItem value="dessert">Dessert</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
+          {/* Budget pills */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Budget</p>
+            <div className="flex flex-wrap gap-2">
+              {BUDGETS.map(b => {
+                const active = watched.budget === b.value;
+                return (
+                  <button type="button" key={b.value} onClick={() => sel("budget", b.value)}
+                    className={`px-7 py-2.5 text-sm border transition-all duration-200 ${
+                      active
+                        ? "border-[#722F37] bg-[#722F37] text-white"
+                        : "border-border text-foreground hover:border-[#722F37]/50 bg-card"
+                    }`}
+                  >
+                    {b.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                <FormField
-                  control={form.control}
-                  name="wineType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Wine Style</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-white border-creme-300 focus:ring-burgundy-500">
-                            <SelectValue placeholder="No preference" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="no-preference">No preference</SelectItem>
-                          <SelectItem value="red">Red</SelectItem>
-                          <SelectItem value="white">White</SelectItem>
-                          <SelectItem value="rose">Rosé</SelectItem>
-                          <SelectItem value="sparkling">Sparkling</SelectItem>
-                          <SelectItem value="dessert">Dessert</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-              </div>
+          {/* Food pairing emoji chips */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Food Pairing</p>
+            <div className="flex flex-wrap gap-2">
+              {FOOD_PAIRINGS.map(f => {
+                const active = watched.foodPairing === f.value;
+                return (
+                  <button type="button" key={f.value} onClick={() => sel("foodPairing", f.value)}
+                    className={`flex items-center gap-2 px-4 py-2.5 text-sm border transition-all duration-200 ${
+                      active
+                        ? "border-[#722F37] bg-[#722F37]/10 dark:bg-[#722F37]/20 text-[#722F37] dark:text-[#C9A84C]"
+                        : "border-border text-foreground hover:border-[#722F37]/40 bg-card"
+                    }`}
+                  >
+                    <span>{f.icon}</span><span>{f.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-              <FormField
-                control={form.control}
-                name="preferences"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Notes</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        className="bg-white border-creme-300 focus:ring-burgundy-500 h-24"
-                        placeholder="Favourite regions, grapes, or anything else worth knowing..."
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+          {/* Wine style with color dots */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Wine Style</p>
+            <div className="flex flex-wrap gap-2">
+              {WINE_STYLES.map(w => {
+                const active = watched.wineType === w.value;
+                return (
+                  <button type="button" key={w.value} onClick={() => sel("wineType", w.value)}
+                    className={`flex items-center gap-2.5 px-4 py-2.5 text-sm border transition-all duration-200 ${
+                      active
+                        ? "border-[#722F37] bg-[#722F37]/10 dark:bg-[#722F37]/20 text-[#722F37] dark:text-[#C9A84C]"
+                        : "border-border text-foreground hover:border-[#722F37]/40 bg-card"
+                    }`}
+                  >
+                    {w.dot && (
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: w.dot }} />
+                    )}
+                    <span>{w.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-              <div className="text-center">
-                <Button
-                  type="submit"
-                  disabled={recommendationMutation.isPending || (!isAuthenticated && guestRecommendationCount >= 2)}
-                  className="bg-burgundy-600 hover:bg-burgundy-700 text-white font-medium px-8 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {recommendationMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Curating...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Reveal My Selections
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </Card>
+          {/* Notes */}
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Notes</p>
+            <textarea
+              {...form.register("preferences")}
+              className="w-full bg-card border border-border focus:border-[#722F37] dark:focus:border-[#C9A84C] focus:outline-none p-4 text-sm text-foreground placeholder:text-muted-foreground resize-none transition-colors duration-200 h-20"
+              placeholder="Favourite regions, grapes, or anything else worth knowing..."
+            />
+          </div>
 
-        {/* Wine Recommendations Display */}
+          {/* Submit */}
+          <div className="text-center pt-2">
+            <Button
+              type="submit"
+              disabled={recommendationMutation.isPending || isBlocked}
+              className="bg-[#722F37] hover:bg-[#5d252a] dark:bg-[#C9A84C] dark:hover:bg-[#B8922A] dark:text-[#120810] text-white font-medium px-12 py-5 rounded-none tracking-wider text-sm transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {recommendationMutation.isPending ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Curating your selections…</>
+              ) : (
+                <><Sparkles className="h-4 w-4 mr-2" />Reveal My Selections</>
+              )}
+            </Button>
+          </div>
+        </form>
+
+        {/* Results */}
         {recommendations.length > 0 && (
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {recommendations.map((wine) => (
-              <WineCard
-                key={wine.id}
-                wine={wine}
+              <WineCard key={wine.id} wine={wine}
                 onSave={() => handleSaveWine(wine.id)}
-                isSaved={savedWines.has(wine.id)}
-              />
+                isSaved={savedWines.has(wine.id)} />
             ))}
           </div>
         )}
 
-        {/* Payment Dialog */}
-        <PaymentDialog
-          isOpen={showPaymentDialog}
-          onClose={() => setShowPaymentDialog(false)}
-        />
+        <PaymentDialog isOpen={showPaymentDialog} onClose={() => setShowPaymentDialog(false)} />
 
-        {/* Auth Dialog for Guest Users */}
         {showAuthDialog && (
-          <AuthDialog
-            open={showAuthDialog}
-            onOpenChange={setShowAuthDialog}
-            defaultMode="register"
-          >
-            <Button style={{ display: 'none' }}>Hidden</Button>
+          <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} defaultMode="register">
+            <Button style={{ display: "none" }}>Hidden</Button>
           </AuthDialog>
         )}
       </div>

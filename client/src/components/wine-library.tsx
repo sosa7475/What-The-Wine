@@ -21,7 +21,7 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
   const [typeFilter, setTypeFilter] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const { data: libraryData, isLoading } = useQuery({
     queryKey: ["/api/library"],
@@ -85,32 +85,69 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
   }
 
   if (!isAuthenticated) {
+    // Ghost card data — purely visual placeholders
+    const GHOST_WINES = [
+      { name: "Château Margaux 2018", winery: "Château Margaux", region: "Bordeaux", type: "Red", price: "$320" },
+      { name: "Opus One 2019", winery: "Opus One Winery", region: "Napa Valley", type: "Red", price: "$450" },
+      { name: "Cloudy Bay Sauvignon Blanc", winery: "Cloudy Bay", region: "Marlborough", type: "White", price: "$28" },
+      { name: "Whispering Angel Rosé", winery: "Château d'Esclans", region: "Provence", type: "Rosé", price: "$42" },
+    ];
     return (
       <section id="library" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto text-center py-16">
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <div className="h-px w-12" style={{ background: "linear-gradient(to right, transparent, #722F37)" }} />
-              <div className="w-1.5 h-1.5 rounded-full bg-[#722F37]" />
-              <div className="h-px w-12" style={{ background: "linear-gradient(to left, transparent, #722F37)" }} />
+          <div className="relative">
+            {/* Ghost cards — blurred, pointer-events off */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 select-none pointer-events-none"
+              style={{ filter: "blur(3px)", opacity: 0.35 }}>
+              {GHOST_WINES.map((w, i) => (
+                <div key={i} className="bg-card border border-border overflow-hidden">
+                  <div className="h-48 bg-gradient-to-b from-muted/60 to-muted/30 flex items-center justify-center">
+                    <svg viewBox="0 0 60 160" className="h-32 text-muted-foreground/40" fill="currentColor">
+                      <rect x="22" y="4" width="16" height="20" rx="3" />
+                      <rect x="25" y="22" width="10" height="30" rx="2" />
+                      <path d="M25 52 Q18 64 16 80 L44 80 Q42 64 35 52 Z" />
+                      <rect x="16" y="80" width="28" height="72" rx="3" />
+                    </svg>
+                  </div>
+                  <div className="p-5 space-y-2">
+                    <div className="h-4 w-3/4 bg-muted-foreground/20 rounded" />
+                    <div className="h-3 w-1/2 bg-muted-foreground/15 rounded" />
+                    <div className="h-3 w-2/3 bg-muted-foreground/15 rounded" />
+                    <div className="h-3 w-1/4 bg-muted-foreground/10 rounded mt-3" />
+                  </div>
+                </div>
+              ))}
             </div>
-            <p className="font-playfair text-2xl text-[#722F37] italic mb-3">
-              Every great cellar begins with a single bottle.
-            </p>
-            <p className="text-sm text-gray-500 mb-10">
-              Sign in to save discoveries, track favourites, and build your personal collection.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <AuthDialog defaultMode="register">
-                <Button className="bg-[#722F37] hover:bg-[#5d252a] text-white rounded-none px-8 py-3 tracking-wider text-sm">
-                  Create Account
-                </Button>
-              </AuthDialog>
-              <AuthDialog defaultMode="login">
-                <Button variant="outline" className="border-[#722F37]/30 text-[#722F37] hover:bg-[#722F37]/5 rounded-none px-8 py-3 tracking-wider text-sm">
-                  Sign In
-                </Button>
-              </AuthDialog>
+
+            {/* Overlay fade + CTA */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center"
+              style={{ background: "linear-gradient(to bottom, transparent 0%, var(--background) 45%)" }}>
+              <div className="text-center px-6 mt-auto pb-10">
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className="h-px w-10" style={{ background: "linear-gradient(to right, transparent, #722F37)" }} />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#722F37] dark:bg-[#C9A84C]" />
+                  <div className="h-px w-10" style={{ background: "linear-gradient(to left, transparent, #722F37)" }} />
+                </div>
+                <p className="font-playfair text-2xl md:text-3xl text-[#722F37] dark:text-[#C9A84C] italic mb-3">
+                  Every great cellar begins with a single bottle.
+                </p>
+                <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto">
+                  Sign in to save discoveries, track favourites, and build your personal collection.
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <AuthDialog defaultMode="register">
+                    <Button className="bg-[#722F37] hover:bg-[#5d252a] dark:bg-[#C9A84C] dark:hover:bg-[#B8922A] dark:text-[#120810] text-white rounded-none px-8 py-3 tracking-wider text-sm">
+                      Create Account
+                    </Button>
+                  </AuthDialog>
+                  <AuthDialog defaultMode="login">
+                    <Button variant="outline"
+                      className="border-[#722F37]/30 dark:border-[#C9A84C]/30 text-[#722F37] dark:text-[#C9A84C] hover:bg-[#722F37]/5 dark:hover:bg-[#C9A84C]/10 rounded-none px-8 py-3 tracking-wider text-sm">
+                      Sign In
+                    </Button>
+                  </AuthDialog>
+                </div>
+              </div>
             </div>
           </div>
         </div>
