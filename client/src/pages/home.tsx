@@ -1,6 +1,5 @@
-import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Wine, Brain, Camera, Bookmark, Crown, LogOut, User, Star, TrendingUp } from "lucide-react";
+import { Wine, Brain, Camera, Bookmark, Star, TrendingUp } from "lucide-react";
 import logoPath from "@assets/cropped_1749956607943.png";
 import Header from "@/components/header";
 import WineRecommendations from "@/components/wine-recommendations";
@@ -9,15 +8,44 @@ import WineLibrary from "@/components/wine-library";
 import Testimonials from "@/components/testimonials";
 import AuthDialog from "@/components/auth-dialog";
 import EmailSubscriptionForm from "@/components/email-subscription";
-import { useAuth, useLogout } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { useSEO } from "@/hooks/useSEO";
 
-export default function Home() {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const logoutMutation = useLogout();
-  const { toast } = useToast();
+const GOLD = "#C9A84C";
+const GOLD_BRIGHT = "#D4B86A";
+const CHAMPAGNE = "#F5EDD6";
+const CHAMPAGNE_MUTED = "#C5B59A";
+const CHAMPAGNE_SUBTLE = "#7A6A5A";
+const INK_950 = "#050203";
+const INK_900 = "#0a0408";
+const INK_800 = "#130810";
+const INK_700 = "#1c0e17";
+const GOLD_BORDER = "rgba(201, 168, 76, 0.15)";
+const BURGUNDY_GLOW = "rgba(139, 32, 48, 0.4)";
 
+function GoldDivider() {
+  return (
+    <div className="flex items-center justify-center gap-4 mb-6">
+      <div className="h-px w-12" style={{ background: `linear-gradient(to right, transparent, ${GOLD})` }} />
+      <div className="w-1.5 h-1.5 rounded-full" style={{ background: GOLD }} />
+      <div className="h-px w-12" style={{ background: `linear-gradient(to left, transparent, ${GOLD})` }} />
+    </div>
+  );
+}
+
+function SectionLabel({ label }: { label: string }) {
+  return (
+    <div className="flex items-center justify-center gap-3 mb-5">
+      <div className="h-px w-8" style={{ background: GOLD }} />
+      <span className="uppercase tracking-[0.2em] text-[11px] font-medium" style={{ color: GOLD }}>
+        {label}
+      </span>
+      <div className="h-px w-8" style={{ background: GOLD }} />
+    </div>
+  );
+}
+
+export default function Home() {
   useSEO({
     title: "AI Wine Recommendations for Every Occasion",
     description: "What the Wine uses AI to recommend the perfect wine for any occasion, food pairing, or budget. Scan labels, build your cellar, and discover wines loved by the community. Free to start.",
@@ -27,32 +55,36 @@ export default function Home() {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await logoutMutation.mutateAsync();
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+  const features = [
+    {
+      icon: <Brain className="w-7 h-7" />,
+      title: "AI Sommelier",
+      body: "Our AI learns your palate, the occasion, and what's on the menu — so every recommendation is one your guests will remember.",
+    },
+    {
+      icon: <Camera className="w-7 h-7" />,
+      title: "Instant Label Scan",
+      body: "Point your camera at any bottle. Get tasting notes, food pairings, serving temperature, and a vintage score in seconds.",
+    },
+    {
+      icon: <Bookmark className="w-7 h-7" />,
+      title: "Your Private Cellar",
+      body: "Save every bottle that impressed you. Build a personal collection of show-stopping wines, annotated your way.",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-creme-50">
+    <div style={{ background: INK_900 }}>
       <Header onScrollTo={scrollToSection} />
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-burgundy-600 to-burgundy-900 text-white">
-        <div className="absolute inset-0 opacity-60">
+
+      {/* ── HERO ── */}
+      <section className="relative flex items-center justify-center" style={{ minHeight: "100vh" }}>
+        {/* Background image */}
+        <div className="absolute inset-0 overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080"
             alt="Guests raising wine glasses at an elegant dinner party"
@@ -61,317 +93,396 @@ export default function Home() {
             height="1080"
             fetchPriority="high"
           />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(to bottom, ${INK_950}cc 0%, ${INK_950}99 40%, ${INK_900}f0 100%)`,
+            }}
+          />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-burgundy-900/70 to-burgundy-600/70"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="font-playfair text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#391316] leading-tight">Want to Impress Your Guests with the Perfect Wine—Every Time?</h1>
-            <p className="text-xl mb-8 leading-relaxed text-[#391316]">Discover the Secret Sophisticated Hosts Use to Pair the Right Bottle with Every Dish & Occasion</p>
+
+        {/* Content */}
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          <div className="flex items-center justify-center gap-4 mb-10">
+            <div className="h-px w-16" style={{ background: `linear-gradient(to right, transparent, ${GOLD})` }} />
+            <span className="uppercase tracking-[0.25em] text-[11px] font-medium" style={{ color: GOLD }}>
+              Wine Intelligence
+            </span>
+            <div className="h-px w-16" style={{ background: `linear-gradient(to left, transparent, ${GOLD})` }} />
+          </div>
+
+          <h1
+            className="font-playfair font-bold leading-tight mb-8"
+            style={{ color: CHAMPAGNE, fontSize: "clamp(2.5rem, 7vw, 5rem)" }}
+          >
+            The Art of the
+            <br />
+            <span style={{ color: GOLD }}>Perfect Pour</span>
+          </h1>
+
+          <p
+            className="text-lg md:text-xl leading-relaxed mb-12 max-w-2xl mx-auto"
+            style={{ color: CHAMPAGNE_MUTED, fontFamily: "Inter, sans-serif" }}
+          >
+            AI-powered wine recommendations for hosts who refuse to guess.
+            Discover the perfect bottle for every occasion, every time.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => scrollToSection('recommendations')}
-              className="bg-gold-400 hover:bg-gold-500 text-burgundy-900 font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+              onClick={() => scrollToSection("recommendations")}
+              className="px-10 py-6 text-base font-medium rounded-none transition-all duration-300"
+              style={{
+                border: `1px solid ${GOLD}`,
+                color: GOLD,
+                background: "transparent",
+                letterSpacing: "0.05em",
+              }}
             >
-              Get Wine Recommendations
+              Discover Your Wine
             </Button>
+            <AuthDialog defaultMode="register">
+              <Button
+                className="px-10 py-6 text-base font-semibold rounded-none transition-all duration-300"
+                style={{
+                  background: GOLD,
+                  color: INK_950,
+                  letterSpacing: "0.05em",
+                }}
+              >
+                Start Free →
+              </Button>
+            </AuthDialog>
           </div>
+
+          <div
+            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-xs uppercase tracking-widest"
+            style={{ color: CHAMPAGNE_SUBTLE }}
+          >
+            <span>Free to start</span>
+            <span style={{ color: GOLD }}>·</span>
+            <span>AI-powered</span>
+            <span style={{ color: GOLD }}>·</span>
+            <span>No sommelier required</span>
+          </div>
+        </div>
+
+        {/* Scroll cue */}
+        <div
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          style={{ color: CHAMPAGNE_SUBTLE }}
+        >
+          <span className="text-xs uppercase tracking-widest">Explore</span>
+          <div className="w-px h-12 animate-pulse" style={{ background: `linear-gradient(to bottom, ${GOLD}, transparent)` }} />
         </div>
       </section>
 
-      {/* Relatable Story Section */}
-      <section className="py-20 bg-gradient-to-br from-creme-50 to-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-6">
-            <div className="space-y-4 text-lg leading-relaxed text-gray-700">
-              <p className="font-medium">You've spent hours planning the meal…</p>
-              <p className="font-medium">The table is beautifully set…</p>
-              <p className="font-medium">Your friends are laughing in the kitchen…</p>
-            </div>
-            
-            <div className="my-8">
-              <div className="w-16 h-0.5 bg-burgundy-300 mx-auto"></div>
-            </div>
-            
-            <div className="space-y-4 text-lg leading-relaxed text-gray-700">
-              <p className="font-medium text-burgundy-700">But when it's time to pour the wine—</p>
-              <p className="font-medium text-burgundy-700">you hesitate.</p>
-            </div>
-            
-            <div className="bg-burgundy-50 rounded-2xl p-8 my-8">
-              <div className="space-y-3 text-burgundy-600 italic">
-                <p>"Will this go with the salmon?"</p>
-                <p>"Is this too sweet for dinner?"</p>
-                <p>"Do they even like red?"</p>
-              </div>
-            </div>
-            
-            <div className="space-y-6 text-lg leading-relaxed text-gray-700 max-w-3xl mx-auto">
-              <p>
-                We get it. You're not trying to be a sommelier—you just want to feel confident 
-                that the wine you serve will wow your guests and make you look like the host 
-                who has it all together.
-              </p>
-              <p className="text-xl font-semibold text-burgundy-700">
-                That's why we created What the Wine—your personal wine stylist for every occasion.
-              </p>
-            </div>
-          </div>
+      {/* ── HOOK ── */}
+      <section className="py-28" style={{ background: INK_800 }}>
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <GoldDivider />
+          <blockquote
+            className="font-playfair text-2xl md:text-3xl leading-relaxed italic mb-10"
+            style={{ color: CHAMPAGNE }}
+          >
+            "Will this go with the salmon? Is it too sweet for dinner? Do they even like red?"
+          </blockquote>
+          <p className="text-base leading-relaxed mb-6" style={{ color: CHAMPAGNE_MUTED }}>
+            You've spent hours on the meal. The table is set. The guests are arriving. And then — the wine question.
+          </p>
+          <p className="text-lg font-semibold" style={{ color: CHAMPAGNE }}>
+            That moment of hesitation ends here.
+          </p>
         </div>
       </section>
 
-      {/* Wine Recommendations Section */}
-      <div id="recommendations">
-        <WineRecommendations />
-      </div>
-      {/* Wine Scanner Section */}
-      <div id="scanner">
-        <WineScanner />
-      </div>
-      {/* Wine Library Section */}
-      <div id="library">
-        <WineLibrary />
-      </div>
-      {/* Features Section */}
-      <section className="py-20 bg-creme-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── RECOMMENDATIONS ── */}
+      <section className="py-28" style={{ background: INK_900 }}>
+        <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-              Why Choose What The Wine?
+            <SectionLabel label="Step One" />
+            <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-5" style={{ color: CHAMPAGNE }}>
+              Tell Us Your Occasion
             </h2>
-            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              Because you don't have to be a wine expert to serve like one. WTW takes the guesswork out of wine so you can focus on what matters: great company, delicious food, and effortless elegance.
+            <p className="text-base max-w-xl mx-auto" style={{ color: CHAMPAGNE_MUTED }}>
+              Our AI crafts personalised recommendations from your taste, budget, and the moment.
             </p>
-            <p className="text-burgundy-600 font-medium text-lg mt-4">
-              From casual brunch to elegant dinner, we've got your bottle.
+          </div>
+          <div
+            className="overflow-hidden rounded-sm"
+            style={{ border: `1px solid ${GOLD_BORDER}`, background: INK_700 }}
+          >
+            <div id="recommendations">
+              <WineRecommendations />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SCANNER ── */}
+      <section className="py-28" style={{ background: INK_800 }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <SectionLabel label="Step Two" />
+            <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-5" style={{ color: CHAMPAGNE }}>
+              Scan Any Bottle
+            </h2>
+            <p className="text-base max-w-xl mx-auto" style={{ color: CHAMPAGNE_MUTED }}>
+              Point, shoot, impress. Instant tasting notes, expert pairings, and a vintage score in seconds.
+            </p>
+          </div>
+          <div
+            className="overflow-hidden rounded-sm"
+            style={{ border: `1px solid ${GOLD_BORDER}`, background: INK_700 }}
+          >
+            <div id="scanner">
+              <WineScanner />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── LIBRARY ── */}
+      <section className="py-28" style={{ background: INK_900 }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <SectionLabel label="Step Three" />
+            <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-5" style={{ color: CHAMPAGNE }}>
+              Build Your Cellar
+            </h2>
+            <p className="text-base max-w-xl mx-auto" style={{ color: CHAMPAGNE_MUTED }}>
+              Save every favourite. Build a curated collection of wines that have made your evenings memorable.
+            </p>
+          </div>
+          <div
+            className="overflow-hidden rounded-sm"
+            style={{ border: `1px solid ${GOLD_BORDER}`, background: INK_700 }}
+          >
+            <div id="library">
+              <WineLibrary />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FEATURES ── */}
+      <section className="py-28" style={{ background: INK_800 }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <SectionLabel label="Why What the Wine" />
+            <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-5" style={{ color: CHAMPAGNE }}>
+              Crafted for Connoisseurs
+            </h2>
+            <p className="text-base max-w-2xl mx-auto" style={{ color: CHAMPAGNE_MUTED }}>
+              Because great hosts don't guess. WTW removes the uncertainty so you can focus on what matters — unforgettable evenings.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 shadow-sm text-center hover:shadow-md transition-shadow duration-200">
-              <div className="w-16 h-16 bg-burgundy-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Brain className="text-white h-8 w-8" />
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className="p-10 transition-all duration-300 group"
+                style={{
+                  background: INK_700,
+                  borderTop: `2px solid ${GOLD}`,
+                  border: `1px solid ${GOLD_BORDER}`,
+                  borderTopWidth: "2px",
+                  borderTopColor: GOLD,
+                }}
+              >
+                <div className="mb-6" style={{ color: GOLD }}>
+                  {f.icon}
+                </div>
+                <h3 className="font-playfair text-xl font-bold mb-4" style={{ color: CHAMPAGNE }}>
+                  {f.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: CHAMPAGNE_MUTED }}>
+                  {f.body}
+                </p>
               </div>
-              <h3 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
-                Confident Recommendations, Powered by AI
-              </h3>
-              <p className="text-gray-600">
-                Our smart wine assistant learns your taste, the vibe you're going for, and what's on the menu—so you always serve something that impresses.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 shadow-sm text-center hover:shadow-md transition-shadow duration-200">
-              <div className="w-16 h-16 bg-burgundy-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Camera className="text-white h-8 w-8" />
-              </div>
-              <h3 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
-                Snap & Learn in Seconds
-              </h3>
-              <p className="text-gray-600 mb-4 font-medium">
-                Point, shoot, impress.
-              </p>
-              <p className="text-gray-600">
-                Scan any wine label to instantly see flavor notes, expert pairings, and when to serve it. No more guessing in the wine aisle or second-guessing at dinner.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 shadow-sm text-center hover:shadow-md transition-shadow duration-200">
-              <div className="w-16 h-16 bg-burgundy-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Bookmark className="text-white h-8 w-8" />
-              </div>
-              <h3 className="font-playfair text-xl font-semibold text-burgundy-700 mb-4">
-                Your Go-To Wine Collection
-              </h3>
-              <p className="text-gray-600 mb-4 font-medium">
-                Save every favorite you find.
-              </p>
-              <p className="text-gray-600">
-                Keep track of the bottles that wowed your guests, paired perfectly with your meals, or made a night unforgettable. Build your own collection of show-stopping wines.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
-      {/* Testimonials Section */}
-      <Testimonials />
-      {/* Secondary Call to Action Section */}
-      <section className="py-20 bg-gradient-to-r from-burgundy-800 to-burgundy-900 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <defs>
-              <pattern id="wine-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="1.5" fill="white" opacity="0.3"/>
-                <circle cx="5" cy="5" r="1" fill="white" opacity="0.2"/>
-                <circle cx="15" cy="15" r="1" fill="white" opacity="0.2"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#wine-pattern)" />
-          </svg>
-        </div>
-        
-        {/* Wine Bottle Silhouettes */}
-        <div className="absolute left-10 top-10 opacity-5 transform rotate-12">
-          <svg width="60" height="120" viewBox="0 0 60 120" fill="white">
-            <path d="M20 0h20v30l5 5v85h-30V35l5-5V0z"/>
-          </svg>
-        </div>
-        <div className="absolute right-16 bottom-16 opacity-5 transform -rotate-12">
-          <svg width="60" height="120" viewBox="0 0 60 120" fill="white">
-            <path d="M20 0h20v30l5 5v85h-30V35l5-5V0z"/>
-          </svg>
-        </div>
-        
-        {/* Grape Vine Pattern */}
-        <div className="absolute right-10 top-20 opacity-8">
-          <svg width="80" height="100" viewBox="0 0 80 100" fill="white">
-            <circle cx="20" cy="20" r="3"/>
-            <circle cx="25" cy="25" r="3"/>
-            <circle cx="30" cy="20" r="3"/>
-            <circle cx="35" cy="25" r="3"/>
-            <circle cx="22" cy="30" r="3"/>
-            <circle cx="28" cy="32" r="3"/>
-            <circle cx="33" cy="30" r="3"/>
-            <path d="M25 10 Q30 15 35 10" stroke="white" strokeWidth="2" fill="none"/>
-          </svg>
-        </div>
-        
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 bg-[391316]">
-          <div className="mb-8">
-            <h2 className="font-playfair text-4xl font-bold mb-6 text-[#391316]">
-              Ready to Be the Host Who Always Gets the Wine Right?
-            </h2>
 
-            <p className="text-lg max-w-2xl mx-auto mb-8 text-[#391316]">
-              Join hosts everywhere using What the Wine to take the stress out of picking bottles and add a touch of elegance to every occasion—brunches, birthdays, dinner parties, and more.
-            </p>
-            <p className="text-lg font-semibold max-w-2xl mx-auto mb-8 text-[#391316]">
-              Start Curating Your Signature Wine Style Today
-            </p>
+      {/* ── TESTIMONIALS ── */}
+      <section className="py-28" style={{ background: INK_900 }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <SectionLabel label="Members" />
+            <h2 className="font-playfair text-4xl md:text-5xl font-bold" style={{ color: CHAMPAGNE }}>
+              Voices from the Table
+            </h2>
           </div>
-          
+          <Testimonials />
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="py-32 relative overflow-hidden" style={{ background: INK_800 }}>
+        {/* Burgundy glow */}
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        >
+          <div
+            className="w-[700px] h-[500px] rounded-full"
+            style={{
+              background: `radial-gradient(ellipse, ${BURGUNDY_GLOW} 0%, transparent 65%)`,
+            }}
+          />
+        </div>
+        <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
+          <GoldDivider />
+          <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-6 leading-tight" style={{ color: CHAMPAGNE }}>
+            Ready to Be the Host<br />Who Always Gets It Right?
+          </h2>
+          <p className="text-base mb-12 leading-relaxed" style={{ color: CHAMPAGNE_MUTED }}>
+            Join hosts everywhere using What the Wine to take the stress out of picking bottles
+            and add a touch of effortless elegance to every occasion.
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <AuthDialog defaultMode="register">
               <Button
-                size="lg"
-                className="hover:bg-creme-100 px-8 py-3 bg-[#68272d] text-[#FFFFFF]"
+                className="px-12 py-6 text-base font-semibold rounded-none transition-all duration-300"
+                style={{ background: GOLD, color: INK_950, letterSpacing: "0.05em" }}
               >
-                <Wine className="w-5 h-5 mr-2" />
+                <Wine className="w-4 h-4 mr-2" />
                 Start Your Wine Journey
               </Button>
             </AuthDialog>
             <AuthDialog defaultMode="login">
               <Button
-                variant="outline"
-                size="lg"
-                className="border-white text-white hover:bg-white hover:text-burgundy-700 px-8 py-3"
+                className="px-12 py-6 text-base font-medium rounded-none transition-all duration-300"
+                style={{ border: `1px solid ${GOLD}`, color: GOLD, background: "transparent", letterSpacing: "0.05em" }}
               >
-                Sign In to Continue
+                Sign In
               </Button>
             </AuthDialog>
           </div>
         </div>
       </section>
-      {/* Email Signup Section */}
-      <section className="py-16 bg-creme-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
-            <div className="text-center mb-8">
-              <h2 className="font-playfair text-3xl font-bold text-burgundy-700 mb-4">
-                Stay in the Know
+
+      {/* ── NEWSLETTER ── */}
+      <section className="py-24" style={{ background: INK_900 }}>
+        <div className="max-w-2xl mx-auto px-6">
+          <div
+            className="p-12"
+            style={{ border: `1px solid ${GOLD_BORDER}`, background: INK_800 }}
+          >
+            <div className="text-center mb-10">
+              <SectionLabel label="Stay Informed" />
+              <h2 className="font-playfair text-3xl font-bold mb-4" style={{ color: CHAMPAGNE }}>
+                Weekly Wine Intelligence
               </h2>
-              <p className="text-gray-600 text-lg">
-                Get weekly wine recommendations, expert tips, and exclusive offers delivered to your inbox.
+              <p className="text-sm" style={{ color: CHAMPAGNE_MUTED }}>
+                Curated picks, expert insights, and exclusive offers — delivered every week.
               </p>
             </div>
-            
+
             <EmailSubscriptionForm />
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 pt-8 border-t border-gray-200">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Wine className="w-6 h-6 text-burgundy-600" />
+
+            <div className="grid grid-cols-3 gap-6 mt-10 pt-8" style={{ borderTop: `1px solid ${GOLD_BORDER}` }}>
+              {[
+                { icon: <Wine className="w-5 h-5" />, label: "Weekly Picks" },
+                { icon: <Star className="w-5 h-5" />, label: "Expert Tips" },
+                { icon: <TrendingUp className="w-5 h-5" />, label: "Exclusive Offers" },
+              ].map((item) => (
+                <div key={item.label} className="text-center">
+                  <div className="flex justify-center mb-2" style={{ color: GOLD }}>
+                    {item.icon}
+                  </div>
+                  <p className="text-xs uppercase tracking-widest" style={{ color: CHAMPAGNE_SUBTLE }}>
+                    {item.label}
+                  </p>
                 </div>
-                <h3 className="font-semibold text-burgundy-700 mb-2">Weekly Picks</h3>
-                <p className="text-sm text-gray-600">Curated wine selections based on trending tastes</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Star className="w-6 h-6 text-burgundy-600" />
-                </div>
-                <h3 className="font-semibold text-burgundy-700 mb-2">Expert Tips</h3>
-                <p className="text-sm text-gray-600">Professional advice from certified sommeliers</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-burgundy-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <TrendingUp className="w-6 h-6 text-burgundy-600" />
-                </div>
-                <h3 className="font-semibold text-burgundy-700 mb-2">Exclusive Offers</h3>
-                <p className="text-sm text-gray-600">Special discounts and early access to features</p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
-      {/* Footer */}
-      <footer className="bg-burgundy-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+
+      {/* ── FOOTER ── */}
+      <footer className="py-20" style={{ background: INK_950, borderTop: `1px solid ${GOLD_BORDER}` }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="md:col-span-2">
-              <div className="flex items-center space-x-3 mb-4">
-                <img 
-                  src={logoPath} 
-                  alt="What the Wine" 
-                  className="h-8 w-8 object-contain"
-                />
-                <h4 className="font-playfair text-2xl font-bold">What the Wine</h4>
+              <div className="flex items-center gap-3 mb-5">
+                <img src={logoPath} alt="What the Wine" className="h-8 w-8 object-contain" />
+                <span className="font-playfair text-xl font-bold" style={{ color: CHAMPAGNE }}>
+                  What the Wine
+                </span>
               </div>
-              <p className="text-gray-300 mb-6 max-w-md">
-                Your intelligent wine companion for discovering, exploring, and collecting exceptional wines from around the world.
+              <p className="text-sm leading-relaxed mb-6 max-w-xs" style={{ color: CHAMPAGNE_SUBTLE }}>
+                Your personal wine intelligence for every occasion. Powered by AI, guided by taste.
               </p>
+              <div className="flex gap-1">
+                {[GOLD, GOLD, GOLD, "#7A6A5A", "#7A6A5A"].map((c, i) => (
+                  <Star key={i} className="w-4 h-4 fill-current" style={{ color: c }} />
+                ))}
+                <span className="ml-2 text-xs" style={{ color: CHAMPAGNE_SUBTLE }}>Loved by hosts everywhere</span>
+              </div>
             </div>
 
             <div>
-              <h5 className="font-semibold mb-4">Features</h5>
-              <ul className="space-y-2 text-gray-300">
-                <li>
-                  <button 
-                    onClick={() => scrollToSection('recommendations')}
-                    className="hover:text-gold-400 transition-colors text-left"
-                  >
-                    Wine Recommendations
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => scrollToSection('scan')}
-                    className="hover:text-gold-400 transition-colors"
-                  >
-                    Bottle Scanner
-                  </button>
-                </li>
-                <li>
-                  <button 
-                    onClick={() => scrollToSection('library')}
-                    className="hover:text-gold-400 transition-colors"
-                  >
-                    Wine Library
-                  </button>
-                </li>
+              <h5 className="text-xs uppercase tracking-widest mb-6 font-medium" style={{ color: GOLD }}>
+                Features
+              </h5>
+              <ul className="space-y-3">
+                {[
+                  { label: "Wine Recommendations", id: "recommendations" },
+                  { label: "Bottle Scanner", id: "scanner" },
+                  { label: "Wine Library", id: "library" },
+                ].map((item) => (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => scrollToSection(item.id)}
+                      className="text-sm transition-colors duration-200"
+                      style={{ color: CHAMPAGNE_SUBTLE }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = CHAMPAGNE_MUTED)}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = CHAMPAGNE_SUBTLE)}
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
 
             <div>
-              <h5 className="font-semibold mb-4">Support</h5>
-              <ul className="space-y-2 text-gray-300">
-                <li><a href="/help" className="hover:text-gold-400 transition-colors">Help Center</a></li>
-                <li><a href="/contact" className="hover:text-gold-400 transition-colors">Contact Us</a></li>
-                <li><a href="/privacy" className="hover:text-gold-400 transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-gold-400 transition-colors">Terms of Service</a></li>
+              <h5 className="text-xs uppercase tracking-widest mb-6 font-medium" style={{ color: GOLD }}>
+                Company
+              </h5>
+              <ul className="space-y-3">
+                {[
+                  { label: "Help Center", href: "/help" },
+                  { label: "Contact Us", href: "/contact" },
+                  { label: "For Agents", href: "/for-agents" },
+                  { label: "Privacy Policy", href: "/privacy" },
+                  { label: "Terms of Service", href: "/terms" },
+                ].map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      className="text-sm transition-colors duration-200"
+                      style={{ color: CHAMPAGNE_SUBTLE }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = CHAMPAGNE_MUTED)}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = CHAMPAGNE_SUBTLE)}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-burgundy-800 pt-8 text-center text-gray-400">
-            <p>© 2024 What the Wine. All rights reserved. Elevating your wine experience with artificial intelligence.</p>
+          <div
+            className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 text-xs"
+            style={{ borderTop: `1px solid ${GOLD_BORDER}`, color: CHAMPAGNE_SUBTLE }}
+          >
+            <p>© 2024 What the Wine. All rights reserved.</p>
+            <p style={{ color: `rgba(201,168,76,0.4)` }}>Elevating wine discovery with artificial intelligence.</p>
           </div>
         </div>
       </footer>
