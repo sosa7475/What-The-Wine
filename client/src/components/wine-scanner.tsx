@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Camera, Image as ImageIcon, Upload, Loader2 } from "lucide-react";
+import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { analyzeWineBottle, addWineToLibrary } from "@/lib/api";
@@ -144,23 +144,10 @@ export default function WineScanner() {
   return (
     <section id="scan" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-            Scan Wine Bottles
-          </h3>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Snap a photo of any wine bottle and get instant insights—flavor notes, perfect food pairings, and when to serve it.
-          </p>
-        </div>
-
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             {/* Camera Interface */}
             <Card className="bg-white rounded-2xl p-8 shadow-lg">
-              <h4 className="font-playfair text-2xl font-semibold text-burgundy-700 mb-6 text-center">
-                Scan Your Wine
-              </h4>
-              
               <div
                 className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors duration-200 ${
                   dragActive

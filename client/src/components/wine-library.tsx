@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Lock } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -88,30 +88,31 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
     return (
       <section id="library" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-              Your Personal Wine Library
-            </h3>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Keep track of every wine you've loved—so you always know what to bring, pour, or gift.<br />
-              Save your favorites, add tasting notes, and feel confident curating your signature wine list.
+          <div className="max-w-2xl mx-auto text-center py-16">
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <div className="h-px w-12" style={{ background: "linear-gradient(to right, transparent, #722F37)" }} />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#722F37]" />
+              <div className="h-px w-12" style={{ background: "linear-gradient(to left, transparent, #722F37)" }} />
+            </div>
+            <p className="font-playfair text-2xl text-[#722F37] italic mb-3">
+              Every great cellar begins with a single bottle.
             </p>
-          </div>
-
-          <Card className="bg-gradient-to-r from-[#722F37]/10 to-[#F5F5DC]/20 rounded-2xl p-12 text-center max-w-2xl mx-auto border-2 border-[#722F37]/10">
-            <CardContent>
-              <Lock className="w-16 h-16 text-[#722F37] mx-auto mb-6" />
-              <h4 className="text-2xl font-semibold text-[#722F37] mb-4">Sign In Required</h4>
-              <p className="text-gray-600 mb-6">
-                Please sign in to access your personal wine library and save your favorite wines.
-              </p>
+            <p className="text-sm text-gray-500 mb-10">
+              Sign in to save discoveries, track favourites, and build your personal collection.
+            </p>
+            <div className="flex gap-3 justify-center">
               <AuthDialog defaultMode="register">
-                <Button className="bg-[#722F37] hover:bg-[#5d252a] text-white px-8 py-3">
-                  Get Started - It's Free
+                <Button className="bg-[#722F37] hover:bg-[#5d252a] text-white rounded-none px-8 py-3 tracking-wider text-sm">
+                  Create Account
                 </Button>
               </AuthDialog>
-            </CardContent>
-          </Card>
+              <AuthDialog defaultMode="login">
+                <Button variant="outline" className="border-[#722F37]/30 text-[#722F37] hover:bg-[#722F37]/5 rounded-none px-8 py-3 tracking-wider text-sm">
+                  Sign In
+                </Button>
+              </AuthDialog>
+            </div>
+          </div>
         </div>
       </section>
     );
@@ -135,9 +136,7 @@ export default function WineLibrary({ onNavigateToRecommendations }: WineLibrary
   return (
     <section id="library" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-12 space-y-6 lg:space-y-0">
-          <h3 className="font-playfair text-3xl sm:text-4xl font-bold text-burgundy-700">Your Personal Wine Library</h3>
-          
+        <div className="flex flex-col lg:flex-row lg:justify-end lg:items-center mb-12 space-y-6 lg:space-y-0">
           <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
             <div className="relative flex-1 sm:flex-initial">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />

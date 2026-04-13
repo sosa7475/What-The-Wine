@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2, Crown, Lock } from "lucide-react";
+import { Sparkles, Loader2, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -171,116 +171,88 @@ export default function WineRecommendations() {
   return (
     <section id="recommendations" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h3 className="font-playfair text-4xl font-bold text-burgundy-700 mb-4">
-            How It Works
-          </h3>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Tell us about your preferences and we'll suggest three perfect wines for you
-          </p>
-        </div>
 
-        {/* Guest Usage Status for non-authenticated users */}
-        {!isAuthenticated && !isLoading && (
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mb-8 max-w-4xl mx-auto border-2 border-blue-200">
-            <CardContent>
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-semibold text-blue-700">Try Our AI Wine Recommendations</h4>
-                <Sparkles className="w-6 h-6 text-blue-500" />
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Free Guest Recommendations Used:</span>
-                  <span className="font-semibold text-blue-700">{guestRecommendationCount} / 2</span>
-                </div>
-                <div className="w-full bg-blue-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.min((guestRecommendationCount / 2) * 100, 100)}%` }}
-                  ></div>
-                </div>
-                {guestRecommendationCount >= 2 ? (
-                  <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                    <div className="flex items-center gap-2 text-orange-700 mb-2">
-                      <Lock className="w-4 h-4" />
-                      <span className="font-medium">Free trial complete</span>
-                    </div>
-                    <p className="text-sm text-orange-600 mb-3">
-                      Sign up now to get 5 more free recommendations plus the ability to save wines to your library.
-                    </p>
-                    <AuthDialog defaultMode="register">
-                      <Button className="bg-[#722F37] hover:bg-[#5d252a] text-white" size="sm">
-                        <Crown className="w-4 h-4 mr-2" />
-                        Sign Up for Free
-                      </Button>
-                    </AuthDialog>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-600">
-                    Get {2 - guestRecommendationCount} more free recommendation{2 - guestRecommendationCount > 1 ? 's' : ''}, then sign up for 5 additional free recommendations!
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Usage strip — authenticated premium */}
+        {isAuthenticated && user?.isPremium && (
+          <div className="flex items-center justify-center gap-3 mb-10 text-xs uppercase tracking-widest text-[#722F37]">
+            <Crown className="w-3.5 h-3.5" />
+            <span>Unlimited · Premium Member</span>
+          </div>
         )}
 
-        {/* Usage Status for Authenticated Users */}
-        {isAuthenticated && user && (
-          <Card className="bg-gradient-to-r from-[#722F37]/10 to-[#F5F5DC]/20 rounded-2xl p-6 mb-8 max-w-4xl mx-auto border-2 border-[#722F37]/10">
-            <CardContent>
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-semibold text-[#722F37]">Welcome back, {user.firstName}!</h4>
-                {user.isPremium && <Crown className="w-6 h-6 text-yellow-500" />}
+        {/* Usage strip — authenticated free, approaching limit */}
+        {isAuthenticated && user && !user.isPremium && (
+          <div className="max-w-4xl mx-auto mb-10">
+            {(user.recommendationCount || 0) >= 5 ? (
+              <div className="flex items-center justify-between px-6 py-4 border border-[#722F37]/20 bg-[#722F37]/5">
+                <span className="text-sm text-[#722F37]">You've used your 5 complimentary selections.</span>
+                <Button
+                  onClick={() => setShowPaymentDialog(true)}
+                  size="sm"
+                  className="bg-[#722F37] hover:bg-[#5d252a] text-white rounded-none text-xs tracking-wider px-5"
+                >
+                  <Crown className="w-3 h-3 mr-1.5" />
+                  Unlock Unlimited — $3.99
+                </Button>
               </div>
-              {user.isPremium ? (
-                <div className="flex items-center gap-2 text-green-600">
-                  <Crown className="w-5 h-5" />
-                  <span>Premium Member - Unlimited Recommendations</span>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Free Recommendations Used:</span>
-                    <span className="font-semibold text-[#722F37]">{user.recommendationCount || 0} / 5</span>
+            ) : (
+              <div className="flex items-center justify-between px-6 py-3 border-b border-[#722F37]/15">
+                <span className="text-xs uppercase tracking-widest text-gray-400">
+                  Complimentary selections
+                </span>
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-5 h-0.5 transition-colors duration-300"
+                        style={{ background: i < (user.recommendationCount || 0) ? "#722F37" : "#E5E7EB" }}
+                      />
+                    ))}
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-[#722F37] to-[#8B4513] h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(((user.recommendationCount || 0) / 5) * 100, 100)}%` }}
-                    ></div>
-                  </div>
-                  {(user.recommendationCount || 0) >= 5 && (
-                    <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                      <div className="flex items-center gap-2 text-orange-700 mb-2">
-                        <Lock className="w-4 h-4" />
-                        <span className="font-medium">Usage limit reached</span>
-                      </div>
-                      <p className="text-sm text-orange-600 mb-3">
-                        Upgrade to premium for unlimited wine recommendations and advanced features.
-                      </p>
-                      <Button 
-                        onClick={() => setShowPaymentDialog(true)}
-                        className="bg-[#722F37] hover:bg-[#5d252a] text-white"
-                        size="sm"
-                      >
-                        <Crown className="w-4 h-4 mr-2" />
-                        Upgrade to Premium - $3.99
-                      </Button>
-                    </div>
-                  )}
+                  <span className="text-xs text-gray-500">{user.recommendationCount || 0} / 5</span>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Usage strip — guest */}
+        {!isAuthenticated && !isLoading && (
+          <div className="max-w-4xl mx-auto mb-10">
+            {guestRecommendationCount >= 2 ? (
+              <div className="flex items-center justify-between px-6 py-4 border border-[#722F37]/20 bg-[#722F37]/5">
+                <span className="text-sm text-[#722F37]">You've used your 2 complimentary guest selections.</span>
+                <AuthDialog defaultMode="register">
+                  <Button size="sm" className="bg-[#722F37] hover:bg-[#5d252a] text-white rounded-none text-xs tracking-wider px-5">
+                    Create Account — Free
+                  </Button>
+                </AuthDialog>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between px-6 py-3 border-b border-[#722F37]/15">
+                <span className="text-xs uppercase tracking-widest text-gray-400">
+                  Guest selections remaining
+                </span>
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1">
+                    {[...Array(2)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-5 h-0.5 transition-colors duration-300"
+                        style={{ background: i < guestRecommendationCount ? "#722F37" : "#E5E7EB" }}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs text-gray-500">{2 - guestRecommendationCount} remaining</span>
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Preference Form */}
         <Card className="bg-creme-50 rounded-2xl p-8 mb-12 max-w-4xl mx-auto shadow-sm">
-          <h4 className="font-playfair text-2xl font-semibold text-burgundy-700 mb-6 text-center">
-            Your Preferences
-          </h4>
-          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
@@ -313,7 +285,7 @@ export default function WineRecommendations() {
                   name="budget"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Budget Range</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Budget</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-white border-creme-300 focus:ring-burgundy-500">
@@ -322,8 +294,8 @@ export default function WineRecommendations() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="under-25">Under $25</SelectItem>
-                          <SelectItem value="25-50">$25 - $50</SelectItem>
-                          <SelectItem value="50-100">$50 - $100</SelectItem>
+                          <SelectItem value="25-50">$25 – $50</SelectItem>
+                          <SelectItem value="50-100">$50 – $100</SelectItem>
                           <SelectItem value="100+">$100+</SelectItem>
                         </SelectContent>
                       </Select>
@@ -361,7 +333,7 @@ export default function WineRecommendations() {
                   name="wineType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-700">Wine Type Preference</FormLabel>
+                      <FormLabel className="text-sm font-medium text-gray-700">Wine Style</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-white border-creme-300 focus:ring-burgundy-500">
@@ -370,11 +342,11 @@ export default function WineRecommendations() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="no-preference">No preference</SelectItem>
-                          <SelectItem value="red">Red wine</SelectItem>
-                          <SelectItem value="white">White wine</SelectItem>
+                          <SelectItem value="red">Red</SelectItem>
+                          <SelectItem value="white">White</SelectItem>
                           <SelectItem value="rose">Rosé</SelectItem>
                           <SelectItem value="sparkling">Sparkling</SelectItem>
-                          <SelectItem value="dessert">Dessert wine</SelectItem>
+                          <SelectItem value="dessert">Dessert</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormItem>
@@ -387,12 +359,12 @@ export default function WineRecommendations() {
                 name="preferences"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">Additional Notes</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">Notes</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         className="bg-white border-creme-300 focus:ring-burgundy-500 h-24"
-                        placeholder="Tell us more about your taste preferences, favorite regions, or any specific requirements..."
+                        placeholder="Favourite regions, grapes, or anything else worth knowing..."
                       />
                     </FormControl>
                   </FormItem>
@@ -408,12 +380,12 @@ export default function WineRecommendations() {
                   {recommendationMutation.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Generating...
+                      Curating...
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4 mr-2" />
-                      Get My Recommendations
+                      Reveal My Selections
                     </>
                   )}
                 </Button>
