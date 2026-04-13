@@ -61,6 +61,16 @@ export default function Home() {
   const GOLD_SOFT  = "rgba(201,168,76,0.13)";
   const GOLD_MED   = "rgba(201,168,76,0.22)";
 
+  // Inverted accent sections — cream in dark theme, burgundy in light theme
+  const INV_BG       = c.isDark ? "#F0E6D0" : "#5C1A20";     // cream / deep burgundy
+  const INV_BG_ALT   = c.isDark ? "#E8DBBF" : "#4A1520";     // slightly deeper
+  const INV_TEXT     = c.isDark ? "#2E1218" : "#F5EDD6";     // dark wine / champagne
+  const INV_MUTED    = c.isDark ? "#6B3D3D" : "#D4C4A8";     // medium wine / muted champagne
+  const INV_SUBTLE   = c.isDark ? "#9A7070" : "#9A8A7A";     // soft wine / subtle champagne
+  const INV_GOLD     = c.isDark ? "#B8922A" : "#C9A84C";     // darker gold on light / bright gold on dark
+  const INV_BORDER   = c.isDark ? "rgba(184,146,42,0.30)" : "rgba(201,168,76,0.25)";
+  const INV_BTN_TEXT = c.isDark ? "#2E1218" : "#120810";     // dark text on gold button
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -185,26 +195,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── HOOK ── */}
+      {/* ── HOOK — inverted accent (cream in dark / burgundy in light) ── */}
       <section
         className="py-28"
         style={{
-          background: `linear-gradient(180deg, ${BG_WARM} 0%, ${INK_800} 100%)`,
-          borderTop: `1px solid ${GOLD_MED}`,
+          background: `linear-gradient(180deg, ${INV_BG} 0%, ${INV_BG_ALT} 100%)`,
+          borderTop: `1px solid ${INV_BORDER}`,
         }}
       >
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <GoldDivider gold={GOLD} />
+          <GoldDivider gold={INV_GOLD} />
           <blockquote
             className="font-playfair text-2xl md:text-3xl leading-relaxed italic mb-10"
-            style={{ color: CHAMPAGNE }}
+            style={{ color: INV_TEXT }}
           >
             "Will this go with the salmon? Is it too sweet for dinner? Do they even like red?"
           </blockquote>
-          <p className="text-base leading-relaxed mb-6" style={{ color: CHAMPAGNE_MUTED }}>
+          <p className="text-base leading-relaxed mb-6" style={{ color: INV_MUTED }}>
             You've spent hours on the meal. The table is set. The guests are arriving. And then — the wine question.
           </p>
-          <p className="text-lg font-semibold" style={{ color: CHAMPAGNE }}>
+          <p className="text-lg font-semibold" style={{ color: INV_TEXT }}>
             That moment of hesitation ends here.
           </p>
         </div>
@@ -350,12 +360,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA ── */}
+      {/* ── CTA — inverted accent (cream in dark / burgundy in light) ── */}
       <section
         className="py-32 relative overflow-hidden"
         style={{
-          background: `linear-gradient(180deg, ${BG_WARM} 0%, ${BG_MID} 100%)`,
-          borderTop: `1px solid ${GOLD_MED}`,
+          background: `linear-gradient(180deg, ${INV_BG_ALT} 0%, ${INV_BG} 100%)`,
+          borderTop: `1px solid ${INV_BORDER}`,
         }}
       >
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -365,11 +375,11 @@ export default function Home() {
           />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
-          <GoldDivider gold={GOLD} />
-          <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-6 leading-tight" style={{ color: CHAMPAGNE }}>
+          <GoldDivider gold={INV_GOLD} />
+          <h2 className="font-playfair text-4xl md:text-5xl font-bold mb-6 leading-tight" style={{ color: INV_TEXT }}>
             Ready to Be the Host<br />Who Always Gets It Right?
           </h2>
-          <p className="text-base mb-12 leading-relaxed" style={{ color: CHAMPAGNE_MUTED }}>
+          <p className="text-base mb-12 leading-relaxed" style={{ color: INV_MUTED }}>
             Join hosts everywhere using What the Wine to take the stress out of picking bottles
             and add a touch of effortless elegance to every occasion.
           </p>
@@ -377,7 +387,7 @@ export default function Home() {
             <AuthDialog defaultMode="register">
               <Button
                 className="px-12 py-6 text-base font-semibold rounded-none transition-all duration-300"
-                style={{ background: GOLD, color: INK_950, letterSpacing: "0.05em" }}
+                style={{ background: INV_GOLD, color: INV_BTN_TEXT, letterSpacing: "0.05em" }}
               >
                 <Wine className="w-4 h-4 mr-2" />
                 Start Your Wine Journey
@@ -386,7 +396,7 @@ export default function Home() {
             <AuthDialog defaultMode="login">
               <Button
                 className="px-12 py-6 text-base font-medium rounded-none transition-all duration-300"
-                style={{ border: `1px solid ${GOLD}`, color: GOLD, background: "transparent", letterSpacing: "0.05em" }}
+                style={{ border: `1px solid ${INV_GOLD}`, color: INV_GOLD, background: "transparent", letterSpacing: "0.05em" }}
               >
                 Sign In
               </Button>
