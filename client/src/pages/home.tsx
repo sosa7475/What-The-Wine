@@ -54,6 +54,13 @@ export default function Home() {
   const GOLD_BORDER = c.goldBorder;
   const BURGUNDY_GLOW = c.burgundyGlow;
 
+  // Section background variants for visual rhythm
+  const BG_WARM  = c.isDark ? "#1f0e12" : "#FFF4EE";  // warm burgundy blush / peach-cream
+  const BG_COOL  = c.isDark ? "#140d1a" : "#FFFFFF";  // deep cool plum / clean white
+  const BG_MID   = c.isDark ? "#1d1320" : "#F5EEE4";  // balanced mid / deeper cream
+  const GOLD_SOFT  = "rgba(201,168,76,0.13)";
+  const GOLD_MED   = "rgba(201,168,76,0.22)";
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -179,7 +186,13 @@ export default function Home() {
       </section>
 
       {/* ── HOOK ── */}
-      <section className="py-28" style={{ background: INK_800 }}>
+      <section
+        className="py-28"
+        style={{
+          background: `linear-gradient(180deg, ${BG_WARM} 0%, ${INK_800} 100%)`,
+          borderTop: `1px solid ${GOLD_MED}`,
+        }}
+      >
         <div className="max-w-3xl mx-auto px-6 text-center">
           <GoldDivider gold={GOLD} />
           <blockquote
@@ -198,7 +211,7 @@ export default function Home() {
       </section>
 
       {/* ── RECOMMENDATIONS ── */}
-      <section className="py-28" style={{ background: INK_900 }}>
+      <section className="py-28" style={{ background: INK_900, borderTop: `1px solid ${GOLD_SOFT}` }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <SectionLabel label="Step One" gold={GOLD} />
@@ -221,7 +234,13 @@ export default function Home() {
       </section>
 
       {/* ── SCANNER ── */}
-      <section className="py-28" style={{ background: INK_800 }}>
+      <section
+        className="py-28"
+        style={{
+          background: `linear-gradient(180deg, ${BG_COOL} 0%, ${BG_MID} 100%)`,
+          borderTop: `1px solid ${GOLD_MED}`,
+        }}
+      >
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <SectionLabel label="Step Two" gold={GOLD} />
@@ -244,7 +263,7 @@ export default function Home() {
       </section>
 
       {/* ── LIBRARY ── */}
-      <section className="py-28" style={{ background: INK_900 }}>
+      <section className="py-28" style={{ background: INK_900, borderTop: `1px solid ${GOLD_SOFT}` }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <SectionLabel label="Step Three" gold={GOLD} />
@@ -267,7 +286,13 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="py-28" style={{ background: INK_800 }}>
+      <section
+        className="py-28"
+        style={{
+          background: `linear-gradient(135deg, ${BG_WARM} 0%, ${BG_MID} 50%, ${BG_COOL} 100%)`,
+          borderTop: `1px solid ${GOLD_MED}`,
+        }}
+      >
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-20">
             <SectionLabel label="Why What the Wine" gold={GOLD} />
@@ -307,7 +332,13 @@ export default function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="py-28" style={{ background: INK_900 }}>
+      <section
+        className="py-28"
+        style={{
+          background: `linear-gradient(180deg, ${BG_COOL} 0%, ${INK_900} 100%)`,
+          borderTop: `1px solid ${GOLD_MED}`,
+        }}
+      >
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <SectionLabel label="Members" gold={GOLD} />
@@ -320,7 +351,13 @@ export default function Home() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-32 relative overflow-hidden" style={{ background: INK_800 }}>
+      <section
+        className="py-32 relative overflow-hidden"
+        style={{
+          background: `linear-gradient(180deg, ${BG_WARM} 0%, ${BG_MID} 100%)`,
+          borderTop: `1px solid ${GOLD_MED}`,
+        }}
+      >
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
             className="w-[700px] h-[500px] rounded-full"
@@ -359,7 +396,7 @@ export default function Home() {
       </section>
 
       {/* ── NEWSLETTER ── */}
-      <section className="py-24" style={{ background: INK_900 }}>
+      <section className="py-24" style={{ background: INK_900, borderTop: `1px solid ${GOLD_SOFT}` }}>
         <div className="max-w-2xl mx-auto px-6">
           <div className="p-12" style={{ border: `1px solid ${GOLD_BORDER}`, background: INK_800 }}>
             <div className="text-center mb-10">

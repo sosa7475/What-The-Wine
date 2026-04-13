@@ -37,8 +37,16 @@ export default function Dashboard() {
   const INK_950 = c.shade950;
   const INK_900 = c.shade900;
   const INK_800 = c.shade800;
-  const INK_700 = c.shade700;
   const GOLD_BORDER = c.goldBorder;
+
+  // Section/card background variants
+  const BG_WARM = c.isDark ? "#1f0e12" : "#FFF4EE";
+  const BG_COOL = c.isDark ? "#140d1a" : "#FFFFFF";
+  const GOLD_SOFT = "rgba(201,168,76,0.13)";
+  const GOLD_MED  = "rgba(201,168,76,0.22)";
+
+  // Stat card accent colours (left border)
+  const STAT_ACCENTS = [GOLD, "#C4726A", "#7A9E8A"] as const;
 
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -151,7 +159,14 @@ export default function Dashboard() {
     <div className="min-h-screen pt-16" style={{ background: INK_900 }}>
 
       {/* ── GREETING BAR ── */}
-      <div style={{ background: INK_800, borderBottom: `1px solid ${GOLD_BORDER}` }}>
+      <div
+        style={{
+          background: c.isDark
+            ? `linear-gradient(135deg, #241520 0%, #1f0e18 60%, #221420 100%)`
+            : `linear-gradient(135deg, #7A2030 0%, #5C1A20 60%, #6B1E28 100%)`,
+          borderBottom: `1px solid ${GOLD_MED}`,
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -209,15 +224,19 @@ export default function Dashboard() {
               value: user.isPremium ? "Premium" : "Free",
               sub: user.isPremium ? "All features unlocked" : "Upgrade for unlimited",
             },
-          ].map((stat) => (
+          ].map((stat, idx) => (
             <div
               key={stat.label}
               className="px-6 py-5 flex items-center gap-5"
-              style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}
+              style={{
+                background: idx === 1 ? BG_WARM : idx === 2 ? BG_COOL : INK_800,
+                border: `1px solid ${GOLD_BORDER}`,
+                borderLeft: `3px solid ${STAT_ACCENTS[idx]}`,
+              }}
             >
               <div
                 className="w-10 h-10 flex items-center justify-center flex-shrink-0"
-                style={{ background: `rgba(201,168,76,0.1)`, color: GOLD }}
+                style={{ background: `${STAT_ACCENTS[idx]}18`, color: STAT_ACCENTS[idx] }}
               >
                 {stat.icon}
               </div>
@@ -311,7 +330,7 @@ export default function Dashboard() {
 
         {/* ── TAB CONTENT ── */}
         {activeTab === "recommendations" && (
-          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}`, borderTop: `2px solid ${GOLD}` }}>
             <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
               <div className="flex items-center gap-3">
                 <Star className="w-4 h-4" style={{ color: GOLD }} />
@@ -325,10 +344,10 @@ export default function Dashboard() {
         )}
 
         {activeTab === "scanner" && (
-          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+          <div style={{ background: BG_COOL, border: `1px solid ${GOLD_BORDER}`, borderTop: `2px solid #C4726A` }}>
             <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
               <div className="flex items-center gap-3">
-                <Camera className="w-4 h-4" style={{ color: GOLD }} />
+                <Camera className="w-4 h-4" style={{ color: "#C4726A" }} />
                 <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
                   Bottle Scanner
                 </h2>
@@ -339,10 +358,10 @@ export default function Dashboard() {
         )}
 
         {activeTab === "library" && (
-          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+          <div style={{ background: BG_WARM, border: `1px solid ${GOLD_BORDER}`, borderTop: `2px solid #7A9E8A` }}>
             <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
               <div className="flex items-center gap-3">
-                <BookOpen className="w-4 h-4" style={{ color: GOLD }} />
+                <BookOpen className="w-4 h-4" style={{ color: "#7A9E8A" }} />
                 <h2 className="font-playfair text-lg font-bold" style={{ color: CHAMPAGNE }}>
                   My Wine Library
                 </h2>
@@ -353,7 +372,7 @@ export default function Dashboard() {
         )}
 
         {activeTab === "community" && (
-          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}` }}>
+          <div style={{ background: INK_800, border: `1px solid ${GOLD_BORDER}`, borderTop: `2px solid ${GOLD}` }}>
             <div className="px-6 py-5" style={{ borderBottom: `1px solid ${GOLD_BORDER}` }}>
               <div className="flex items-center gap-3">
                 <Users className="w-4 h-4" style={{ color: GOLD }} />
