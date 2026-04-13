@@ -219,8 +219,8 @@ export default function WineRecommendations() {
 
           {/* Occasion tiles */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>The Occasion</p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium text-center" style={{ color: GOLD }}>The Occasion</p>
+            <div className="flex flex-wrap justify-center gap-3">
               {OCCASIONS.map(o => {
                 const active = watched.occasion === o.value;
                 return (
@@ -242,8 +242,8 @@ export default function WineRecommendations() {
 
           {/* Budget pills */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Budget</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium text-center" style={{ color: GOLD }}>Budget</p>
+            <div className="flex flex-wrap justify-center gap-2">
               {BUDGETS.map(b => {
                 const active = watched.budget === b.value;
                 return (
@@ -263,8 +263,8 @@ export default function WineRecommendations() {
 
           {/* Food pairing chips */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Food Pairing</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium text-center" style={{ color: GOLD }}>Food Pairing</p>
+            <div className="flex flex-wrap justify-center gap-2">
               {FOOD_PAIRINGS.map(f => {
                 const active = watched.foodPairing === f.value;
                 return (
@@ -284,8 +284,8 @@ export default function WineRecommendations() {
 
           {/* Wine style with color dots */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Wine Style</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium text-center" style={{ color: GOLD }}>Wine Style</p>
+            <div className="flex flex-wrap justify-center gap-2">
               {WINE_STYLES.map(w => {
                 const active = watched.wineType === w.value;
                 return (
@@ -308,7 +308,7 @@ export default function WineRecommendations() {
 
           {/* Notes */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Notes</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium text-center" style={{ color: GOLD }}>Notes</p>
             <textarea
               {...form.register("preferences")}
               className="w-full bg-card border border-border focus:border-[#722F37] dark:focus:border-[#C9A84C] focus:outline-none p-4 text-sm text-foreground placeholder:text-muted-foreground resize-none transition-colors duration-200 h-20"
