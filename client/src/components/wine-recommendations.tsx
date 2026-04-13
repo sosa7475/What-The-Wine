@@ -13,11 +13,11 @@ import AuthDialog from "./auth-dialog";
 import PaymentDialog from "./payment-dialog";
 
 const OCCASIONS = [
-  { value: "romantic dinner",      label: "Romantic",    icon: "🕯️" },
-  { value: "business dinner",      label: "Business",    icon: "💼" },
-  { value: "casual evening",       label: "Casual",      icon: "🌙" },
-  { value: "special celebration",  label: "Celebration", icon: "🥂" },
-  { value: "wine tasting",         label: "Tasting",     icon: "🍷" },
+  { value: "romantic dinner",     label: "Romantic" },
+  { value: "business dinner",     label: "Business" },
+  { value: "casual evening",      label: "Casual" },
+  { value: "special celebration", label: "Celebration" },
+  { value: "wine tasting",        label: "Tasting" },
 ];
 
 const BUDGETS = [
@@ -28,21 +28,21 @@ const BUDGETS = [
 ];
 
 const FOOD_PAIRINGS = [
-  { value: "red meat",   label: "Red Meat",    icon: "🥩" },
-  { value: "seafood",    label: "Seafood",     icon: "🐟" },
-  { value: "poultry",   label: "Poultry",     icon: "🍗" },
-  { value: "vegetarian", label: "Vegetarian", icon: "🥗" },
-  { value: "cheese",    label: "Cheese",      icon: "🧀" },
-  { value: "dessert",   label: "Dessert",     icon: "🍮" },
+  { value: "red meat",    label: "Red Meat" },
+  { value: "seafood",     label: "Seafood" },
+  { value: "poultry",     label: "Poultry" },
+  { value: "vegetarian",  label: "Vegetarian" },
+  { value: "cheese",      label: "Cheese" },
+  { value: "dessert",     label: "Dessert" },
 ];
 
 const WINE_STYLES = [
-  { value: "no-preference", label: "Any Style",  dot: null },
-  { value: "red",           label: "Red",        dot: "#722F37" },
-  { value: "white",         label: "White",      dot: "#D4C4A8" },
-  { value: "rose",          label: "Rosé",       dot: "#E8A0A0" },
-  { value: "sparkling",     label: "Sparkling",  dot: "#C9A84C" },
-  { value: "dessert",       label: "Dessert",    dot: "#B8720A" },
+  { value: "no-preference", label: "Any Style", dot: null },
+  { value: "red",           label: "Red",       dot: "#722F37" },
+  { value: "white",         label: "White",     dot: "#D4C4A8" },
+  { value: "rose",          label: "Rosé",      dot: "#E8A0A0" },
+  { value: "sparkling",     label: "Sparkling", dot: "#C9A84C" },
+  { value: "dessert",       label: "Dessert",   dot: "#B8720A" },
 ];
 
 export default function WineRecommendations() {
@@ -231,7 +231,6 @@ export default function WineRecommendations() {
                         : "border-border hover:border-[#722F37]/50 bg-card"
                     }`}
                   >
-                    <span className="text-2xl block mb-2 leading-none">{o.icon}</span>
                     <span className={`text-[11px] uppercase tracking-wider ${active ? "text-[#722F37] dark:text-[#C9A84C] font-medium" : "text-muted-foreground"}`}>
                       {o.label}
                     </span>
@@ -262,7 +261,7 @@ export default function WineRecommendations() {
             </div>
           </div>
 
-          {/* Food pairing emoji chips */}
+          {/* Food pairing chips */}
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] mb-4 font-medium" style={{ color: GOLD }}>Food Pairing</p>
             <div className="flex flex-wrap gap-2">
@@ -270,13 +269,13 @@ export default function WineRecommendations() {
                 const active = watched.foodPairing === f.value;
                 return (
                   <button type="button" key={f.value} onClick={() => sel("foodPairing", f.value)}
-                    className={`flex items-center gap-2 px-4 py-2.5 text-sm border transition-all duration-200 ${
+                    className={`px-5 py-2.5 text-sm border transition-all duration-200 ${
                       active
                         ? "border-[#722F37] bg-[#722F37]/10 dark:bg-[#722F37]/20 text-[#722F37] dark:text-[#C9A84C]"
                         : "border-border text-foreground hover:border-[#722F37]/40 bg-card"
                     }`}
                   >
-                    <span>{f.icon}</span><span>{f.label}</span>
+                    {f.label}
                   </button>
                 );
               })}
