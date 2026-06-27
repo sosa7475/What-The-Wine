@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { pgTable, text, serial, integer, boolean, timestamp, real, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -109,6 +110,45 @@ export const recommendationLikes = pgTable("recommendation_likes", {
   recommendationId: integer("recommendation_id").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Blog Posts
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  excerpt: text("excerpt").notNull(),
+  thumbnail: text("thumbnail"),
+  metaDescription: text("meta_description").notNull(),
+  publishedAt: timestamp("published_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
+
+// File Uploads (stored in database)
+export const uploads = pgTable("uploads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  filename: text("filename").notNull(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  data: text("data").notNull(), // Base64-encoded file data
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertUploadSchema = createInsertSchema(uploads).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertUpload = z.infer<typeof insertUploadSchema>;
+export type Upload = typeof uploads.$inferSelect;
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({

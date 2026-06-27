@@ -1,7 +1,10 @@
 import { 
   users, wines, userWineLibrary, wineRecommendations, emailSubscriptions,
   wineReviews, communityRecommendations, reviewComments, recommendationComments, recommendationLikes,
-  type User, type InsertUser, 
+  blogPosts, uploads,
+  type BlogPost, type InsertBlogPost,
+  type Upload, type InsertUpload,
+  type User, type InsertUser,
   type Wine, type InsertWine,
   type UserWineLibrary, type InsertUserWineLibrary,
   type WineRecommendation, type InsertWineRecommendation,
@@ -76,6 +79,16 @@ export interface IStorage {
   // Recommendation like operations
   toggleRecommendationLike(userId: number, recommendationId: number): Promise<boolean>; // returns true if liked, false if unliked
   getRecommendationLikes(recommendationId: number): Promise<RecommendationLike[]>;
+
+  // Blog Posts
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  getAllBlogPosts(): Promise<BlogPost[]>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: string): Promise<boolean>;
+
+  // File Uploads
+  createUpload(upload: InsertUpload): Promise<Upload>;
+  getUpload(id: string): Promise<Upload | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -517,6 +530,43 @@ export class DatabaseStorage implements IStorage {
       .from(recommendationLikes)
       .where(eq(recommendationLikes.recommendationId, recommendationId));
     return likes;
+  }
+
+  // Blog Posts
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const [result] = await db
+      .insert(blogPosts)
+      .values(post)
+      .returning();
+    return result;
+  }
+
+  async getAllBlogPosts(): Promise<BlogPost[]> {
+    return await db.select().from(blogPosts).orderBy(desc(blogPosts.publishedAt));
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post || undefined;
+  }
+
+  async deleteBlogPost(id: string): Promise<boolean> {
+    const result = await db.delete(blogPosts).where(eq(blogPosts.id, id)).returning();
+    return result.length > 0;
+  }
+
+  // File Uploads
+  async createUpload(upload: InsertUpload): Promise<Upload> {
+    const [result] = await db
+      .insert(uploads)
+      .values(upload)
+      .returning();
+    return result;
+  }
+
+  async getUpload(id: string): Promise<Upload | undefined> {
+    const [upload] = await db.select().from(uploads).where(eq(uploads.id, id));
+    return upload || undefined;
   }
 }
 

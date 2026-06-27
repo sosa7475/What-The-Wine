@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, User, LogOut, Crown, Camera, Bookmark, Wine, Moon, Sun } from "lucide-react";
+import { Menu, X, User, LogOut, Crown, Camera, Bookmark, Wine, Moon, Sun, BookOpen } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
@@ -33,17 +33,21 @@ export default function Header({ onScrollTo }: HeaderProps) {
     location.includes("/terms") ||
     location.includes("/for-agents");
 
-  const navigation = isAuthenticated
-    ? [{ name: "Dashboard", id: "dashboard", isRoute: true }]
+  const navigation: { name: string; id: string; isRoute?: boolean; path?: string }[] = isAuthenticated
+    ? [
+        { name: "Dashboard", id: "dashboard", isRoute: true },
+        { name: "Blog", id: "blog", isRoute: true, path: "/blog" },
+      ]
     : [
         { name: "Recommendations", id: "recommendations" },
         { name: "Scanner", id: "scanner" },
         { name: "Library", id: "library" },
+        { name: "Blog", id: "blog", isRoute: true, path: "/blog" },
       ];
 
-  const handleNavigation = (item: { name: string; id: string; isRoute?: boolean }) => {
+  const handleNavigation = (item: { name: string; id: string; isRoute?: boolean; path?: string }) => {
     if (item.isRoute) {
-      setLocation(`/${item.id}`);
+      setLocation(item.path ?? `/${item.id}`);
     } else if (isSupportPage) {
       setLocation("/");
     } else if (isAuthenticated) {
@@ -216,6 +220,7 @@ export default function Header({ onScrollTo }: HeaderProps) {
                   {item.name === "Recommendations" && <Wine className="w-3.5 h-3.5" />}
                   {item.name === "Scanner" && <Camera className="w-3.5 h-3.5" />}
                   {item.name === "Library" && <Bookmark className="w-3.5 h-3.5" />}
+                  {item.name === "Blog" && <BookOpen className="w-3.5 h-3.5" />}
                   {item.name}
                 </button>
               ))}

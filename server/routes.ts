@@ -16,6 +16,50 @@ import {
   insertRecommendationCommentSchema
 } from "@shared/schema";
 import { setAuthCookie, clearAuthCookie, hashPassword, verifyPassword, requireAuth, optionalAuth, generateApiKey } from "./auth";
+import { z } from "zod";
+import { fromError } from "zod-validation-error";
+
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 100);
+}
+
+async function saveBase64ImageToDatabase(base64Data: string, slug: string): Promise<string> {
+  const base64Regex = /^data:image\/(\w+);base64,(.+)$/;
+  const match = base64Data.match(base64Regex);
+
+  let pureBase64: string;
+  let contentType = 'image/png';
+  let extension = 'png';
+
+  if (match) {
+    extension = match[1];
+    contentType = `image/${extension}`;
+    pureBase64 = match[2];
+  } else {
+    pureBase64 = base64Data;
+  }
+
+  // Calculate size from base64 (approximately 3/4 of base64 string length)
+  const size = Math.ceil((pureBase64.length * 3) / 4);
+
+  const filename = `blog-${slug}.${extension}`;
+
+  // Store in database
+  const upload = await storage.createUpload({
+    filename,
+    contentType,
+    size,
+    data: pureBase64,
+  });
+
+  return `/objects/${upload.id}`;
+}
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -1009,6 +1053,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching recommendation comments:", error);
       res.status(500).json({ error: "Failed to fetch recommendation comments" });
+    }
+  });
+
+  // ============ BLOG ROUTES ============
+
+  // Public: Get all blog posts
+  app.get("/api/blog", async (req, res) => {
+    try {
+      const posts = await storage.getAllBlogPosts();
+      res.json({ posts });
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
+  // Public: Get single blog post by slug
+  app.get("/api/blog/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const post = await storage.getBlogPostBySlug(slug);
+      if (!post) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      res.json({ post });
+    } catch (error) {
+      console.error("Error fetching blog post:", error);
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
+
+  // External API: Delete a blog post (secured with the same API key as publish)
+  app.delete("/api/blog/:id", async (req, res) => {
+    try {
+      const apiKey = req.headers["x-api-key"] || (req.headers["authorization"] as string | undefined)?.replace("Bearer ", "");
+      if (!process.env.BLOG_API_KEY) return res.status(500).json({ error: "Server configuration error" });
+      if (!apiKey || apiKey !== process.env.BLOG_API_KEY) return res.status(401).json({ error: "Unauthorized" });
+      const id = req.params.id;
+      const ok = await storage.deleteBlogPost(id);
+      res.status(ok ? 200 : 404).json({ success: ok, id });
+    } catch (error) {
+      console.error("Error deleting blog post:", error);
+      res.status(500).json({ error: "Failed to delete blog post" });
+    }
+  });
+
+  // External API: Publish blog post (secured with API key)
+  const blogPublishSchema = z.object({
+    blog: z.object({
+      title: z.string().min(1, "Title is required"),
+      content: z.string().min(1, "Content is required"),
+      excerpt: z.string().min(1, "Excerpt is required"),
+      thumbnail: z.string().nullable().optional(),
+      metaTag: z.string().min(1, "Meta description is required"),
+    }),
+    businessName: z.string().nullable().optional(),
+    userEmail: z.string().nullable().optional(),
+  });
+
+  app.post("/api/blog/publish", async (req, res) => {
+    try {
+      const apiKey = req.headers["x-api-key"] || (req.headers["authorization"] as string | undefined)?.replace("Bearer ", "");
+
+      if (!apiKey || apiKey !== process.env.BLOG_API_KEY) {
+        return res.status(401).json({ error: "Unauthorized: Invalid API key" });
+      }
+
+      const parsed = blogPublishSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const validationError = fromError(parsed.error);
+        return res.status(400).json({ error: validationError.message });
+      }
+
+      const { blog } = parsed.data;
+
+      let baseSlug = generateSlug(blog.title);
+      let slug = baseSlug;
+      let counter = 1;
+
+      while (await storage.getBlogPostBySlug(slug)) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+
+      let thumbnailPath: string | undefined;
+      if (blog.thumbnail) {
+        try {
+          thumbnailPath = await saveBase64ImageToDatabase(blog.thumbnail, slug);
+        } catch (imgError) {
+          console.error("Error saving thumbnail image:", imgError);
+        }
+      }
+
+      const post = await storage.createBlogPost({
+        slug,
+        title: blog.title,
+        content: blog.content,
+        excerpt: blog.excerpt,
+        thumbnail: thumbnailPath,
+        metaDescription: blog.metaTag,
+        publishedAt: new Date(),
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "Blog post published successfully",
+        post: {
+          id: post.id,
+          slug: post.slug,
+          title: post.title,
+          url: `/blog/${post.slug}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error publishing blog post:", error);
+      res.status(500).json({ error: "Failed to publish blog post" });
+    }
+  });
+
+  // Serve uploaded objects (blog images) from the database
+  app.get("/objects/:id", async (req, res) => {
+    try {
+      const upload = await storage.getUpload(req.params.id);
+      if (!upload) {
+        return res.status(404).json({ error: "Not found" });
+      }
+      const buffer = Buffer.from(upload.data, "base64");
+      res.setHeader("Content-Type", upload.contentType);
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+      res.send(buffer);
+    } catch (error) {
+      console.error("Error serving object:", error);
+      res.status(500).json({ error: "Failed to serve object" });
     }
   });
 
