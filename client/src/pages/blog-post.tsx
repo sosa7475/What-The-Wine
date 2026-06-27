@@ -4,6 +4,7 @@ import { useParams, useLocation, Link } from "wouter";
 import { Loader2, Calendar, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import Header from "@/components/header";
+import { useTheme } from "@/contexts/theme-context";
 import type { BlogPost as BlogPostType } from "@shared/schema";
 
 const SITE_URL = "https://what-the-wine.vercel.app";
@@ -16,6 +17,8 @@ function stripH1(html: string): string {
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
   const [location, setLocation] = useLocation();
+  const { colors: c } = useTheme();
+  const BG = c.isDark ? "#120810" : "#FAF5EC";
 
   const { data, isLoading, error } = useQuery<{ post: BlogPostType }>({
     queryKey: ["/api/blog", slug],
@@ -106,10 +109,10 @@ export default function BlogPost() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen" style={{ background: "#120810" }}>
+      <div className="min-h-screen" style={{ background: BG }}>
         <Header onScrollTo={() => setLocation("/")} />
         <div className="pt-20 flex justify-center items-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#C5B59A" }} />
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: c.gold }} />
         </div>
       </div>
     );
@@ -117,13 +120,13 @@ export default function BlogPost() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen" style={{ background: "#120810" }}>
+      <div className="min-h-screen" style={{ background: BG }}>
         <Header onScrollTo={() => setLocation("/")} />
         <div className="pt-20 flex flex-col justify-center items-center min-h-[60vh] gap-4">
-          <h1 className="font-playfair text-2xl font-bold" style={{ color: "#F5EDD6" }}>
+          <h1 className="font-playfair text-2xl font-bold" style={{ color: c.textPrimary }}>
             Blog Post Not Found
           </h1>
-          <Link href="/blog" className="text-sm hover:underline" style={{ color: "#C5B59A" }}>
+          <Link href="/blog" className="text-sm hover:underline" style={{ color: c.gold }}>
             ← Back to The Cellar
           </Link>
         </div>
@@ -132,7 +135,7 @@ export default function BlogPost() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "#120810" }}>
+    <div className="min-h-screen" style={{ background: BG }}>
       <Header onScrollTo={() => setLocation("/")} />
 
       <article className="pt-16">
@@ -140,7 +143,7 @@ export default function BlogPost() {
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-sm transition-colors mb-8"
-            style={{ color: "#9A8A7A" }}
+            style={{ color: c.textSubtle }}
           >
             <ArrowLeft className="w-4 h-4" />
             Back to The Cellar
@@ -149,7 +152,7 @@ export default function BlogPost() {
           {post.thumbnail && (
             <div
               className="w-full mb-8 overflow-hidden"
-              style={{ border: "1px solid rgba(197,181,154,0.2)" }}
+              style={{ border: `1px solid ${c.goldBorder}` }}
             >
               <img
                 src={post.thumbnail}
@@ -162,7 +165,7 @@ export default function BlogPost() {
           <header className="mb-8">
             <div
               className="flex items-center gap-2 text-sm mb-4"
-              style={{ color: "#9A8A7A" }}
+              style={{ color: c.gold }}
             >
               <Calendar className="w-4 h-4" />
               <time dateTime={String(post.publishedAt)}>
@@ -171,42 +174,42 @@ export default function BlogPost() {
             </div>
             <h1
               className="font-playfair text-3xl md:text-5xl font-bold leading-tight"
-              style={{ color: "#F5EDD6" }}
+              style={{ color: c.textPrimary }}
             >
               {post.title}
             </h1>
           </header>
 
           <div
-            className="prose prose-invert prose-lg max-w-none wtw-prose"
+            className={`prose prose-lg max-w-none wtw-prose ${c.isDark ? "prose-invert" : ""}`}
             dangerouslySetInnerHTML={{ __html: stripH1(post.content) }}
           />
         </div>
       </article>
 
-      {/* Readable prose on the dark burgundy background */}
+      {/* Readable prose that respects the active theme */}
       <style>{`
         .wtw-prose {
-          color: #D8CBB6;
+          color: ${c.textMuted};
         }
         .wtw-prose h2,
         .wtw-prose h3,
         .wtw-prose h4 {
-          color: #F5EDD6;
+          color: ${c.textPrimary};
           font-family: 'Playfair Display', serif;
         }
-        .wtw-prose strong { color: #F5EDD6; }
+        .wtw-prose strong { color: ${c.textPrimary}; }
         .wtw-prose a {
-          color: #C5B59A;
+          color: ${c.gold};
           text-decoration: underline;
         }
-        .wtw-prose a:hover { color: #F5EDD6; }
+        .wtw-prose a:hover { color: ${c.goldBright}; }
         .wtw-prose blockquote {
-          color: #B6A892;
-          border-left-color: #C5B59A;
+          color: ${c.textMuted};
+          border-left-color: ${c.gold};
         }
         .wtw-prose ul > li::marker,
-        .wtw-prose ol > li::marker { color: #C5B59A; }
+        .wtw-prose ol > li::marker { color: ${c.gold}; }
       `}</style>
     </div>
   );
