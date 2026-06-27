@@ -2,8 +2,9 @@ import express from "express";
 import { registerRoutes } from "./routes";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// 10mb so base64 blog thumbnails from the content agent aren't rejected (413).
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: false }));
 
 let initPromise: Promise<void> | null = null;
 
