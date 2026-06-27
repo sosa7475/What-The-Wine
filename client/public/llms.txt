@@ -1,6 +1,6 @@
 # What the Wine
 # llms.txt — Machine-readable platform guide for AI agents and language models
-# https://what-the-wine.vercel.app
+# https://www.whatthewine.com
 
 > What the Wine is an AI-powered wine discovery platform built for both humans and AI agents.
 > It provides personalized wine recommendations, bottle label analysis, a personal wine library,
@@ -26,10 +26,10 @@ food pairing, or preference profile. No sommelier required.
 ---
 
 ## API Reference
-Base URL: https://what-the-wine.vercel.app/api
+Base URL: https://www.whatthewine.com/api
 All responses: application/json
-OpenAPI spec: https://what-the-wine.vercel.app/api/openapi.json
-Agent docs: https://what-the-wine.vercel.app/for-agents
+OpenAPI spec: https://www.whatthewine.com/api/openapi.json
+Agent docs: https://www.whatthewine.com/for-agents
 
 ### Authentication for Agents (API Key)
 
@@ -132,16 +132,16 @@ GET /api/user/api-key
 ## Quick Start (curl)
 
 # 1. Register
-curl -X POST https://what-the-wine.vercel.app/api/auth/register \
+curl -X POST https://www.whatthewine.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"agent@example.com","username":"myagent","firstName":"My","lastName":"Agent","password":"securepass"}'
 
 # 2. Get API key (using session cookie from register response, or log in first)
-curl https://what-the-wine.vercel.app/api/user/api-key \
+curl https://www.whatthewine.com/api/user/api-key \
   -H "Cookie: wtw_auth=<your_cookie>"
 
 # 3. Get recommendations (using API key)
-curl -X POST https://what-the-wine.vercel.app/api/recommendations \
+curl -X POST https://www.whatthewine.com/api/recommendations \
   -H "Authorization: Bearer wtw_<your_key>" \
   -H "Content-Type: application/json" \
   -d '{"wineType":"red","budget":"$20-$40","occasion":"dinner party","foodPairing":"grilled lamb"}'
@@ -152,7 +152,7 @@ curl -X POST https://what-the-wine.vercel.app/api/recommendations \
 - The /api/recommendations endpoint is the primary entry point for AI workflows
 - API keys are stable Bearer tokens — no OAuth flow, no redirects
 - All endpoints return structured JSON; no scraping required
-- Full machine-readable spec: https://what-the-wine.vercel.app/api/openapi.json
+- Full machine-readable spec: https://www.whatthewine.com/api/openapi.json
 - For tool-use agents: the RecommendationRequest schema maps cleanly to function call parameters
 
 ## Pricing
@@ -160,10 +160,10 @@ curl -X POST https://what-the-wine.vercel.app/api/recommendations \
 - Premium: $3.99/month — unlimited recommendations, bottle scanning, full library access
 
 ## Contact & Support
-- Agent docs: https://what-the-wine.vercel.app/for-agents
-- Web: https://what-the-wine.vercel.app/contact
-- Help: https://what-the-wine.vercel.app/help
+- Agent docs: https://www.whatthewine.com/for-agents
+- Web: https://www.whatthewine.com/contact
+- Help: https://www.whatthewine.com/help
 
 ## Legal
-- Privacy: https://what-the-wine.vercel.app/privacy
-- Terms: https://what-the-wine.vercel.app/terms
+- Privacy: https://www.whatthewine.com/privacy
+- Terms: https://www.whatthewine.com/terms

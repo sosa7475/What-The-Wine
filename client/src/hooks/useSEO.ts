@@ -13,7 +13,7 @@ interface SEOOptions {
 }
 
 const SITE_NAME = "What the Wine";
-const BASE_URL = "https://what-the-wine.vercel.app";
+const BASE_URL = "https://www.whatthewine.com";
 const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.jpg`;
 
 function upsertMeta(selector: string, attr: string, value: string) {

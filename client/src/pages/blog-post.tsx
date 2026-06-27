@@ -7,7 +7,7 @@ import Header from "@/components/header";
 import { useTheme } from "@/contexts/theme-context";
 import type { BlogPost as BlogPostType } from "@shared/schema";
 
-const SITE_URL = "https://what-the-wine.vercel.app";
+const SITE_URL = "https://www.whatthewine.com";
 
 // Remove any <h1>...</h1> from the body so the page has exactly one H1 (the title)
 function stripH1(html: string): string {

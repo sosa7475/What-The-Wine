@@ -1,5 +1,5 @@
 # What the Wine — robots.txt
-# https://what-the-wine.vercel.app
+# https://www.whatthewine.com
 
 User-agent: *
 Allow: /
@@ -28,4 +28,4 @@ Allow: /
 User-agent: Googlebot
 Allow: /
 
-Sitemap: https://what-the-wine.vercel.app/sitemap.xml
+Sitemap: https://www.whatthewine.com/sitemap.xml

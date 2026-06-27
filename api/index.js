@@ -15,13 +15,16 @@ import Stripe from "stripe";
 // shared/schema.ts
 var schema_exports = {};
 __export(schema_exports, {
+  blogPosts: () => blogPosts,
   communityRecommendations: () => communityRecommendations,
   emailSubscriptions: () => emailSubscriptions,
+  insertBlogPostSchema: () => insertBlogPostSchema,
   insertCommunityRecommendationSchema: () => insertCommunityRecommendationSchema,
   insertEmailSubscriptionSchema: () => insertEmailSubscriptionSchema,
   insertRecommendationCommentSchema: () => insertRecommendationCommentSchema,
   insertRecommendationLikeSchema: () => insertRecommendationLikeSchema,
   insertReviewCommentSchema: () => insertReviewCommentSchema,
+  insertUploadSchema: () => insertUploadSchema,
   insertUserSchema: () => insertUserSchema,
   insertUserWineLibrarySchema: () => insertUserWineLibrarySchema,
   insertWineRecommendationSchema: () => insertWineRecommendationSchema,
@@ -32,6 +35,7 @@ __export(schema_exports, {
   recommendationLikes: () => recommendationLikes,
   registerUserSchema: () => registerUserSchema,
   reviewComments: () => reviewComments,
+  uploads: () => uploads,
   userWineLibrary: () => userWineLibrary,
   users: () => users,
   winePreferencesSchema: () => winePreferencesSchema,
@@ -39,7 +43,8 @@ __export(schema_exports, {
   wineReviews: () => wineReviews,
   wines: () => wines
 });
-import { pgTable, text, serial, integer, boolean, timestamp, real } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, text, serial, integer, boolean, timestamp, real, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 var users = pgTable("users", {
@@ -146,6 +151,34 @@ var recommendationLikes = pgTable("recommendation_likes", {
   recommendationId: integer("recommendation_id").notNull(),
   createdAt: timestamp("created_at").defaultNow()
 });
+var blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  excerpt: text("excerpt").notNull(),
+  thumbnail: text("thumbnail"),
+  metaDescription: text("meta_description").notNull(),
+  publishedAt: timestamp("published_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow()
+});
+var insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true
+});
+var uploads = pgTable("uploads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  filename: text("filename").notNull(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  data: text("data").notNull(),
+  // Base64-encoded file data
+  createdAt: timestamp("created_at").notNull().defaultNow()
+});
+var insertUploadSchema = createInsertSchema(uploads).omit({
+  id: true,
+  createdAt: true
+});
 var insertUserSchema = createInsertSchema(users).pick({
   email: true,
   username: true,
@@ -226,7 +259,7 @@ var pool = new Pool({ connectionString: process.env.DATABASE_URL });
 var db = drizzle({ client: pool, schema: schema_exports });
 
 // server/storage.ts
-import { eq, and, desc, sql, ilike, or } from "drizzle-orm";
+import { eq, and, desc, sql as sql2, ilike, or } from "drizzle-orm";
 var DatabaseStorage = class {
   async getUser(id) {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -249,7 +282,7 @@ var DatabaseStorage = class {
     return user;
   }
   async updateUserRecommendationCount(userId) {
-    const [user] = await db.update(users).set({ recommendationCount: sql`${users.recommendationCount} + 1` }).where(eq(users.id, userId)).returning();
+    const [user] = await db.update(users).set({ recommendationCount: sql2`${users.recommendationCount} + 1` }).where(eq(users.id, userId)).returning();
     return user;
   }
   async updateUserPremiumStatus(userId, isPremium) {
@@ -483,17 +516,42 @@ var DatabaseStorage = class {
     const existingLike = await db.select().from(recommendationLikes).where(and(eq(recommendationLikes.userId, userId), eq(recommendationLikes.recommendationId, recommendationId)));
     if (existingLike.length > 0) {
       await db.delete(recommendationLikes).where(and(eq(recommendationLikes.userId, userId), eq(recommendationLikes.recommendationId, recommendationId)));
-      await db.update(communityRecommendations).set({ likesCount: sql`${communityRecommendations.likesCount} - 1` }).where(eq(communityRecommendations.id, recommendationId));
+      await db.update(communityRecommendations).set({ likesCount: sql2`${communityRecommendations.likesCount} - 1` }).where(eq(communityRecommendations.id, recommendationId));
       return false;
     } else {
       await db.insert(recommendationLikes).values({ userId, recommendationId });
-      await db.update(communityRecommendations).set({ likesCount: sql`${communityRecommendations.likesCount} + 1` }).where(eq(communityRecommendations.id, recommendationId));
+      await db.update(communityRecommendations).set({ likesCount: sql2`${communityRecommendations.likesCount} + 1` }).where(eq(communityRecommendations.id, recommendationId));
       return true;
     }
   }
   async getRecommendationLikes(recommendationId) {
     const likes = await db.select().from(recommendationLikes).where(eq(recommendationLikes.recommendationId, recommendationId));
     return likes;
+  }
+  // Blog Posts
+  async createBlogPost(post) {
+    const [result] = await db.insert(blogPosts).values(post).returning();
+    return result;
+  }
+  async getAllBlogPosts() {
+    return await db.select().from(blogPosts).orderBy(desc(blogPosts.publishedAt));
+  }
+  async getBlogPostBySlug(slug) {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post || void 0;
+  }
+  async deleteBlogPost(id) {
+    const result = await db.delete(blogPosts).where(eq(blogPosts.id, id)).returning();
+    return result.length > 0;
+  }
+  // File Uploads
+  async createUpload(upload2) {
+    const [result] = await db.insert(uploads).values(upload2).returning();
+    return result;
+  }
+  async getUpload(id) {
+    const [upload2] = await db.select().from(uploads).where(eq(uploads.id, id));
+    return upload2 || void 0;
   }
 };
 var storage = new DatabaseStorage();
@@ -756,6 +814,34 @@ var optionalAuth = async (req, res, next) => {
 };
 
 // server/routes.ts
+import { z as z2 } from "zod";
+import { fromError } from "zod-validation-error";
+function generateSlug(title) {
+  return title.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "").substring(0, 100);
+}
+async function saveBase64ImageToDatabase(base64Data, slug) {
+  const base64Regex = /^data:image\/(\w+);base64,(.+)$/;
+  const match = base64Data.match(base64Regex);
+  let pureBase64;
+  let contentType = "image/png";
+  let extension = "png";
+  if (match) {
+    extension = match[1];
+    contentType = `image/${extension}`;
+    pureBase64 = match[2];
+  } else {
+    pureBase64 = base64Data;
+  }
+  const size = Math.ceil(pureBase64.length * 3 / 4);
+  const filename = `blog-${slug}.${extension}`;
+  const upload2 = await storage.createUpload({
+    filename,
+    contentType,
+    size,
+    data: pureBase64
+  });
+  return `/objects/${upload2.id}`;
+}
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing required Stripe secret: STRIPE_SECRET_KEY");
 }
@@ -1580,14 +1666,126 @@ ${urls}
       res.status(500).json({ error: "Failed to fetch recommendation comments" });
     }
   });
+  app2.get("/api/blog", async (req, res) => {
+    try {
+      const posts = await storage.getAllBlogPosts();
+      res.json({ posts });
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+  app2.get("/api/blog/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const post = await storage.getBlogPostBySlug(slug);
+      if (!post) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      res.json({ post });
+    } catch (error) {
+      console.error("Error fetching blog post:", error);
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
+  app2.delete("/api/blog/:id", async (req, res) => {
+    try {
+      const apiKey = req.headers["x-api-key"] || req.headers["authorization"]?.replace("Bearer ", "");
+      if (!process.env.BLOG_API_KEY) return res.status(500).json({ error: "Server configuration error" });
+      if (!apiKey || apiKey !== process.env.BLOG_API_KEY) return res.status(401).json({ error: "Unauthorized" });
+      const id = req.params.id;
+      const ok = await storage.deleteBlogPost(id);
+      res.status(ok ? 200 : 404).json({ success: ok, id });
+    } catch (error) {
+      console.error("Error deleting blog post:", error);
+      res.status(500).json({ error: "Failed to delete blog post" });
+    }
+  });
+  const blogPublishSchema = z2.object({
+    blog: z2.object({
+      title: z2.string().min(1, "Title is required"),
+      content: z2.string().min(1, "Content is required"),
+      excerpt: z2.string().min(1, "Excerpt is required"),
+      thumbnail: z2.string().nullable().optional(),
+      metaTag: z2.string().min(1, "Meta description is required")
+    }),
+    businessName: z2.string().nullable().optional(),
+    userEmail: z2.string().nullable().optional()
+  });
+  app2.post("/api/blog/publish", async (req, res) => {
+    try {
+      const apiKey = req.headers["x-api-key"] || req.headers["authorization"]?.replace("Bearer ", "");
+      if (!apiKey || apiKey !== process.env.BLOG_API_KEY) {
+        return res.status(401).json({ error: "Unauthorized: Invalid API key" });
+      }
+      const parsed = blogPublishSchema.safeParse(req.body);
+      if (!parsed.success) {
+        const validationError = fromError(parsed.error);
+        return res.status(400).json({ error: validationError.message });
+      }
+      const { blog } = parsed.data;
+      let baseSlug = generateSlug(blog.title);
+      let slug = baseSlug;
+      let counter = 1;
+      while (await storage.getBlogPostBySlug(slug)) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      let thumbnailPath;
+      if (blog.thumbnail) {
+        try {
+          thumbnailPath = await saveBase64ImageToDatabase(blog.thumbnail, slug);
+        } catch (imgError) {
+          console.error("Error saving thumbnail image:", imgError);
+        }
+      }
+      const post = await storage.createBlogPost({
+        slug,
+        title: blog.title,
+        content: blog.content,
+        excerpt: blog.excerpt,
+        thumbnail: thumbnailPath,
+        metaDescription: blog.metaTag,
+        publishedAt: /* @__PURE__ */ new Date()
+      });
+      res.status(201).json({
+        success: true,
+        message: "Blog post published successfully",
+        post: {
+          id: post.id,
+          slug: post.slug,
+          title: post.title,
+          url: `/blog/${post.slug}`
+        }
+      });
+    } catch (error) {
+      console.error("Error publishing blog post:", error);
+      res.status(500).json({ error: "Failed to publish blog post" });
+    }
+  });
+  app2.get("/objects/:id", async (req, res) => {
+    try {
+      const upload2 = await storage.getUpload(req.params.id);
+      if (!upload2) {
+        return res.status(404).json({ error: "Not found" });
+      }
+      const buffer = Buffer.from(upload2.data, "base64");
+      res.setHeader("Content-Type", upload2.contentType);
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+      res.send(buffer);
+    } catch (error) {
+      console.error("Error serving object:", error);
+      res.status(500).json({ error: "Failed to serve object" });
+    }
+  });
   const httpServer = createServer(app2);
   return httpServer;
 }
 
 // server/vercel-entry.ts
 var app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: false }));
 var initPromise = null;
 function init() {
   if (!initPromise) {

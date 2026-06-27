@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { Copy, Check, ExternalLink, Zap, Code2, Key, Globe } from "lucide-react";
 
-const BASE = "https://what-the-wine.vercel.app";
+const BASE = "https://www.whatthewine.com";
 
 const CURL_REGISTER = `curl -X POST ${BASE}/api/auth/register \\
   -H "Content-Type: application/json" \\
@@ -36,7 +36,7 @@ const CURL_RECOMMEND = `curl -X POST ${BASE}/api/recommendations \\
 const PYTHON_EXAMPLE = `import requests
 
 API_KEY = "wtw_<your_api_key>"
-BASE_URL = "https://what-the-wine.vercel.app/api"
+BASE_URL = "https://www.whatthewine.com/api"
 
 def recommend_wine(occasion, food, budget="$20-$40", wine_type="red"):
     resp = requests.post(
@@ -245,7 +245,7 @@ export default function ForAgents() {
           <div>
             <p className="text-gray-400 text-sm mb-3">
               <span className="text-white font-medium">Step 1</span> — Register an account (or log in at{" "}
-              <a href="/" className="text-burgundy-400 hover:underline">what-the-wine.vercel.app</a>)
+              <a href="/" className="text-burgundy-400 hover:underline">www.whatthewine.com</a>)
             </p>
             <CodeBlock code={CURL_REGISTER} />
           </div>
